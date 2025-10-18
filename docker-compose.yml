@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   redis:
     image: redis:7-alpine
@@ -19,6 +17,15 @@ services:
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - REDIS_URL=redis://redis:6379/0
+      # 🚀 메모리 최적화 환경변수
+      - CLIP_MODEL=ViT-B/32
+      - CLIP_BATCH_SIZE=4
+      - YOLO_IMG_SIZE=256
+      - MAX_IMAGE_SIZE=256
+      - MAX_HOLDS=20
+      - OMP_NUM_THREADS=1
+      - MKL_NUM_THREADS=1
+      - NUMEXPR_NUM_THREADS=1
     volumes:
       - ./backend/climbmate.db:/app/backend/climbmate.db
       - ./backend/models:/app/backend/models
@@ -26,6 +33,12 @@ services:
     depends_on:
       - redis
     restart: unless-stopped
+    # 🚀 로그 로테이션 설정
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
       interval: 30s
@@ -36,10 +49,19 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: celery -A celery_app worker --loglevel=info
+    command: celery -A celery_app worker --loglevel=info --concurrency=1
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - REDIS_URL=redis://redis:6379/0
+      # 🚀 메모리 최적화 환경변수
+      - CLIP_MODEL=ViT-B/32
+      - CLIP_BATCH_SIZE=4
+      - YOLO_IMG_SIZE=256
+      - MAX_IMAGE_SIZE=256
+      - MAX_HOLDS=20
+      - OMP_NUM_THREADS=1
+      - MKL_NUM_THREADS=1
+      - NUMEXPR_NUM_THREADS=1
     volumes:
       - ./backend/climbmate.db:/app/backend/climbmate.db
       - ./backend/models:/app/backend/models
@@ -48,6 +70,12 @@ services:
       - redis
       - backend
     restart: unless-stopped
+    # 🚀 로그 로테이션 설정
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   frontend:
     build:

@@ -30,11 +30,13 @@ celery_app.conf.update(
     timezone='Asia/Seoul',
     enable_utc=True,
     task_track_started=True,
-    task_time_limit=300,  # 5분 제한
-    task_soft_time_limit=240,  # 4분 소프트 제한
+    task_time_limit=180,  # 3분 제한 (더 짧게)
+    task_soft_time_limit=150,  # 2.5분 소프트 제한
     worker_prefetch_multiplier=1,  # 한 번에 하나의 작업만 처리
     task_acks_late=True,  # 작업 완료 후에만 ACK
-    worker_max_tasks_per_child=10,  # 메모리 누수 방지
+    worker_max_tasks_per_child=5,  # 메모리 누수 방지 (더 자주 재시작)
+    worker_max_memory_per_child=200000,  # 200MB 제한
+    result_expires=3600,  # 결과 1시간 후 만료
 )
 
 # Redis 클라이언트 (작업 상태 저장용)
