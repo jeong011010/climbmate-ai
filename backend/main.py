@@ -103,7 +103,7 @@ async def analyze_image(
         print(f"🔍 홀드 감지 시작...")
         hold_data_raw, masks = preprocess(
             image,
-            model_path="/app/holdcheck/roboflow_weights/weights.pt",
+            model_path="/app/holdcheck/yolov8n.pt",
             mask_refinement=1,  # 속도 우선
             conf=0.4,  # 확실한 홀드만
             use_clip_ai=True
@@ -446,7 +446,7 @@ async def analyze_image_stream(
             # 🚀 최적화: 전처리 (홀드 감지)
             hold_data_raw, masks = preprocess(
                 image,
-                model_path="/app/holdcheck/roboflow_weights/weights.pt",
+                model_path="/app/holdcheck/yolov8n.pt",
                 mask_refinement=1,  # 속도 우선
                 conf=0.4,  # 확실한 홀드만
                 use_clip_ai=True
