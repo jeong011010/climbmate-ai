@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://climbmate.store'
 
@@ -96,8 +96,8 @@ function App() {
     }
   }
 
-  // 🚀 OpenAI Vision API 분석 (무제한 동시 처리)
-  const analyzeImageOpenAI = async () => {
+  // 🚀 클라이언트 사이드 AI 분석 (사용자 브라우저에서 처리)
+  const analyzeImageClientSide = async () => {
     if (!image) return
 
     setLoading(true)
@@ -108,44 +108,40 @@ function App() {
     setResult(null)
 
     try {
-      const formData = new FormData()
-      formData.append('file', image)
-      if (wallAngle) formData.append('wall_angle', wallAngle)
+      console.log('🚀 클라이언트 사이드 AI 분석 시작...')
+      setCurrentAnalysisStep('사용자 브라우저에서 AI 모델 로딩 중...')
+      setLoadingProgress(20)
 
-      console.log('🚀 OpenAI Vision 분석 시작...')
-      setCurrentAnalysisStep('OpenAI Vision API로 분석 중...')
+      // 클라이언트 AI 분석기 로드
+      const { default: ClientAIAnalyzer } = await import('./clientAI.js')
+      const analyzer = new ClientAIAnalyzer()
 
-      const response = await fetch(`${API_URL}/api/analyze-openai`, {
-        method: 'POST',
-        body: formData
-      })
+      setCurrentAnalysisStep('AI 모델 로딩 중...')
+      setLoadingProgress(40)
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
+      // 사용자 브라우저에서 직접 분석
+      const result = await analyzer.analyzeImage(image)
 
-      const data = await response.json()
-      
       setLoading(false)
       setCurrentAnalysisStep('분석 완료!')
-      setResult(data)
+      setResult(result)
 
       // 통계 업데이트
-      if (data.statistics) {
-        setDetectedHolds(data.statistics.total_holds || 0)
-        setDetectedProblems(data.statistics.total_problems || 0)
+      if (result.statistics) {
+        setDetectedHolds(result.statistics.total_holds || 0)
+        setDetectedProblems(result.statistics.total_problems || 0)
       }
 
       // 히스토리에 저장
-      saveToHistory(data)
+      saveToHistory(result)
 
-      console.log('✅ OpenAI 분석 완료:', data)
+      console.log('✅ 클라이언트 사이드 분석 완료:', result)
 
     } catch (error) {
-      console.error('❌ OpenAI 분석 실패:', error)
+      console.error('❌ 클라이언트 사이드 분석 실패:', error)
       setLoading(false)
       setCurrentAnalysisStep('분석 실패')
-      alert(`❌ OpenAI 분석 실패: ${error.message}`)
+      alert(`❌ 클라이언트 사이드 분석 실패: ${error.message}`)
     }
   }
 
