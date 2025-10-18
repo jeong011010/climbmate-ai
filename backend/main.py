@@ -358,6 +358,77 @@ async def health_check():
         "timestamp": psutil.time.time()
     }
 
+# 🚀 CLIP 색상 분석 API (서버에서 실행)
+class ColorAnalysisRequest(BaseModel):
+    holds: list
+    image_data_base64: str
+
+@app.post("/api/analyze-colors")
+async def analyze_colors_with_clip(request: ColorAnalysisRequest):
+    """
+    🎨 CLIP 모델로 홀드 색상 분석 (서버에서 실행)
+    브라우저: YOLO로 홀드 감지 → 서버: CLIP으로 색상 분석
+    """
+    try:
+        from holdcheck.preprocess import get_clip_model, extract_color_with_clip_ai
+        
+        # 이미지 디코딩
+        image_data = base64.b64decode(request.image_data_base64)
+        from PIL import Image
+        import io
+        
+        pil_image = Image.open(io.BytesIO(image_data))
+        image = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
+        
+        # CLIP 모델 로드
+        clip_model, clip_preprocess, clip_device = get_clip_model()
+        
+        colored_holds = []
+        
+        for hold in request.holds:
+            try:
+                # 홀드 영역 추출
+                x, y, w, h = int(hold['x']), int(hold['y']), int(hold['width']), int(hold['height'])
+                
+                # 경계 체크
+                x = max(0, min(x, image.shape[1] - 1))
+                y = max(0, min(y, image.shape[0] - 1))
+                w = max(1, min(w, image.shape[1] - x))
+                h = max(1, min(h, image.shape[0] - y))
+                
+                hold_image = image[y:y+h, x:x+w]
+                
+                if hold_image.size == 0:
+                    colored_holds.append({**hold, 'color': 'unknown'})
+                    continue
+                
+                # CLIP으로 색상 분석
+                color = extract_color_with_clip_ai(hold_image, None, clip_model, clip_preprocess, clip_device)
+                
+                colored_holds.append({
+                    **hold,
+                    'color': color
+                })
+                
+            except Exception as e:
+                print(f"⚠️ 홀드 색상 분석 실패: {e}")
+                colored_holds.append({
+                    **hold,
+                    'color': 'unknown'
+                })
+        
+        return {
+            "success": True,
+            "colored_holds": colored_holds,
+            "message": f"✅ CLIP으로 {len(colored_holds)}개 홀드 색상 분석 완료"
+        }
+        
+    except Exception as e:
+        print(f"❌ CLIP 색상 분석 실패: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"CLIP color analysis failed: {str(e)}")
+
 # 기존 API들 (데이터베이스, 통계 등)은 그대로 유지
 @app.post("/api/analyze-openai")
 async def analyze_with_openai(

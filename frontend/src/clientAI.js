@@ -172,45 +172,48 @@ class ClientAIAnalyzer {
   }
 
   /**
-   * CLIP으로 색상 분석
+   * 서버 CLIP API로 색상 분석
    */
-  async analyzeColorsWithCLIP(imageElement, holds) {
-    if (!this.clipSession) {
-      return this.analyzeColorsMock(holds);
-    }
-
+  async analyzeColorsWithServerCLIP(imageElement, holds) {
     try {
-      console.log('🎨 CLIP으로 색상 분석 중...');
+      console.log('🎨 서버 CLIP API로 색상 분석 중...');
       
-      const coloredHolds = [];
+      // 이미지를 Base64로 변환
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = imageElement.width;
+      canvas.height = imageElement.height;
+      ctx.drawImage(imageElement, 0, 0);
+      const imageDataBase64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
       
-      for (const hold of holds) {
-        // 홀드 영역 추출 및 224x224로 리사이즈
-        const holdCanvas = this.extractHoldRegion(imageElement, hold, 224);
-        const holdTensor = await this.imageToTensor(holdCanvas, 224);
-        
-        // CLIP 추론
-        const feeds = {
-          'input': new this.ort.Tensor('float32', holdTensor, [1, 3, 224, 224])
-        };
-        
-        const results = await this.clipSession.run(feeds);
-        const features = results[Object.keys(results)[0]].data;
-        
-        // 색상 결정 (특징 벡터 기반)
-        const color = this.determineColorFromFeatures(features);
-        
-        coloredHolds.push({
-          ...hold,
-          color: color
-        });
+      // 서버 CLIP API 호출
+      const response = await fetch('/api/analyze-colors', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          holds: holds,
+          image_data_base64: imageDataBase64
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Server CLIP API error: ${response.status}`);
       }
       
-      console.log('✅ CLIP: 색상 분석 완료');
-      return coloredHolds;
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log(`✅ 서버 CLIP: ${result.colored_holds.length}개 홀드 색상 분석 완료`);
+        return result.colored_holds;
+      } else {
+        throw new Error('Server CLIP API returned error');
+      }
       
     } catch (error) {
-      console.error('❌ CLIP 추론 실패:', error);
+      console.error('❌ 서버 CLIP API 실패:', error);
+      console.log('⚠️ Mock 색상 분석으로 전환');
       return this.analyzeColorsMock(holds);
     }
   }
@@ -379,8 +382,8 @@ class ClientAIAnalyzer {
       // YOLO로 홀드 감지
       const holds = await this.detectHoldsWithYOLO(imageElement);
       
-      // CLIP으로 색상 분석
-      const coloredHolds = await this.analyzeColorsWithCLIP(imageElement, holds);
+      // 서버 CLIP API로 색상 분석
+      const coloredHolds = await this.analyzeColorsWithServerCLIP(imageElement, holds);
       
       // 색상별 그룹화
       const colorGroups = this.groupByColor(coloredHolds);
