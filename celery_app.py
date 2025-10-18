@@ -102,10 +102,15 @@ def analyze_image_task(self, image_data_base64, params):
         print("📷 이미지 데이터 디코딩 중...")
         image_data = base64.b64decode(image_data_base64)
         
-        # PIL Image로 변환
+        # PIL Image로 변환 후 OpenCV 배열로 변환
         from PIL import Image
         import io
-        image = Image.open(io.BytesIO(image_data))
+        pil_image = Image.open(io.BytesIO(image_data))
+        
+        # PIL Image를 OpenCV 배열로 변환
+        import cv2
+        import numpy as np
+        image = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
         
         redis_client.setex(f"task_status:{task_id}", 300, json.dumps({
             'status': 'processing',
@@ -115,6 +120,13 @@ def analyze_image_task(self, image_data_base64, params):
         }))
         
         log_memory_usage("이미지 로딩 후")
+        
+        # 🚀 CRITICAL: 이미지 크기 제한 (메모리 절약)
+        max_size = int(os.getenv("MAX_IMAGE_SIZE", "256")) # 256으로 더 줄임
+        if image.shape[0] > max_size or image.shape[1] > max_size:
+            print(f"📏 이미지 크기 조정: {image.shape[:2]} -> {max_size}x{max_size}")
+            # OpenCV는 (width, height)가 아니라 (height, width) 순서
+            image = cv2.resize(image, (max_size, max_size), interpolation=cv2.INTER_LANCZOS4)
         
         # AI 분석 실행
         print("🤖 AI 분석 실행 중...")
