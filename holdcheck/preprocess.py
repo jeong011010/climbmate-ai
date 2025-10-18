@@ -119,8 +119,8 @@ def get_clip_model():
         
         _clip_device = "cuda" if torch.cuda.is_available() else "cpu"
         
-        # 환경변수에서 모델 선택 (기본값: 가장 가벼운 ViT-B/14)
-        clip_model_name = os.getenv("CLIP_MODEL", "ViT-B/14")  # 151MB → 85MB (더 가벼움!)
+        # 환경변수에서 모델 선택 (기본값: 가벼운 ViT-B/16)
+        clip_model_name = os.getenv("CLIP_MODEL", "ViT-B/16")  # 경량 모델 (메모리 절약)
         print(f"📊 사용할 CLIP 모델: {clip_model_name}")
         
         _clip_model, _clip_preprocess = clip.load(clip_model_name, device=_clip_device)
