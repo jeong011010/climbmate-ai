@@ -6,6 +6,48 @@ from ultralytics import YOLO
 import torch
 import clip
 from PIL import Image
+import psutil
+import gc
+
+# 🚀 메모리 최적화: 스레드 수 제한 (메모리 절약)
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+os.environ.setdefault("NUMEXPR_NUM_THREADS", "1")
+try:
+    torch.set_num_threads(1)
+except:
+    pass
+
+def get_memory_usage():
+    """📊 현재 메모리 사용량 반환 (MB 단위)"""
+    process = psutil.Process()
+    memory_info = process.memory_info()
+    return {
+        'rss': memory_info.rss / 1024 / 1024,  # 실제 메모리 사용량 (MB)
+        'vms': memory_info.vms / 1024 / 1024,  # 가상 메모리 사용량 (MB)
+        'percent': process.memory_percent(),    # 시스템 메모리 대비 비율
+        'available': psutil.virtual_memory().available / 1024 / 1024  # 사용 가능한 메모리 (MB)
+    }
+
+def log_memory_usage(stage_name):
+    """📊 메모리 사용량 로그 출력"""
+    memory = get_memory_usage()
+    
+    # 메모리 사용률에 따른 경고
+    if memory['percent'] > 90:
+        print(f"🚨 [CRITICAL] [{stage_name}] 메모리 사용량이 90%를 초과했습니다!")
+        print(f"   🔴 실제 메모리: {memory['rss']:.1f}MB ({memory['percent']:.1f}%)")
+        print(f"   ⚠️  OOM 위험! 컨테이너가 종료될 수 있습니다!")
+    elif memory['percent'] > 80:
+        print(f"⚠️  [WARNING] [{stage_name}] 메모리 사용량이 80%를 초과했습니다!")
+        print(f"   🟡 실제 메모리: {memory['rss']:.1f}MB ({memory['percent']:.1f}%)")
+    else:
+        print(f"📊 [{stage_name}] 메모리 사용량:")
+        print(f"   🔸 실제 메모리: {memory['rss']:.1f}MB ({memory['percent']:.1f}%)")
+    
+    print(f"   🔸 가상 메모리: {memory['vms']:.1f}MB")
+    print(f"   🔸 사용 가능: {memory['available']:.1f}MB")
+    return memory
 
 def convert_to_json_safe(data):
     """🚀 JSON 직렬화 가능하도록 데이터 변환"""
@@ -40,8 +82,20 @@ def get_yolo_model(model_path="/app/holdcheck/roboflow_weights/weights.pt"):
     
     if _yolo_model is None or _yolo_model_path != model_path:
         print(f"🔍 YOLO 모델 로딩 중... ({model_path})")
+        
+        # 메모리 사용량 측정 (로딩 전)
+        memory_before = log_memory_usage("YOLO 로딩 전")
+        
         _yolo_model = YOLO(model_path)
         _yolo_model_path = model_path
+        
+        # 메모리 사용량 측정 (로딩 후)
+        memory_after = log_memory_usage("YOLO 로딩 후")
+        
+        # 메모리 증가량 계산
+        memory_increase = memory_after['rss'] - memory_before['rss']
+        print(f"📊 YOLO 모델 메모리 사용량: +{memory_increase:.1f}MB")
+        
         print(f"✅ YOLO 모델 로딩 완료!")
     
     return _yolo_model
@@ -52,8 +106,25 @@ def get_clip_model():
     
     if _clip_model is None:
         print("🤖 CLIP 모델 로딩 중...")
+        
+        # 메모리 사용량 측정 (로딩 전)
+        memory_before = log_memory_usage("CLIP 로딩 전")
+        
         _clip_device = "cuda" if torch.cuda.is_available() else "cpu"
-        _clip_model, _clip_preprocess = clip.load("ViT-B/32", device=_clip_device)
+        
+        # 환경변수에서 모델 선택 (기본값: 더 가벼운 ViT-B/32)
+        clip_model_name = os.getenv("CLIP_MODEL", "ViT-B/32")  # 338MB → 151MB (훨씬 가벼움!)
+        print(f"📊 사용할 CLIP 모델: {clip_model_name}")
+        
+        _clip_model, _clip_preprocess = clip.load(clip_model_name, device=_clip_device)
+        
+        # 메모리 사용량 측정 (로딩 후)
+        memory_after = log_memory_usage("CLIP 로딩 후")
+        
+        # 메모리 증가량 계산
+        memory_increase = memory_after['rss'] - memory_before['rss']
+        print(f"📊 CLIP 모델 메모리 사용량: +{memory_increase:.1f}MB")
+        
         print(f"✅ CLIP 모델 로딩 완료 (Device: {_clip_device})")
     
     return _clip_model, _clip_preprocess, _clip_device
@@ -89,6 +160,13 @@ def extract_color_with_clip_ai(image, mask):
     # 홀드 크롭
     hold_image = image[y_min:y_max+1, x_min:x_max+1]
     hold_pil = Image.fromarray(cv2.cvtColor(hold_image, cv2.COLOR_BGR2RGB))
+    
+    # 🔧 마스크 침범 방지: mask_core 생성
+    mask_area = mask[y_min:y_max+1, x_min:x_max+1]
+    kernel_size = max(3, min(mask_area.shape) // 10)
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (kernel_size, kernel_size))
+    mask_core = cv2.erode((mask_area * 255).astype(np.uint8), kernel, iterations=2)
+    mask_core = (mask_core > 127).astype(np.float32)
     
     # 색상 프롬프트 정의 (검정색 우선, 주황색 강화)
     color_prompts = [
@@ -353,8 +431,10 @@ def extract_colors_with_clip_ai_batch(hold_images, masks):
         text_features = model.encode_text(text_tokens)
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
     
-    # 🚀 최적화: 배치 크기를 64로 증가 (속도 우선)
-    batch_size = 64
+    # 🚀 메모리 최적화: 배치 크기를 환경변수로 설정 (기본값: 16)
+    batch_size = int(os.getenv("CLIP_BATCH_SIZE", "16"))  # 메모리 절약을 위해 작게 설정
+    print(f"📊 CLIP 배치 크기: {batch_size}")
+    
     all_similarities = []
     all_image_features = []
     valid_indices = []
@@ -396,6 +476,12 @@ def extract_colors_with_clip_ai_batch(hold_images, masks):
         all_similarities.append(batch_similarities)
         all_image_features.append(batch_image_features)
         valid_indices.extend(batch_valid_indices)
+        
+        # 🚀 메모리 최적화: 배치마다 메모리 정리
+        del batch_image_features, batch_similarities, images_tensor
+        if 'processed_images' in locals():
+            del processed_images
+        gc.collect()
     
     if not all_similarities:
         return []
@@ -1351,6 +1437,10 @@ def calculate_advanced_features(pixels_hsv, pixels_lab, pixels_rgb):
 def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.pt", conf=0.4, brightness_normalization=False, 
                brightness_filter=False, min_brightness=0, max_brightness=100, 
                saturation_filter=False, min_saturation=0, mask_refinement=5, use_clip_ai=False):
+    
+    # 메모리 사용량 측정 (시작)
+    log_memory_usage("Preprocess 시작")
+    
     # image_input이 문자열(파일 경로)인지 numpy 배열인지 확인
     if isinstance(image_input, str):
         # 파일 경로인 경우
@@ -1363,10 +1453,21 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
 
     h_img, w_img = original_image.shape[:2]
     padded_image, scale, pad_left, pad_top = resize_with_padding(original_image)
+    
+    # 메모리 사용량 측정 (이미지 로딩 후)
+    log_memory_usage("이미지 로딩 후")
 
     # 🚀 캐싱된 YOLO 모델 사용 (속도 대폭 향상)
     model = get_yolo_model(model_path)
-    results = model(padded_image, conf=conf)[0]
+    
+    # 🚀 메모리 최적화: YOLO 해상도를 환경변수로 설정 (기본값: 384)
+    yolo_img_size = int(os.getenv("YOLO_IMG_SIZE", "384"))  # 640 → 384 (메모리 절약)
+    print(f"📊 YOLO 이미지 크기: {yolo_img_size}")
+    
+    results = model(padded_image, conf=conf, imgsz=yolo_img_size)[0]
+    
+    # 메모리 사용량 측정 (YOLO 추론 후)
+    log_memory_usage("YOLO 추론 후")
 
     masks_raw = results.masks.data.cpu().numpy()
     masks = [restore_mask_to_original(m, (h_img, w_img), scale, pad_left, pad_top) for m in masks_raw]
@@ -1380,6 +1481,24 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
         valid_masks = []
         valid_indices = []
         preprocessed_data = {}  # 전처리 결과 캐싱
+        
+        # 🚨 CRITICAL: 홀드 개수가 너무 많으면 메모리 부족 위험!
+        max_holds = int(os.getenv("MAX_HOLDS", "50"))  # 기본값: 50개로 제한
+        if len(masks) > max_holds:
+            print(f"⚠️  경고: 홀드가 {len(masks)}개 감지되었습니다! (최대 {max_holds}개)")
+            print(f"⚠️  메모리 절약을 위해 상위 {max_holds}개만 처리합니다.")
+            print(f"⚠️  더 많은 홀드를 처리하려면 MAX_HOLDS 환경변수를 늘려주세요.")
+            
+            # 면적이 큰 홀드부터 선택 (confidence가 높은 것 우선)
+            mask_areas = []
+            for mask in masks:
+                area = np.sum(mask > 0)
+                mask_areas.append(area)
+            
+            # 면적 기준으로 정렬하고 상위 N개만 선택
+            top_indices = np.argsort(mask_areas)[::-1][:max_holds]
+            masks = [masks[i] for i in sorted(top_indices)]
+            print(f"✅ 상위 {len(masks)}개 홀드 선택 완료")
         
         # 먼저 모든 홀드를 검증하고 수집
         print(f"🔍 홀드 마스크 전처리 중... ({len(masks)}개)")
@@ -1425,10 +1544,25 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
         
         print(f"✅ 마스크 전처리 완료 ({len(valid_indices)}개 유효)")
         
+        # 메모리 사용량 측정 (마스크 전처리 후)
+        log_memory_usage("마스크 전처리 후")
+        
         # 🚀 배치 처리로 CLIP AI 색상 추출
         if valid_hold_images:
             print(f"🤖 CLIP AI 배치 처리 시작 ({len(valid_hold_images)}개 홀드)")
+            
+            # 메모리 사용량 측정 (CLIP 처리 전)
+            memory_before_clip = log_memory_usage("CLIP 처리 전")
+            
             batch_results = extract_colors_with_clip_ai_batch(valid_hold_images, valid_masks)
+            
+            # 메모리 사용량 측정 (CLIP 처리 후)
+            memory_after_clip = log_memory_usage("CLIP 처리 후")
+            
+            # 메모리 증가량 계산
+            clip_memory_increase = memory_after_clip['rss'] - memory_before_clip['rss']
+            print(f"📊 CLIP 처리 메모리 사용량: +{clip_memory_increase:.1f}MB")
+            
             print(f"✅ CLIP AI 배치 처리 완료")
         else:
             batch_results = []
@@ -1577,4 +1711,10 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
     with open(f"outputs/{base_name}_preprocessed.json", "w", encoding="utf-8") as f:
         json.dump(json_safe_data, f, indent=2, ensure_ascii=False)
 
+    # 메모리 사용량 측정 (완료)
+    log_memory_usage("Preprocess 완료")
+    
+    # 가비지 컬렉션 실행
+    gc.collect()
+    
     return hold_data, masks

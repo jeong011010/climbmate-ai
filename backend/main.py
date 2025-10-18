@@ -9,6 +9,18 @@ import numpy as np
 import sys
 import os
 import base64
+import psutil
+import gc
+import torch
+
+# 🚀 메모리 최적화: 스레드 수 제한 (메모리 절약)
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+os.environ.setdefault("NUMEXPR_NUM_THREADS", "1")
+try:
+    torch.set_num_threads(1)
+except:
+    pass
 
 # holdcheck 모듈 경로 추가
 holdcheck_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'holdcheck')
@@ -20,6 +32,27 @@ sys.path.insert(0, backend_path)
 
 from preprocess import preprocess
 from clustering import clip_ai_color_clustering, analyze_problem
+
+def get_memory_usage():
+    """📊 현재 메모리 사용량 반환 (MB 단위)"""
+    process = psutil.Process()
+    memory_info = process.memory_info()
+    return {
+        'rss': memory_info.rss / 1024 / 1024,  # 실제 메모리 사용량 (MB)
+        'vms': memory_info.vms / 1024 / 1024,  # 가상 메모리 사용량 (MB)
+        'percent': process.memory_percent(),    # 시스템 메모리 대비 비율
+        'available': psutil.virtual_memory().available / 1024 / 1024  # 사용 가능한 메모리 (MB)
+    }
+
+def log_memory_usage(stage_name):
+    """📊 메모리 사용량 로그 출력"""
+    memory = get_memory_usage()
+    print(f"📊 [{stage_name}] 메모리 사용량:")
+    print(f"   🔸 실제 메모리: {memory['rss']:.1f}MB")
+    print(f"   🔸 가상 메모리: {memory['vms']:.1f}MB") 
+    print(f"   🔸 사용률: {memory['percent']:.1f}%")
+    print(f"   🔸 사용 가능: {memory['available']:.1f}MB")
+    return memory
 
 # 데이터베이스 및 분석 모듈 (선택적 로드)
 try:
@@ -43,6 +76,30 @@ try:
 except ImportError as e:
     print(f"⚠️ Hybrid 모듈 없음: {e}")
     HYBRID_AVAILABLE = False
+
+# 🚀 CRITICAL FIX: CLIP/YOLO 모델 사전 로딩 (서버 시작 시)
+print("🚀 AI 모델 사전 로딩 시작...")
+try:
+    from preprocess import get_yolo_model, get_clip_model
+    
+    # YOLO 모델 사전 로딩
+    print("📦 YOLO 모델 사전 로딩 중...")
+    log_memory_usage("YOLO 로딩 전")
+    _ = get_yolo_model()
+    log_memory_usage("YOLO 로딩 후")
+    
+    # CLIP 모델 사전 로딩 (이게 338MB 다운로드하는 부분!)
+    print("📦 CLIP 모델 사전 로딩 중...")
+    log_memory_usage("CLIP 로딩 전")
+    _ = get_clip_model()
+    log_memory_usage("CLIP 로딩 후")
+    
+    print("✅ 모든 AI 모델 사전 로딩 완료!")
+    gc.collect()  # 메모리 정리
+    log_memory_usage("모델 로딩 완료 후")
+except Exception as e:
+    print(f"⚠️ 모델 사전 로딩 실패: {e}")
+    print("⚠️ 첫 요청 시 모델이 로딩됩니다 (느릴 수 있음)")
 
 try:
     from ml_trainer import train_difficulty_model, train_type_model
@@ -91,21 +148,32 @@ async def analyze_image(
     - statistics: 통계 정보
     """
     try:
+        # 메모리 사용량 측정 (시작)
+        log_memory_usage("API 분석 시작")
+        
         # 이미지 읽기
         contents = await file.read()
         nparr = np.frombuffer(contents, np.uint8)
         image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
+        # 메모리 사용량 측정 (이미지 디코딩 후)
+        log_memory_usage("이미지 디코딩 후")
+        
         if image is None:
             raise HTTPException(status_code=400, detail="Invalid image file")
         
-        # 🚀 최적화: 이미지 크기 제한 (메모리 절약)
-        if image.size[0] > 800 or image.size[1] > 800:
-            print(f"📏 이미지 크기 조정: {image.size} -> 800x800")
-            image = image.resize((800, 800), Image.Resampling.LANCZOS)
+        # 🚀 CRITICAL: 이미지 크기 제한 (메모리 절약 - 957MB RAM 대응)
+        max_size = int(os.getenv("MAX_IMAGE_SIZE", "320"))  # 800 → 320 (메모리 절약)
+        if image.size[0] > max_size or image.size[1] > max_size:
+            print(f"📏 이미지 크기 조정: {image.size} -> {max_size}x{max_size}")
+            image = image.resize((max_size, max_size), Image.Resampling.LANCZOS)
         
         # 🚀 최적화: 전처리 (홀드 감지)
         print(f"🔍 홀드 감지 시작...")
+        
+        # 메모리 사용량 측정 (전처리 전)
+        memory_before_preprocess = log_memory_usage("전처리 전")
+        
         hold_data_raw, masks = preprocess(
             image,
             model_path="/app/holdcheck/roboflow_weights/weights.pt",
@@ -113,6 +181,13 @@ async def analyze_image(
             conf=0.4,  # 확실한 홀드만
             use_clip_ai=True
         )
+        
+        # 메모리 사용량 측정 (전처리 후)
+        memory_after_preprocess = log_memory_usage("전처리 후")
+        
+        # 메모리 증가량 계산
+        preprocess_memory_increase = memory_after_preprocess['rss'] - memory_before_preprocess['rss']
+        print(f"📊 전처리 메모리 사용량: +{preprocess_memory_increase:.1f}MB")
         
         if not hold_data_raw:
             return JSONResponse(
@@ -236,6 +311,9 @@ async def analyze_image(
         
         print(f"✅ {len(problems)}개 문제 분석 완료")
         
+        # 메모리 사용량 측정 (분석 완료)
+        log_memory_usage("분석 완료")
+        
         # 🎨 주석 이미지 생성 (색상별로 홀드 표시)
         annotated_image = image.copy()
         
@@ -288,6 +366,9 @@ async def analyze_image(
                 "message": f"{len(problems)}개의 문제를 발견했습니다."
             }
         )
+        
+        # 가비지 컬렉션 실행
+        gc.collect()
         
     except Exception as e:
         print(f"❌ 에러 발생: {str(e)}")
