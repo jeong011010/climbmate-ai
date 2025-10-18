@@ -1,0 +1,18 @@
+# 모델 변환용 의존성 (로컬에서만 사용)
+
+# TensorFlow.js 변환 도구
+tensorflowjs>=4.0.0
+
+# ONNX 변환
+onnx>=1.15.0
+tf2onnx>=1.16.0
+
+# TensorFlow
+tensorflow>=2.15.0
+
+# 기존 모델 (이미 설치되어 있음)
+ultralytics>=8.2.0
+git+https://github.com/openai/CLIP.git
+torch>=2.4.1
+torchvision>=0.19.1
+
