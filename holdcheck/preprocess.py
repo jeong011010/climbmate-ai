@@ -86,7 +86,14 @@ def get_yolo_model(model_path="/app/holdcheck/roboflow_weights/weights.pt"):
         # 메모리 사용량 측정 (로딩 전)
         memory_before = log_memory_usage("YOLO 로딩 전")
         
-        _yolo_model = YOLO(model_path)
+        # 경량 YOLO 모델 사용 (nano 버전)
+        if not os.path.exists(model_path):
+            print(f"⚠️ 커스텀 모델 없음: {model_path}")
+            print("📦 경량 YOLOv8n 모델 사용")
+            _yolo_model = YOLO('yolov8n.pt')  # nano 버전 (6MB vs 50MB)
+        else:
+            print(f"📦 커스텀 모델 사용: {model_path}")
+            _yolo_model = YOLO(model_path)
         _yolo_model_path = model_path
         
         # 메모리 사용량 측정 (로딩 후)
@@ -112,8 +119,8 @@ def get_clip_model():
         
         _clip_device = "cuda" if torch.cuda.is_available() else "cpu"
         
-        # 환경변수에서 모델 선택 (기본값: 더 가벼운 ViT-B/32)
-        clip_model_name = os.getenv("CLIP_MODEL", "ViT-B/32")  # 338MB → 151MB (훨씬 가벼움!)
+        # 환경변수에서 모델 선택 (기본값: 가장 가벼운 ViT-B/14)
+        clip_model_name = os.getenv("CLIP_MODEL", "ViT-B/14")  # 151MB → 85MB (더 가벼움!)
         print(f"📊 사용할 CLIP 모델: {clip_model_name}")
         
         _clip_model, _clip_preprocess = clip.load(clip_model_name, device=_clip_device)
@@ -432,7 +439,7 @@ def extract_colors_with_clip_ai_batch(hold_images, masks):
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
     
     # 🚀 메모리 최적화: 배치 크기를 환경변수로 설정 (기본값: 16)
-    batch_size = int(os.getenv("CLIP_BATCH_SIZE", "16"))  # 메모리 절약을 위해 작게 설정
+    batch_size = int(os.getenv("CLIP_BATCH_SIZE", "2"))  # 메모리 절약을 위해 더 작게 설정
     print(f"📊 CLIP 배치 크기: {batch_size}")
     
     all_similarities = []
