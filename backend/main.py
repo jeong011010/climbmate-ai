@@ -109,52 +109,56 @@ app.add_middleware(
 )
 
 # 🚀 CRITICAL: FastAPI startup event로 모델 사전 로딩 (확실하게!)
+# 🚨 임시로 모델 사전 로딩 비활성화 (메모리 부족 문제 해결용)
 @app.on_event("startup")
 async def startup_event():
     """서버 시작 시 AI 모델을 사전 로딩하여 첫 요청 시 먹통 방지"""
     print("")
     print("=" * 80)
-    print("🚀 AI 모델 사전 로딩 시작... (이 과정은 서버 시작 시 1회만 실행됩니다)")
+    print("⚠️  AI 모델 사전 로딩 임시 비활성화 (메모리 절약)")
+    print("📌 모델은 첫 번째 요청 시 로드됩니다")
     print("=" * 80)
     
-    try:
-        from preprocess import get_yolo_model, get_clip_model
-        
-        # YOLO 모델 사전 로딩
-        print("")
-        print("📦 1/2: YOLO 모델 사전 로딩 중...")
-        log_memory_usage("YOLO 로딩 전")
-        yolo_model = get_yolo_model()
-        log_memory_usage("YOLO 로딩 후")
-        print("✅ YOLO 모델 로딩 완료!")
-        
-        # CLIP 모델 사전 로딩 (338MB → 151MB)
-        print("")
-        print("📦 2/2: CLIP 모델 사전 로딩 중...")
-        log_memory_usage("CLIP 로딩 전")
-        clip_model, clip_preprocess, clip_device = get_clip_model()
-        log_memory_usage("CLIP 로딩 후")
-        print("✅ CLIP 모델 로딩 완료!")
-        
-        # 메모리 정리
-        gc.collect()
-        
-        print("")
-        print("=" * 80)
-        print("✅ 모든 AI 모델 사전 로딩 완료! 이제 첫 요청부터 빠르게 응답합니다.")
-        print("=" * 80)
-        log_memory_usage("모델 로딩 완료 후")
-        print("")
-        
-    except Exception as e:
-        print("")
-        print("=" * 80)
-        print(f"⚠️  모델 사전 로딩 실패: {e}")
-        print(f"⚠️  첫 요청 시 모델이 로딩됩니다 (느릴 수 있음)")
-        print("=" * 80)
-        print("")
-        import traceback
-        traceback.print_exc()
+    # 임시 주석 처리
+    # try:
+    #     from preprocess import get_yolo_model, get_clip_model
+    #     
+    #     # YOLO 모델 사전 로딩
+    #     print("")
+    #     print("📦 1/2: YOLO 모델 사전 로딩 중...")
+    #     log_memory_usage("YOLO 로딩 전")
+    #     yolo_model = get_yolo_model()
+    #     log_memory_usage("YOLO 로딩 후")
+    #     print("✅ YOLO 모델 로딩 완료!")
+    #     
+    #     # CLIP 모델 사전 로딩 (338MB → 151MB)
+    #     print("")
+    #     print("📦 2/2: CLIP 모델 사전 로딩 중...")
+    #     log_memory_usage("CLIP 로딩 전")
+    #     clip_model, clip_preprocess, clip_device = get_clip_model()
+    #     log_memory_usage("CLIP 로딩 후")
+    #     print("✅ CLIP 모델 로딩 완료!")
+    #     
+    #     # 메모리 정리
+    #     gc.collect()
+    #     
+    #     print("")
+    #     print("=" * 80)
+    #     print("✅ 모든 AI 모델 사전 로딩 완료! 이제 첫 요청부터 빠르게 응답합니다.")
+    #     print("=" * 80)
+    #     log_memory_usage("모델 로딩 완료 후")
+    #     print("")
+    #     
+    # except Exception as e:
+    #     print("")
+    #     print("=" * 80)
+    #     print(f"⚠️  모델 사전 로딩 실패: {e}")
+    #     print(f"⚠️  첫 요청 시 모델이 로딩됩니다 (느릴 수 있음)")
+    #     print("=" * 80)
+    #     print("")
+    #     import traceback
+    #     traceback.print_exc()
+    pass  # 임시로 아무것도 하지 않음
 
 @app.get("/")
 async def root():
