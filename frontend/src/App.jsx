@@ -70,7 +70,7 @@ function App() {
   const testGpt4 = async () => {
     try {
       console.log('🧪 GPT-4 테스트 시작...')
-      const response = await axios.post(`${API_URL}/api/test-gpt4`)
+      const response = await axios.get(`${API_URL}/api/gpt4-status`)
       console.log('🧪 GPT-4 테스트 결과:', response.data)
       
       const result = response.data
