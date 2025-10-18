@@ -1,14 +1,14 @@
 # 🚀 최적화된 필수 라이브러리만 포함
 
-# 기본 과학 연산 라이브러리
-numpy==1.26.4
-opencv-python==4.11.0.86
-Pillow==10.4.0
-psutil==6.1.0
-scikit-learn==1.3.2
-scipy==1.11.4
-matplotlib==3.8.2
-plotly==5.18.0
+# 기본 과학 연산 라이브러리 (서버에 이미 설치된 버전 사용)
+numpy>=1.26.4
+opencv-python>=4.11.0
+Pillow>=10.4.0
+psutil>=6.1.0
+scikit-learn>=1.3.2
+scipy>=1.11.4
+matplotlib>=3.8.2
+plotly>=5.18.0
 
 # PyTorch는 Dockerfile에서 CPU 전용으로 설치합니다
 # (--index-url https://download.pytorch.org/whl/cpu 필요)
