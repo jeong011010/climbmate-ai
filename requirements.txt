@@ -1,0 +1,45 @@
+# 기본 과학 연산 라이브러리
+numpy==1.26.4
+pandas==2.2.2
+scipy==1.13.1
+scikit-learn==1.5.1
+matplotlib==3.9.2
+seaborn==0.13.2
+
+# OpenCV
+opencv-python==4.11.0.86
+
+# PyTorch (CUDA 버전 선택 가능, CPU만 쓸 거면 torchvision, torchaudio 맞춰 설치)
+torch==2.4.1
+torchvision==0.19.1
+torchaudio==2.4.1
+
+# YOLOv8
+ultralytics==8.2.103
+
+# 기타 유틸
+tqdm==4.66.5
+pyyaml==6.0.2
+Pillow==10.4.0
+streamlit==1.38.0
+plotly>=5.0.0
+umap-learn==0.5.6
+
+# CLIP AI 모델 (Git 설치)
+git+https://github.com/openai/CLIP.git
+ftfy
+regex
+
+# FastAPI & Backend
+fastapi==0.119.0
+uvicorn[standard]==0.37.0
+python-multipart==0.0.20
+
+# OpenAI (GPT-4 Vision)
+openai>=1.0.0
+
+# Database
+# sqlite3는 Python 기본 내장
+
+streamlit-drawable-canvas==0.9.3
+streamlit-plotly-events==0.0.6
