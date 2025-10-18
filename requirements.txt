@@ -6,10 +6,8 @@ opencv-python==4.11.0.86
 Pillow==10.4.0
 psutil==6.1.0
 
-# PyTorch (CPU 전용 - 메모리 절약)
-torch==2.4.1+cpu
-torchvision==0.19.1+cpu
-torchaudio==2.4.1+cpu
+# PyTorch는 Dockerfile에서 CPU 전용으로 설치합니다
+# (--index-url https://download.pytorch.org/whl/cpu 필요)
 
 # YOLOv8 (홀드 감지)
 ultralytics==8.2.103
