@@ -35,7 +35,7 @@ celery_app.conf.update(
     worker_prefetch_multiplier=1,  # 한 번에 하나의 작업만 처리
     task_acks_late=True,  # 작업 완료 후에만 ACK
     worker_max_tasks_per_child=5,  # 메모리 누수 방지 (더 자주 재시작)
-    worker_max_memory_per_child=500000,  # 500MB로 증가
+    worker_max_memory_per_child=400000,  # 400MB로 감소 (메모리 부족 방지)
     result_expires=3600,  # 결과 1시간 후 만료
 )
 
