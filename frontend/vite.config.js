@@ -35,7 +35,7 @@ export default defineConfig({
       workbox: {
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/api\./i,
+            urlPattern: /^http:\/\/.*\/api/i,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'api-cache',
@@ -56,7 +56,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'https://climbmate.store',
+        target: 'http://43.203.199.91',
         changeOrigin: true
       }
     }
