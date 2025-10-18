@@ -96,56 +96,6 @@ function App() {
     }
   }
 
-  // 🚀 클라이언트 사이드 AI 분석 (사용자 브라우저에서 처리)
-  const analyzeImageClientSide = async () => {
-    if (!image) return
-
-    setLoading(true)
-    setLoadingProgress(0)
-    setDetectedHolds(0)
-    setDetectedProblems(0)
-    setCurrentAnalysisStep('')
-    setResult(null)
-
-    try {
-      console.log('🚀 클라이언트 사이드 AI 분석 시작...')
-      setCurrentAnalysisStep('사용자 브라우저에서 AI 모델 로딩 중...')
-      setLoadingProgress(20)
-
-      // 클라이언트 AI 분석기 로드
-      const { default: ClientAIAnalyzer } = await import('./clientAI.js')
-      const analyzer = new ClientAIAnalyzer()
-
-      setCurrentAnalysisStep('AI 모델 로딩 중...')
-      setLoadingProgress(40)
-
-      // 사용자 브라우저에서 직접 분석
-      const result = await analyzer.analyzeImage(image)
-
-      setLoading(false)
-      setCurrentAnalysisStep('분석 완료!')
-      setResult(result)
-
-      // 통계 업데이트
-      if (result.statistics) {
-        setDetectedHolds(result.statistics.total_holds || 0)
-        setDetectedProblems(result.statistics.total_problems || 0)
-      }
-
-      // 히스토리에 저장
-      saveToHistory(result)
-
-      console.log('✅ 클라이언트 사이드 분석 완료:', result)
-
-    } catch (error) {
-      console.error('❌ 클라이언트 사이드 분석 실패:', error)
-      setLoading(false)
-      setCurrentAnalysisStep('분석 실패')
-      alert(`❌ 클라이언트 사이드 분석 실패: ${error.message}`)
-    }
-  }
-
-
   // 분석 히스토리 로드
   const loadAnalysisHistory = () => {
     const history = JSON.parse(localStorage.getItem('climbmate_history') || '[]')
@@ -299,6 +249,7 @@ function App() {
   }
 
 
+  // 🚀 클라이언트 사이드 AI 분석 (기본 분석 방법)
   const analyzeImage = async () => {
     if (!image) return
 
@@ -307,88 +258,44 @@ function App() {
     setDetectedHolds(0)
     setDetectedProblems(0)
     setCurrentAnalysisStep('')
-    setResult(null) // 결과 초기화
-    
+    setResult(null)
+
     try {
-      const formData = new FormData()
-      formData.append('file', image)
-      if (wallAngle) formData.append('wall_angle', wallAngle)
+      console.log('🚀 클라이언트 사이드 AI 분석 시작...')
+      setCurrentAnalysisStep('사용자 브라우저에서 AI 모델 로딩 중...')
+      setLoadingProgress(20)
 
-      // 🚀 비동기 분석 시작 (즉시 응답)
-      const response = await fetch(`${API_URL}/api/analyze-stream`, {
-        method: 'POST',
-        body: formData
-      })
+      // 클라이언트 AI 분석기 로드
+      const { default: ClientAIAnalyzer } = await import('./clientAI.js')
+      const analyzer = new ClientAIAnalyzer()
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
+      setCurrentAnalysisStep('AI 모델 로딩 중... (처음 사용 시 시간이 걸릴 수 있습니다)')
+      setLoadingProgress(40)
 
-      const data = await response.json()
-      const taskId = data.task_id
-      
-      console.log('🚀 분석 작업 시작:', taskId)
-      setCurrentAnalysisStep('AI 분석이 시작되었습니다...')
+      // 사용자 브라우저에서 직접 분석
+      const clientResult = await analyzer.analyzeImage(image)
 
-      // 🚀 폴링으로 진행상황 확인
-      const pollStatus = async () => {
-        try {
-          const statusResponse = await fetch(`${API_URL}/api/analysis-status/${taskId}`)
-          const statusData = await statusResponse.json()
-          
-          console.log('📊 분석 상태:', statusData)
-          
-          // 진행률 업데이트
-          setLoadingProgress(statusData.progress || 0)
-          setCurrentAnalysisStep(statusData.message || '분석 중...')
-          
-          if (statusData.status === 'completed') {
-            // 분석 완료
-            setLoading(false)
-            setCurrentAnalysisStep('분석 완료!')
-            
-            if (statusData.result) {
-              setResult(statusData.result)
-              
-              // 통계 업데이트
-              if (statusData.result.statistics) {
-                setDetectedHolds(statusData.result.statistics.total_holds || 0)
-                setDetectedProblems(statusData.result.statistics.total_problems || 0)
-              }
-              
-              // 히스토리에 저장
-              saveToHistory(statusData.result)
-              
-              console.log('✅ 분석 완료:', statusData.result)
-            }
-            return
-          } else if (statusData.status === 'failed') {
-            // 분석 실패
-            setLoading(false)
-            setCurrentAnalysisStep('분석 실패')
-            alert(`❌ 분석 실패: ${statusData.message || '알 수 없는 오류'}`)
-            return
-          }
-          
-          // 계속 폴링 (1초마다)
-          setTimeout(pollStatus, 1000)
-          
-        } catch (error) {
-          console.error('❌ 상태 확인 실패:', error)
-          setLoading(false)
-          setCurrentAnalysisStep('상태 확인 실패')
-          alert(`❌ 상태 확인 실패: ${error.message}`)
-        }
-      }
-      
-      // 폴링 시작
-      pollStatus()
-      
-    } catch (error) {
-      console.error('❌ 분석 요청 실패:', error)
       setLoading(false)
-      setCurrentAnalysisStep('요청 실패')
-      alert(`❌ 분석 요청 실패: ${error.message}`)
+      setLoadingProgress(100)
+      setCurrentAnalysisStep('분석 완료!')
+      setResult(clientResult)
+
+      // 통계 업데이트
+      if (clientResult.statistics) {
+        setDetectedHolds(clientResult.statistics.total_holds || 0)
+        setDetectedProblems(clientResult.statistics.total_problems || 0)
+      }
+
+      // 히스토리에 저장
+      saveToHistory(clientResult)
+
+      console.log('✅ 클라이언트 사이드 분석 완료:', clientResult)
+
+    } catch (error) {
+      console.error('❌ 클라이언트 사이드 분석 실패:', error)
+      setLoading(false)
+      setCurrentAnalysisStep('분석 실패')
+      alert(`❌ 클라이언트 사이드 분석 실패: ${error.message}\n\n브라우저가 AI 모델을 지원하지 않거나 메모리가 부족할 수 있습니다.`)
     }
   }
 
