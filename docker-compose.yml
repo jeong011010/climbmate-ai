@@ -17,12 +17,12 @@ services:
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - REDIS_URL=redis://redis:6379/0
-             # 🚀 메모리 최적화 환경변수 (더 공격적으로)
-             - CLIP_MODEL=ViT-B/14
-             - CLIP_BATCH_SIZE=2
-             - YOLO_IMG_SIZE=224
-             - MAX_IMAGE_SIZE=224
-             - MAX_HOLDS=15
+      # 🚀 메모리 최적화 환경변수 (더 공격적으로)
+      - CLIP_MODEL=ViT-B/14
+      - CLIP_BATCH_SIZE=2
+      - YOLO_IMG_SIZE=224
+      - MAX_IMAGE_SIZE=224
+      - MAX_HOLDS=15
       - OMP_NUM_THREADS=1
       - MKL_NUM_THREADS=1
       - NUMEXPR_NUM_THREADS=1
@@ -53,12 +53,12 @@ services:
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - REDIS_URL=redis://redis:6379/0
-             # 🚀 메모리 최적화 환경변수 (더 공격적으로)
-             - CLIP_MODEL=ViT-B/14
-             - CLIP_BATCH_SIZE=2
-             - YOLO_IMG_SIZE=224
-             - MAX_IMAGE_SIZE=224
-             - MAX_HOLDS=15
+      # 🚀 메모리 최적화 환경변수 (더 공격적으로)
+      - CLIP_MODEL=ViT-B/14
+      - CLIP_BATCH_SIZE=2
+      - YOLO_IMG_SIZE=224
+      - MAX_IMAGE_SIZE=224
+      - MAX_HOLDS=15
       - OMP_NUM_THREADS=1
       - MKL_NUM_THREADS=1
       - NUMEXPR_NUM_THREADS=1
