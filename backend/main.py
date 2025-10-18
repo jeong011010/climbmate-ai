@@ -269,7 +269,7 @@ async def analyze_image_stream(
 @app.get("/api/analysis-status/{task_id}")
 async def get_analysis_status(task_id: str):
     """
-    🚀 분석 작업 상태 확인
+    🚀 분석 작업 상태 확인 (Celery 표준 방식)
     
     Parameters:
     - task_id: 작업 ID
@@ -281,21 +281,57 @@ async def get_analysis_status(task_id: str):
     - result: 분석 결과 (완료 시)
     """
     try:
-        # Redis에서 작업 상태 조회
-        status_data = redis_client.get(f"task_status:{task_id}")
+        # Celery 표준 방식으로 작업 상태 조회
+        task = analyze_image_task.AsyncResult(task_id)
         
-        if not status_data:
-            raise HTTPException(status_code=404, detail="Task not found")
+        if task.state == 'PENDING':
+            response_data = {
+                "task_id": task_id, 
+                "status": "pending", 
+                "message": "분석 대기 중...", 
+                "progress": 0
+            }
+        elif task.state == 'STARTED':
+            meta = task.info or {}
+            response_data = {
+                "task_id": task_id,
+                "status": "started",
+                "message": meta.get('message', '분석 진행 중...'),
+                "progress": meta.get('progress', 0)
+            }
+        elif task.state == 'PROGRESS':
+            meta = task.info or {}
+            response_data = {
+                "task_id": task_id,
+                "status": "progress",
+                "message": meta.get('message', '분석 진행 중...'),
+                "progress": meta.get('progress', 0)
+            }
+        elif task.state == 'SUCCESS':
+            result = task.result
+            response_data = {
+                "task_id": task_id,
+                "status": "completed",
+                "message": "분석 완료!",
+                "progress": 100,
+                "result": result
+            }
+        elif task.state == 'FAILURE':
+            response_data = {
+                "task_id": task.id,
+                "status": "failed",
+                "message": f"분석 실패: {str(task.info)}",
+                "progress": 100
+            }
+        else:
+            response_data = {
+                "task_id": task.id, 
+                "status": task.state, 
+                "message": "알 수 없는 상태", 
+                "progress": 0
+            }
         
-        status_info = json.loads(status_data)
-        
-        # 완료된 경우 결과도 포함
-        if status_info.get('status') == 'completed':
-            result_data = redis_client.get(f"task_result:{task_id}")
-            if result_data:
-                status_info['result'] = json.loads(result_data)
-        
-        return status_info
+        return response_data
         
     except Exception as e:
         print(f"❌ 작업 상태 조회 실패: {e}")
