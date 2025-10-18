@@ -36,6 +36,10 @@ fastapi==0.119.0
 uvicorn[standard]==0.37.0
 python-multipart==0.0.20
 
+# Celery & Redis (비동기 작업 처리)
+celery==5.3.7
+redis==5.0.8
+
 # OpenAI (GPT-4 Vision)
 openai>=1.0.0
 

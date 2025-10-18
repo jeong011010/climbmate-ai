@@ -1,6 +1,15 @@
 version: '3.8'
 
 services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+
   backend:
     build:
       context: .
@@ -9,16 +18,36 @@ services:
       - "8000:8000"
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - REDIS_URL=redis://redis:6379/0
     volumes:
       - ./backend/climbmate.db:/app/backend/climbmate.db
       - ./backend/models:/app/backend/models
       - ./holdcheck:/app/holdcheck
+    depends_on:
+      - redis
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A celery_app worker --loglevel=info
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - ./backend/climbmate.db:/app/backend/climbmate.db
+      - ./backend/models:/app/backend/models
+      - ./holdcheck:/app/holdcheck
+    depends_on:
+      - redis
+      - backend
+    restart: unless-stopped
 
   frontend:
     build:
@@ -56,4 +85,5 @@ services:
 volumes:
   db-data:
   model-data:
+  redis-data:
 

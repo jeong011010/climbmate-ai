@@ -269,7 +269,7 @@ function App() {
       formData.append('file', image)
       if (wallAngle) formData.append('wall_angle', wallAngle)
 
-      // SSE를 사용한 실시간 진행률 수신
+      // 🚀 비동기 분석 시작 (즉시 응답)
       const response = await fetch(`${API_URL}/api/analyze-stream`, {
         method: 'POST',
         body: formData
@@ -279,155 +279,88 @@ function App() {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const reader = response.body.getReader()
-      const decoder = new TextDecoder()
+      const data = await response.json()
+      const taskId = data.task_id
       
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
+      console.log('🚀 분석 작업 시작:', taskId)
+      setCurrentAnalysisStep('AI 분석이 시작되었습니다...')
 
-        const chunk = decoder.decode(value)
-        const lines = chunk.split('\n')
-        
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            try {
-              const jsonStr = line.slice(6).trim()
-              console.log('🔍 받은 JSON 문자열:', jsonStr)
+      // 🚀 폴링으로 진행상황 확인
+      const pollStatus = async () => {
+        try {
+          const statusResponse = await fetch(`${API_URL}/api/analysis-status/${taskId}`)
+          const statusData = await statusResponse.json()
+          
+          console.log('📊 분석 상태:', statusData)
+          
+          // 진행률 업데이트
+          setLoadingProgress(statusData.progress || 0)
+          setCurrentAnalysisStep(statusData.message || '분석 중...')
+          
+          if (statusData.status === 'completed') {
+            // 분석 완료
+            setLoading(false)
+            setCurrentAnalysisStep('분석 완료!')
+            
+            if (statusData.result) {
+              setResult(statusData.result)
               
-              const data = JSON.parse(jsonStr)
-              console.log('✅ 파싱된 데이터:', data)
-              
-              // 진행률 업데이트
-              if (data.progress !== undefined) {
-                setLoadingProgress(data.progress)
+              // 통계 업데이트
+              if (statusData.result.statistics) {
+                setDetectedHolds(statusData.result.statistics.total_holds || 0)
+                setDetectedProblems(statusData.result.statistics.total_problems || 0)
               }
               
-              // 메시지 업데이트
-              if (data.message) {
-                setCurrentAnalysisStep(data.message)
-              }
+              // 히스토리에 저장
+              saveToHistory(statusData.result)
               
-              // 홀드 개수 업데이트
-              if (data.holds_count !== undefined) {
-                setDetectedHolds(data.holds_count)
-              }
-              
-              // 문제 개수 업데이트
-              if (data.problems_count !== undefined) {
-                setDetectedProblems(data.problems_count)
-              }
-              
-              // 완료 시 로딩만 중지 (결과 데이터는 계속 받음)
-              if (data.step === 'complete') {
-                console.log('🎉 분석 완료!')
-                console.log('🎉 최종 결과 상태:', result)
-                
-                // 이미지 청크가 있다면 조합하여 표시
-                setResult(prev => {
-                  if (prev.image_chunks) {
-                    console.log('🖼️ 이미지 청크 조합 완료:', prev.image_chunks.length, 'bytes')
-                    setAnnotatedImage(`data:image/jpeg;base64,${prev.image_chunks}`)
-                    return { ...prev, image_chunks: undefined } // 청크 데이터 제거
-                  }
-                  return prev
-                })
-                
-                setLoading(false)
-                setCurrentAnalysisStep('')
-                return
-              }
-              
-              // 분리된 결과 데이터 처리
-              if (data.step === 'result_stats') {
-                console.log('📊 통계 데이터 받음:', data.statistics)
-                setResult(prev => ({ ...prev, statistics: data.statistics }))
-              }
-              
-              // 홀드 데이터 청크 처리
-              if (data.step === 'result_holds_chunk') {
-                console.log('🔍 홀드 데이터 청크 받음:', data.hold_data_chunk?.length || 0, '개')
-                setResult(prev => {
-                  const existingHolds = prev.hold_data || []
-                  return { ...prev, hold_data: [...existingHolds, ...(data.hold_data_chunk || [])] }
-                })
-              }
-              
-              // 기존 홀드 데이터 처리 (호환성)
-              if (data.step === 'result_holds') {
-                console.log('🔍 홀드 데이터 받음:', data.hold_data?.length || 0, '개')
-                setResult(prev => ({ ...prev, hold_data: data.hold_data }))
-              }
-              
-              if (data.step === 'result_problems') {
-                console.log('🎯 문제 데이터 받음:', data.problems?.length || 0, '개')
-                
-                // 각 문제의 분석 결과 상세 로그 (JSON 형식)
-                if (data.problems) {
-                  data.problems.forEach((problem, index) => {
-                    console.log(`\n📋 문제 ${index + 1} (${problem.color_name}):`)
-                    console.log(JSON.stringify({
-                      id: problem.id,
-                      color_name: problem.color_name,
-                      hold_count: problem.hold_count,
-                      difficulty: problem.difficulty,
-                      climb_type: problem.climb_type,
-                      gpt4_reasoning: problem.gpt4_reasoning,
-                      gpt4_confidence: problem.gpt4_confidence
-                    }, null, 2))
-                  })
-                }
-                
-                setResult(prev => {
-                  const newResult = { ...prev, problems: data.problems }
-                  console.log('🎯 최종 결과 설정:', newResult)
-                  // 분석 결과를 히스토리에 저장
-                  saveToHistory(newResult)
-                  return newResult
-                })
-              }
-              
-              // 이미지 데이터 청크 처리
-              if (data.step === 'result_image_chunk') {
-                // 로그 줄이기 - 청크 정보만 표시
-                const chunkInfo = data.chunk_info || {}
-                console.log(`🖼️ 이미지 청크 ${chunkInfo.current}/${chunkInfo.total} 받음`)
-                setResult(prev => {
-                  const existingImage = prev.image_chunks || ''
-                  return { ...prev, image_chunks: existingImage + (data.image_chunk || '') }
-                })
-              }
-              
-              // 기존 이미지 데이터 처리 (호환성)
-              if (data.step === 'result_image') {
-                if (data.annotated_image_base64) {
-                  console.log('🖼️ 주석 이미지 받음:', data.annotated_image_base64.length, 'bytes')
-                  setAnnotatedImage(`data:image/jpeg;base64,${data.annotated_image_base64}`)
-                }
-              }
-              
-              // 에러 처리
-              if (data.step === 'error') {
-                throw new Error(data.message || '분석 중 오류가 발생했습니다.')
-              }
-              
-            } catch (parseError) {
-              console.error('❌ SSE 데이터 파싱 오류:', parseError)
-              console.error('❌ 파싱 실패한 라인:', line)
-              console.error('❌ 파싱 실패한 JSON 문자열:', line.slice(6))
-              // 파싱 오류가 발생해도 계속 진행
+              console.log('✅ 분석 완료:', statusData.result)
             }
+            return
+          } else if (statusData.status === 'failed') {
+            // 분석 실패
+            setLoading(false)
+            setCurrentAnalysisStep('분석 실패')
+            alert(`❌ 분석 실패: ${statusData.message || '알 수 없는 오류'}`)
+            return
           }
+          
+          // 계속 폴링 (1초마다)
+          setTimeout(pollStatus, 1000)
+          
+        } catch (error) {
+          console.error('❌ 상태 확인 실패:', error)
+          setLoading(false)
+          setCurrentAnalysisStep('상태 확인 실패')
+          alert(`❌ 상태 확인 실패: ${error.message}`)
         }
       }
       
+      // 폴링 시작
+      pollStatus()
+      
     } catch (error) {
-      console.error('분석 실패:', error)
-      setCurrentAnalysisStep('❌ 분석 실패')
-      alert('분석에 실패했습니다. 다시 시도해주세요.')
+      console.error('❌ 분석 요청 실패:', error)
       setLoading(false)
-      setCurrentAnalysisStep('')
+      setCurrentAnalysisStep('요청 실패')
+      alert(`❌ 분석 요청 실패: ${error.message}`)
     }
+  }
+
+  // 히스토리 저장 함수
+  const saveToHistory = (result) => {
+    if (!result || !result.problems) return
+    
+    const historyItem = {
+      id: Date.now(),
+      timestamp: new Date().toISOString(),
+      problems: result.problems,
+      statistics: result.statistics,
+      image: preview
+    }
+    
+    setAnalysisHistory(prev => [historyItem, ...prev.slice(0, 49)]) // 최대 50개 유지
+    localStorage.setItem('analysisHistory', JSON.stringify([historyItem, ...analysisHistory.slice(0, 49)]))
   }
 
   const submitFeedback = async () => {
