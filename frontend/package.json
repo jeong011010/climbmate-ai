@@ -10,13 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tensorflow/tfjs": "^4.17.0",
+    "@tensorflow/tfjs-node": "^4.17.0",
     "axios": "^1.12.2",
+    "onnxruntime-web": "^1.23.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.4",
-    "vite-plugin-pwa": "^1.1.0",
-    "@tensorflow/tfjs": "^4.17.0",
-    "@tensorflow/tfjs-node": "^4.17.0"
+    "vite-plugin-pwa": "^1.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

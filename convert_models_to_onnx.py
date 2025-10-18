@@ -1,43 +1,15 @@
 """
-PyTorch YOLO + CLIP 모델을 TensorFlow.js로 변환
-간단한 방법: ONNX 사용
+PyTorch YOLO + CLIP 모델을 ONNX로 변환
+ONNX Runtime Web으로 브라우저에서 실행
 """
 import os
 import sys
-
-def check_dependencies():
-    """필요한 의존성 확인"""
-    print("🔍 의존성 확인 중...")
-    
-    required = {
-        'torch': 'PyTorch',
-        'ultralytics': 'Ultralytics YOLO',
-        'clip': 'OpenAI CLIP',
-        'onnx': 'ONNX',
-        'tensorflowjs': 'TensorFlow.js Converter'
-    }
-    
-    missing = []
-    for module, name in required.items():
-        try:
-            __import__(module)
-            print(f"  ✅ {name}")
-        except ImportError:
-            print(f"  ❌ {name} (없음)")
-            missing.append(module)
-    
-    if missing:
-        print(f"\n⚠️  필요한 패키지를 먼저 설치하세요:")
-        print(f"pip install {' '.join(missing)}")
-        return False
-    
-    print("✅ 모든 의존성 확인 완료\n")
-    return True
+import torch
 
 def export_yolo_to_onnx():
     """YOLO 모델을 ONNX로 내보내기"""
     print("=" * 80)
-    print("🔄 YOLO 모델 ONNX 변환 시작")
+    print("🔄 YOLO 모델 → ONNX 변환")
     print("=" * 80)
     
     try:
@@ -48,32 +20,40 @@ def export_yolo_to_onnx():
         if not os.path.exists(yolo_path):
             print(f"⚠️  커스텀 모델 없음: {yolo_path}")
             yolo_path = "yolov8n.pt"
-            print(f"📦 YOLOv8n 사용")
+            print(f"📦 YOLOv8n 다운로드 및 사용")
+        else:
+            print(f"📂 커스텀 모델 사용: {yolo_path}")
         
-        print(f"📂 모델 로드: {yolo_path}")
         model = YOLO(yolo_path)
         
         # ONNX로 내보내기
-        output_path = "frontend/public/models/yolo.onnx"
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        print(f"🔄 ONNX 변환 중... (img_size=640)")
+        output_dir = "frontend/public/models"
+        os.makedirs(output_dir, exist_ok=True)
         
-        print(f"🔄 ONNX로 변환 중... (시간이 걸릴 수 있습니다)")
-        success = model.export(format="onnx", imgsz=640, simplify=True)
+        # export() 메서드 사용
+        model.export(
+            format="onnx",
+            imgsz=640,
+            simplify=True,
+            dynamic=True
+        )
         
-        # 변환된 파일 이동
-        if os.path.exists("yolov8n.onnx"):
-            os.rename("yolov8n.onnx", output_path)
-        elif os.path.exists("weights.onnx"):
-            os.rename("weights.onnx", output_path)
+        # 생성된 ONNX 파일 찾기
+        onnx_files = [f for f in os.listdir('.') if f.endswith('.onnx')]
+        if onnx_files:
+            src_file = onnx_files[0]
+            dst_file = os.path.join(output_dir, "yolo.onnx")
+            
+            if os.path.exists(src_file):
+                os.rename(src_file, dst_file)
+                size = os.path.getsize(dst_file) / (1024 * 1024)
+                print(f"✅ YOLO ONNX 변환 완료!")
+                print(f"📦 파일: {dst_file} ({size:.1f}MB)")
+                return True
         
-        if os.path.exists(output_path):
-            size = os.path.getsize(output_path) / (1024 * 1024)
-            print(f"✅ YOLO ONNX 변환 완료!")
-            print(f"📦 파일: {output_path} ({size:.1f}MB)")
-            return True
-        else:
-            print(f"❌ ONNX 파일을 찾을 수 없습니다")
-            return False
+        print(f"❌ ONNX 파일 생성 실패")
+        return False
             
     except Exception as e:
         print(f"❌ YOLO 변환 실패: {e}")
@@ -84,11 +64,10 @@ def export_yolo_to_onnx():
 def export_clip_to_onnx():
     """CLIP 모델을 ONNX로 내보내기"""
     print("\n" + "=" * 80)
-    print("🔄 CLIP 모델 ONNX 변환 시작")
+    print("🔄 CLIP 모델 → ONNX 변환")
     print("=" * 80)
     
     try:
-        import torch
         import clip
         
         # CLIP 모델 로드
@@ -97,14 +76,12 @@ def export_clip_to_onnx():
         model, preprocess = clip.load("ViT-B/32", device=device)
         model.eval()
         
-        # 더미 입력
+        # Visual encoder만 내보내기
+        print("🔄 Visual Encoder ONNX 변환 중...")
+        
         dummy_input = torch.randn(1, 3, 224, 224)
-        
-        # ONNX로 내보내기
         output_path = "frontend/public/models/clip.onnx"
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
         
-        print(f"🔄 ONNX로 변환 중... (visual encoder만)")
         torch.onnx.export(
             model.visual,
             dummy_input,
@@ -115,7 +92,8 @@ def export_clip_to_onnx():
                 'input': {0: 'batch_size'},
                 'output': {0: 'batch_size'}
             },
-            opset_version=13
+            opset_version=13,
+            do_constant_folding=True
         )
         
         if os.path.exists(output_path):
@@ -136,7 +114,7 @@ def export_clip_to_onnx():
 def create_model_info():
     """모델 정보 JSON 생성"""
     print("\n" + "=" * 80)
-    print("📝 모델 정보 파일 생성")
+    print("📝 모델 메타데이터 생성")
     print("=" * 80)
     
     import json
@@ -145,21 +123,30 @@ def create_model_info():
         "yolo": {
             "format": "onnx",
             "path": "/models/yolo.onnx",
-            "input_size": [640, 640],
-            "description": "커스텀 YOLO 홀드 감지 모델"
+            "input_shape": [1, 3, 640, 640],
+            "description": "커스텀 YOLO 홀드 세그멘테이션 모델",
+            "runtime": "onnxruntime-web"
         },
         "clip": {
             "format": "onnx",
             "path": "/models/clip.onnx",
-            "input_size": [224, 224],
+            "input_shape": [1, 3, 224, 224],
             "model": "ViT-B/32",
-            "description": "CLIP 색상 분석 모델"
+            "description": "CLIP 색상 분석 모델 (Visual Encoder)",
+            "runtime": "onnxruntime-web"
+        },
+        "usage": {
+            "library": "onnxruntime-web",
+            "install": "npm install onnxruntime-web",
+            "note": "ONNX Runtime Web을 사용하여 브라우저에서 실행"
         }
     }
     
     info_path = "frontend/public/models/model_info.json"
-    with open(info_path, 'w') as f:
-        json.dump(model_info, f, indent=2)
+    os.makedirs(os.path.dirname(info_path), exist_ok=True)
+    
+    with open(info_path, 'w', encoding='utf-8') as f:
+        json.dump(model_info, f, indent=2, ensure_ascii=False)
     
     print(f"✅ 모델 정보 생성: {info_path}")
     return True
@@ -167,16 +154,9 @@ def create_model_info():
 if __name__ == "__main__":
     print("\n")
     print("=" * 80)
-    print("🚀 PyTorch → ONNX 변환 시작")
+    print("🚀 ClimbMate AI 모델 ONNX 변환")
     print("=" * 80)
     print("\n")
-    
-    # 의존성 확인
-    if not check_dependencies():
-        sys.exit(1)
-    
-    # 디렉토리 생성
-    os.makedirs("frontend/public/models", exist_ok=True)
     
     # YOLO 변환
     yolo_success = export_yolo_to_onnx()
@@ -198,13 +178,15 @@ if __name__ == "__main__":
     print("=" * 80)
     
     if yolo_success and clip_success:
-        print("\n✅ 모든 모델 변환 완료!")
+        print("\n🎉 모든 모델 변환 완료!")
         print("\n📝 다음 단계:")
-        print("  1. clientAI.js에서 ONNX 모델 로드 구현")
-        print("  2. frontend 재빌드: docker compose build frontend")
-        print("  3. 배포: docker compose up -d")
+        print("  1. npm install onnxruntime-web")
+        print("  2. clientAI.js에서 ONNX Runtime 사용")
+        print("  3. frontend 재빌드 및 배포")
+        print("\n")
     else:
-        print("\n⚠️  일부 모델 변환 실패")
-        print("  → 모의 모드로 계속 진행 가능")
+        print("\n⚠️  변환 실패 - 수동으로 확인 필요")
+        print("\n")
     
-    print("\n")
+    sys.exit(0 if (yolo_success and clip_success) else 1)
+

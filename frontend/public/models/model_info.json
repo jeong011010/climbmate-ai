@@ -1,0 +1,32 @@
+{
+  "yolo": {
+    "format": "onnx",
+    "path": "/models/yolo.onnx",
+    "input_shape": [
+      1,
+      3,
+      640,
+      640
+    ],
+    "description": "커스텀 YOLO 홀드 세그멘테이션 모델",
+    "runtime": "onnxruntime-web"
+  },
+  "clip": {
+    "format": "onnx",
+    "path": "/models/clip.onnx",
+    "input_shape": [
+      1,
+      3,
+      224,
+      224
+    ],
+    "model": "ViT-B/32",
+    "description": "CLIP 색상 분석 모델 (Visual Encoder)",
+    "runtime": "onnxruntime-web"
+  },
+  "usage": {
+    "library": "onnxruntime-web",
+    "install": "npm install onnxruntime-web",
+    "note": "ONNX Runtime Web을 사용하여 브라우저에서 실행"
+  }
+}

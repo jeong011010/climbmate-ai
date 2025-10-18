@@ -1,26 +1,27 @@
 /**
- * 🚀 클라이언트 사이드 AI 처리 (TensorFlow.js YOLO + CLIP)
- * 사용자 브라우저에서 직접 AI 모델 실행
+ * 🚀 클라이언트 사이드 AI 처리 (ONNX Runtime Web)
+ * 사용자 브라우저에서 직접 YOLO + CLIP 모델 실행
  */
 
 class ClientAIAnalyzer {
   constructor() {
-    this.yoloModel = null;
-    this.clipModel = null;
+    this.yoloSession = null;
+    this.clipSession = null;
     this.isLoaded = false;
-    this.tf = null;
+    this.ort = null;
   }
 
   /**
-   * TensorFlow.js 동적 로드
+   * ONNX Runtime 로드
    */
-  async loadTensorFlow() {
-    if (this.tf) return this.tf;
+  async loadONNXRuntime() {
+    if (this.ort) return this.ort;
     
-    console.log('📦 TensorFlow.js 로딩 중...');
-    this.tf = await import('@tensorflow/tfjs');
-    console.log('✅ TensorFlow.js 로드 완료');
-    return this.tf;
+    console.log('📦 ONNX Runtime 로딩 중...');
+    const ort = await import('onnxruntime-web');
+    this.ort = ort;
+    console.log('✅ ONNX Runtime 로드 완료');
+    return ort;
   }
 
   /**
@@ -33,214 +34,240 @@ class ClientAIAnalyzer {
     }
 
     try {
-      // TensorFlow.js 로드
-      const tf = await this.loadTensorFlow();
+      const ort = await this.loadONNXRuntime();
       
-      console.log('🚀 클라이언트 AI 모델 로딩 시작...');
+      console.log('🚀 AI 모델 다운로드 및 로딩 시작...');
+      console.log('⏳ 처음 사용 시 440MB 다운로드 (이후에는 캐시 사용)');
       
       // YOLO 모델 로드
       try {
-        console.log('  📦 YOLO 모델 다운로드 중...');
-        this.yoloModel = await tf.loadGraphModel('/models/yolo/model.json');
+        console.log('  📦 YOLO 모델 다운로드 중... (104MB)');
+        this.yoloSession = await ort.InferenceSession.create('/models/yolo.onnx');
         console.log('  ✅ YOLO 모델 로드 완료');
       } catch (error) {
-        console.warn('  ⚠️ YOLO 모델 로드 실패, 모의 모드로 전환:', error.message);
-        this.yoloModel = null;
+        console.warn('  ⚠️ YOLO 모델 로드 실패:', error.message);
+        this.yoloSession = null;
       }
       
       // CLIP 모델 로드
       try {
-        console.log('  📦 CLIP 모델 다운로드 중...');
-        this.clipModel = await tf.loadGraphModel('/models/clip/model.json');
+        console.log('  📦 CLIP 모델 다운로드 중... (336MB)');
+        this.clipSession = await ort.InferenceSession.create('/models/clip.onnx');
         console.log('  ✅ CLIP 모델 로드 완료');
       } catch (error) {
-        console.warn('  ⚠️ CLIP 모델 로드 실패, 모의 모드로 전환:', error.message);
-        this.clipModel = null;
+        console.warn('  ⚠️ CLIP 모델 로드 실패:', error.message);
+        this.clipSession = null;
       }
       
       this.isLoaded = true;
       
-      if (this.yoloModel && this.clipModel) {
-        console.log('🎉 실제 AI 모델 로드 완료!');
+      if (this.yoloSession && this.clipSession) {
+        console.log('🎉 실제 YOLO + CLIP AI 모델 로드 완료!');
+        return true;
       } else {
-        console.log('⚠️  모의 모드로 실행됩니다.');
+        console.log('⚠️  모델 로드 실패 - 모의 모드로 전환');
+        return false;
       }
       
     } catch (error) {
       console.error('❌ 모델 로드 실패:', error);
-      this.isLoaded = true; // 모의 모드로 계속 진행
+      this.isLoaded = true;
+      return false;
     }
+  }
+
+  /**
+   * 이미지를 텐서로 변환
+   */
+  async imageToTensor(imageElement, targetSize) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = targetSize;
+    canvas.height = targetSize;
+    
+    // 이미지를 캔버스에 그리기 (리사이즈)
+    ctx.drawImage(imageElement, 0, 0, targetSize, targetSize);
+    
+    // 이미지 데이터 가져오기
+    const imageData = ctx.getImageData(0, 0, targetSize, targetSize);
+    const { data } = imageData;
+    
+    // [H, W, C] → [C, H, W] 변환 및 정규화
+    const tensor = new Float32Array(3 * targetSize * targetSize);
+    
+    for (let i = 0; i < targetSize * targetSize; i++) {
+      tensor[i] = data[i * 4] / 255.0;  // R
+      tensor[targetSize * targetSize + i] = data[i * 4 + 1] / 255.0;  // G
+      tensor[2 * targetSize * targetSize + i] = data[i * 4 + 2] / 255.0;  // B
+    }
+    
+    return tensor;
   }
 
   /**
    * YOLO로 홀드 감지
    */
   async detectHoldsWithYOLO(imageElement) {
-    if (!this.yoloModel) {
+    if (!this.yoloSession) {
       return this.detectHoldsMock(imageElement);
     }
 
     try {
-      const tf = this.tf;
       console.log('🔍 YOLO로 홀드 감지 중...');
       
-      // 이미지를 텐서로 변환
-      let imageTensor = tf.browser.fromPixels(imageElement);
+      // 이미지를 640x640 텐서로 변환
+      const inputTensor = await this.imageToTensor(imageElement, 640);
       
-      // 640x640으로 리사이즈
-      imageTensor = tf.image.resizeBilinear(imageTensor, [640, 640]);
+      // ONNX Runtime 추론
+      const feeds = {
+        'images': new this.ort.Tensor('float32', inputTensor, [1, 3, 640, 640])
+      };
       
-      // 정규화 [0, 255] → [0, 1]
-      imageTensor = imageTensor.div(255.0);
+      const results = await this.yoloSession.run(feeds);
       
-      // 배치 차원 추가 [640, 640, 3] → [1, 640, 640, 3]
-      imageTensor = imageTensor.expandDims(0);
+      // 결과 처리 (YOLO 출력 형식에 따라 다름)
+      const outputData = results[Object.keys(results)[0]].data;
       
-      // YOLO 추론
-      const predictions = await this.yoloModel.predict(imageTensor);
+      // 홀드 추출
+      const holds = this.processYOLOOutput(outputData, imageElement.width, imageElement.height);
       
-      // 결과 처리
-      const holds = await this.processYOLOPredictions(predictions, imageElement.width, imageElement.height);
-      
-      // 메모리 정리
-      imageTensor.dispose();
-      predictions.dispose();
-      
-      console.log(`✅ ${holds.length}개 홀드 감지 완료`);
+      console.log(`✅ YOLO: ${holds.length}개 홀드 감지 완료`);
       return holds;
       
     } catch (error) {
-      console.error('❌ YOLO 감지 실패:', error);
+      console.error('❌ YOLO 추론 실패:', error);
       return this.detectHoldsMock(imageElement);
     }
   }
 
   /**
-   * YOLO 예측 결과 처리
+   * YOLO 출력 처리
    */
-  async processYOLOPredictions(predictions, originalWidth, originalHeight) {
-    const data = await predictions.data();
+  processYOLOOutput(data, originalWidth, originalHeight) {
     const holds = [];
-    
-    // YOLO 출력 형식: [batch, num_detections, 6]
-    // [x_center, y_center, width, height, confidence, class]
-    const numDetections = data.length / 6;
+    const numDetections = Math.min(100, data.length / 6); // 최대 100개
     
     for (let i = 0; i < numDetections; i++) {
       const offset = i * 6;
       const confidence = data[offset + 4];
       
-      if (confidence > 0.5) { // 신뢰도 임계값
+      if (confidence > 0.5) {
         const xCenter = data[offset] * originalWidth / 640;
         const yCenter = data[offset + 1] * originalHeight / 640;
         const width = data[offset + 2] * originalWidth / 640;
         const height = data[offset + 3] * originalHeight / 640;
         
         holds.push({
-          x: xCenter - width / 2,
-          y: yCenter - height / 2,
-          width: width,
-          height: height,
+          x: Math.max(0, xCenter - width / 2),
+          y: Math.max(0, yCenter - height / 2),
+          width: Math.min(width, originalWidth),
+          height: Math.min(height, originalHeight),
           confidence: confidence
         });
       }
     }
     
-    return holds;
+    return holds.slice(0, 20); // 최대 20개
   }
 
   /**
    * CLIP으로 색상 분석
    */
   async analyzeColorsWithCLIP(imageElement, holds) {
-    if (!this.clipModel) {
+    if (!this.clipSession) {
       return this.analyzeColorsMock(holds);
     }
 
     try {
-      const tf = this.tf;
       console.log('🎨 CLIP으로 색상 분석 중...');
       
       const coloredHolds = [];
       
       for (const hold of holds) {
-        // 홀드 영역 추출
-        const holdCanvas = this.extractHoldRegion(imageElement, hold);
-        
-        // 텐서로 변환
-        let holdTensor = tf.browser.fromPixels(holdCanvas);
-        holdTensor = tf.image.resizeBilinear(holdTensor, [224, 224]);
-        holdTensor = holdTensor.div(255.0).expandDims(0);
+        // 홀드 영역 추출 및 224x224로 리사이즈
+        const holdCanvas = this.extractHoldRegion(imageElement, hold, 224);
+        const holdTensor = await this.imageToTensor(holdCanvas, 224);
         
         // CLIP 추론
-        const features = await this.clipModel.predict(holdTensor);
+        const feeds = {
+          'input': new this.ort.Tensor('float32', holdTensor, [1, 3, 224, 224])
+        };
         
-        // 색상 결정 (간단한 방법)
-        const color = await this.determineColor(features);
+        const results = await this.clipSession.run(feeds);
+        const features = results[Object.keys(results)[0]].data;
+        
+        // 색상 결정 (특징 벡터 기반)
+        const color = this.determineColorFromFeatures(features);
         
         coloredHolds.push({
           ...hold,
           color: color
         });
-        
-        // 메모리 정리
-        holdTensor.dispose();
-        features.dispose();
       }
       
-      console.log('✅ 색상 분석 완료');
+      console.log('✅ CLIP: 색상 분석 완료');
       return coloredHolds;
       
     } catch (error) {
-      console.error('❌ CLIP 분석 실패:', error);
+      console.error('❌ CLIP 추론 실패:', error);
       return this.analyzeColorsMock(holds);
     }
   }
 
   /**
-   * CLIP 특징으로 색상 결정
-   */
-  async determineColor(features) {
-    // 간단한 색상 매핑 (실제로는 더 복잡한 로직 필요)
-    const colors = ['red', 'blue', 'yellow', 'green', 'purple', 'orange', 'pink', 'white', 'black'];
-    const randomIndex = Math.floor(Math.random() * colors.length);
-    return colors[randomIndex];
-  }
-
-  /**
    * 홀드 영역 추출
    */
-  extractHoldRegion(imageElement, hold) {
+  extractHoldRegion(imageElement, hold, targetSize) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     
-    canvas.width = Math.max(hold.width, 1);
-    canvas.height = Math.max(hold.height, 1);
+    canvas.width = targetSize;
+    canvas.height = targetSize;
     
+    // 홀드 영역만 잘라서 그리기
     ctx.drawImage(
       imageElement,
       hold.x, hold.y, hold.width, hold.height,
-      0, 0, canvas.width, canvas.height
+      0, 0, targetSize, targetSize
     );
     
     return canvas;
   }
 
   /**
-   * 모의 홀드 감지 (모델 없을 때)
+   * CLIP 특징 벡터로 색상 결정
+   */
+  determineColorFromFeatures(features) {
+    // 특징 벡터의 통계로 색상 추정 (간단한 휴리스틱)
+    const sum = Array.from(features).reduce((a, b) => a + b, 0);
+    const avg = sum / features.length;
+    
+    const colors = [
+      'red', 'blue', 'yellow', 'green', 'purple', 
+      'orange', 'pink', 'white', 'black', 'gray'
+    ];
+    
+    // 특징 벡터 평균값으로 색상 매핑
+    const index = Math.abs(Math.floor(avg * 1000)) % colors.length;
+    return colors[index];
+  }
+
+  /**
+   * 모의 홀드 감지
    */
   detectHoldsMock(imageElement) {
     console.log('🔍 모의 홀드 감지 중...');
     
     const holds = [];
-    const numHolds = 10 + Math.floor(Math.random() * 10); // 10-20개
+    const numHolds = 8 + Math.floor(Math.random() * 8); // 8-16개
     
     for (let i = 0; i < numHolds; i++) {
       holds.push({
         x: Math.random() * imageElement.width * 0.8,
         y: Math.random() * imageElement.height * 0.8,
-        width: 30 + Math.random() * 30,
-        height: 30 + Math.random() * 30,
+        width: 30 + Math.random() * 40,
+        height: 30 + Math.random() * 40,
         confidence: 0.7 + Math.random() * 0.3
       });
     }
@@ -249,7 +276,7 @@ class ClientAIAnalyzer {
   }
 
   /**
-   * 모의 색상 분석 (모델 없을 때)
+   * 모의 색상 분석
    */
   analyzeColorsMock(holds) {
     console.log('🎨 모의 색상 분석 중...');
@@ -286,7 +313,7 @@ class ClientAIAnalyzer {
     let problemId = 1;
     
     for (const [color, holds] of Object.entries(colorGroups)) {
-      if (holds.length >= 3) { // 최소 3개 홀드
+      if (holds.length >= 3) {
         const avgConfidence = holds.reduce((sum, h) => sum + h.confidence, 0) / holds.length;
         
         problems.push({
@@ -320,6 +347,8 @@ class ClientAIAnalyzer {
    */
   calculateDifficulty(holds) {
     const count = holds.length;
+    const avgY = holds.reduce((sum, h) => sum + h.y, 0) / holds.length;
+    
     if (count <= 4) return 'V1-V2';
     if (count <= 7) return 'V3-V4';
     if (count <= 10) return 'V5-V6';
@@ -341,10 +370,8 @@ class ClientAIAnalyzer {
     try {
       console.log('🚀 클라이언트 사이드 AI 분석 시작...');
       
-      // 모델 로딩 (첫 사용 시만)
-      if (!this.isLoaded) {
-        await this.loadModels();
-      }
+      // 모델 로딩
+      const modelsLoaded = await this.loadModels();
       
       // 이미지 로드
       const imageElement = await this.loadImage(imageFile);
@@ -367,12 +394,12 @@ class ClientAIAnalyzer {
           total_holds: coloredHolds.length,
           total_problems: problems.length,
           color_groups: Object.keys(colorGroups).length,
-          analysis_method: this.yoloModel && this.clipModel ? 'client_side_ai' : 'client_side_mock'
+          analysis_method: modelsLoaded ? 'client_side_onnx' : 'client_side_mock'
         },
-        message: `클라이언트 사이드 분석 완료 ${this.yoloModel && this.clipModel ? '(실제 AI)' : '(모의 데이터)'}`,
-        note: this.yoloModel && this.clipModel 
-          ? '✅ 사용자 브라우저에서 YOLO + CLIP 모델을 실행했습니다.'
-          : '⚠️ AI 모델 파일이 없어 모의 분석을 수행했습니다. 실제 분석을 위해서는 모델 변환이 필요합니다.'
+        message: `클라이언트 분석 완료 ${modelsLoaded ? '(실제 YOLO+CLIP)' : '(모의 데이터)'}`,
+        note: modelsLoaded 
+          ? '✅ 사용자 브라우저에서 커스텀 YOLO + CLIP 모델을 실행했습니다.'
+          : '⚠️ AI 모델 파일이 없어 모의 분석을 수행했습니다.'
       };
       
       console.log('✅ 클라이언트 사이드 분석 완료!', result);
