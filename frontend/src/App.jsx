@@ -96,12 +96,59 @@ function App() {
     }
   }
 
-  // 컴포넌트 마운트 시 통계 로드
-  useEffect(() => {
-    loadStats()
-    loadAnalysisHistory()
-    loadFavorites()
-  }, [])
+  // 🚀 OpenAI Vision API 분석 (무제한 동시 처리)
+  const analyzeImageOpenAI = async () => {
+    if (!image) return
+
+    setLoading(true)
+    setLoadingProgress(0)
+    setDetectedHolds(0)
+    setDetectedProblems(0)
+    setCurrentAnalysisStep('')
+    setResult(null)
+
+    try {
+      const formData = new FormData()
+      formData.append('file', image)
+      if (wallAngle) formData.append('wall_angle', wallAngle)
+
+      console.log('🚀 OpenAI Vision 분석 시작...')
+      setCurrentAnalysisStep('OpenAI Vision API로 분석 중...')
+
+      const response = await fetch(`${API_URL}/api/analyze-openai`, {
+        method: 'POST',
+        body: formData
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+      
+      setLoading(false)
+      setCurrentAnalysisStep('분석 완료!')
+      setResult(data)
+
+      // 통계 업데이트
+      if (data.statistics) {
+        setDetectedHolds(data.statistics.total_holds || 0)
+        setDetectedProblems(data.statistics.total_problems || 0)
+      }
+
+      // 히스토리에 저장
+      saveToHistory(data)
+
+      console.log('✅ OpenAI 분석 완료:', data)
+
+    } catch (error) {
+      console.error('❌ OpenAI 분석 실패:', error)
+      setLoading(false)
+      setCurrentAnalysisStep('분석 실패')
+      alert(`❌ OpenAI 분석 실패: ${error.message}`)
+    }
+  }
+
 
   // 분석 히스토리 로드
   const loadAnalysisHistory = () => {

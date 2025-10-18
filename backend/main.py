@@ -355,17 +355,43 @@ async def health_check():
     }
 
 # 기존 API들 (데이터베이스, 통계 등)은 그대로 유지
-@app.get("/api/stats")
-async def get_stats():
-    """통계 정보 반환"""
-    if not DB_AVAILABLE:
-        return {"error": "Database not available"}
-    
+@app.post("/api/analyze-openai")
+async def analyze_with_openai(
+    file: UploadFile = File(...),
+    wall_angle: str = Form(None)
+):
+    """
+    🚀 OpenAI Vision API로 클라이밍 벽 분석 (무제한 동시 처리)
+    """
     try:
-        stats = get_model_stats()
-        return stats
+        # 이미지 읽기
+        contents = await file.read()
+        image_data_base64 = base64.b64encode(contents).decode('utf-8')
+        
+        # OpenAI Vision API 호출
+        from openai_analyzer import analyze_climbing_wall_with_openai
+        result = await analyze_climbing_wall_with_openai(image_data_base64)
+        
+        # 벽 각도 정보 추가
+        if wall_angle and result.get("problems"):
+            for problem in result["problems"]:
+                problem["wall_angle"] = wall_angle
+        
+        return result
+        
     except Exception as e:
-        return {"error": str(e)}
+        print(f"❌ OpenAI 분석 실패: {e}")
+        raise HTTPException(status_code=500, detail=f"OpenAI analysis failed: {str(e)}")
+
+@app.get("/api/openai-status")
+async def get_openai_status():
+    """OpenAI API 상태 확인"""
+    try:
+        from openai_analyzer import get_openai_status
+        return get_openai_status()
+    except Exception as e:
+        return {"available": False, "message": f"OpenAI status check failed: {str(e)}"}
+
 
 @app.post("/api/feedback")
 async def submit_feedback(feedback: FeedbackRequest):
