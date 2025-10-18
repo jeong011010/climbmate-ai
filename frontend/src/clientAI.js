@@ -1,8 +1,8 @@
 /**
  * 🚀 클라이언트 사이드 AI 처리
- * 사용자 브라우저에서 직접 AI 모델 실행
+ * 사용자 브라우저에서 직접 AI 모델 실행 (TensorFlow.js 의존성 없이 임시 구현)
  */
-import * as tf from '@tensorflow/tfjs';
+// import * as tf from '@tensorflow/tfjs'; // TODO: TensorFlow.js 의존성 추가 후 활성화
 
 class ClientAIAnalyzer {
   constructor() {
