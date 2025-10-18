@@ -1,6 +1,6 @@
-train: /Users/kimjazz/Desktop/project/climbmate/holdcheck/dataset/images/train
-val: /Users/kimjazz/Desktop/project/climbmate/holdcheck/dataset/images/val
-test: /Users/kimjazz/Desktop/project/climbmate/holdcheck/dataset/images/test
+train: /app/holdcheck/dataset/images/train
+val: /app/holdcheck/dataset/images/val
+test: /app/holdcheck/dataset/images/test
 
 nc: 1
 names: ['hold']
