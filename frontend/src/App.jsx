@@ -117,6 +117,8 @@ function App() {
 
   // 분석 결과를 히스토리에 저장
   const saveToHistory = (analysisResult) => {
+    if (!analysisResult || !analysisResult.problems) return
+    
     const historyItem = {
       id: Date.now(),
       timestamp: new Date().toISOString(),
@@ -347,21 +349,6 @@ function App() {
     }
   }
 
-  // 히스토리 저장 함수
-  const saveToHistory = (result) => {
-    if (!result || !result.problems) return
-    
-    const historyItem = {
-      id: Date.now(),
-      timestamp: new Date().toISOString(),
-      problems: result.problems,
-      statistics: result.statistics,
-      image: preview
-    }
-    
-    setAnalysisHistory(prev => [historyItem, ...prev.slice(0, 49)]) // 최대 50개 유지
-    localStorage.setItem('analysisHistory', JSON.stringify([historyItem, ...analysisHistory.slice(0, 49)]))
-  }
 
   const submitFeedback = async () => {
     if (!selectedProblem || !selectedProblem.db_id) {
