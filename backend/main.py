@@ -99,6 +99,11 @@ async def analyze_image(
         if image is None:
             raise HTTPException(status_code=400, detail="Invalid image file")
         
+        # 🚀 최적화: 이미지 크기 제한 (메모리 절약)
+        if image.size[0] > 1024 or image.size[1] > 1024:
+            print(f"📏 이미지 크기 조정: {image.size} -> 1024x1024")
+            image = image.resize((1024, 1024), Image.Resampling.LANCZOS)
+        
         # 🚀 최적화: 전처리 (홀드 감지)
         print(f"🔍 홀드 감지 시작...")
         hold_data_raw, masks = preprocess(
