@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://climbmate.store'
+const API_URL = import.meta.env.VITE_API_URL || 'http://43.203.199.91'
 
 function App() {
   const [image, setImage] = useState(null)

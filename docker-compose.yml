@@ -29,7 +29,7 @@ services:
     depends_on:
       - backend
     environment:
-      - VITE_API_URL=https://climbmate.store
+            - VITE_API_URL=http://43.203.199.91
     restart: unless-stopped
 
   nginx:
