@@ -318,8 +318,8 @@ class ClientAIAnalyzer {
         
         problems.push({
           id: problemId++,
-          name: `${color.toUpperCase()} 루트`,
-          color: color,
+          name: `${(color || 'unknown').toUpperCase()} 루트`,
+          color: color || 'unknown',
           difficulty: this.calculateDifficulty(holds),
           type: this.guessType(holds),
           confidence: avgConfidence,
@@ -328,7 +328,7 @@ class ClientAIAnalyzer {
             y: Math.round(h.y),
             width: Math.round(h.width),
             height: Math.round(h.height),
-            color: h.color,
+            color: h.color || 'unknown',
             confidence: h.confidence
           })),
           statistics: {
