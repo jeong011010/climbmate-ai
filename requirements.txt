@@ -9,10 +9,10 @@ seaborn==0.13.2
 # OpenCV
 opencv-python==4.11.0.86
 
-# PyTorch (CUDA 버전 선택 가능, CPU만 쓸 거면 torchvision, torchaudio 맞춰 설치)
-torch==2.4.1
-torchvision==0.19.1
-torchaudio==2.4.1
+# PyTorch (CPU 전용 - 메모리 절약)
+torch==2.4.1+cpu
+torchvision==0.19.1+cpu
+torchaudio==2.4.1+cpu
 
 # YOLOv8
 ultralytics==8.2.103
