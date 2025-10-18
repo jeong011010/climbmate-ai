@@ -23,13 +23,34 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.frontend
-    ports:
-      - "3000:80"
+    expose:
+      - "80"
     depends_on:
       - backend
     environment:
-      - VITE_API_URL=http://43.203.199.91:8000
+      - VITE_API_URL=https://climbmate.store
     restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
 volumes:
   db-data:
