@@ -319,19 +319,21 @@ class ClientAIAnalyzer {
         formData.append('wall_angle', wallAngle);
       }
       
-      // SSE (Server-Sent Events)로 실시간 진행 상황 업데이트
+      // 🚀 일반 POST 요청으로 분석 (SSE fallback 포함)
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         let result = null;
+        let isSSE = false;
         
-        xhr.open('POST', `${API_URL}/api/analyze-stream`);  // SSE 엔드포인트 사용
+        xhr.open('POST', `${API_URL}/api/analyze-stream`);  // SSE 엔드포인트 시도
         
-        // 실시간 진행 상황 수신
+        // 실시간 진행 상황 수신 (SSE)
         xhr.onprogress = function() {
           const lines = xhr.responseText.split('\n');
           
           for (const line of lines) {
             if (line.startsWith('data: ')) {
+              isSSE = true;
               try {
                 const data = JSON.parse(line.slice(6));
                 
@@ -358,15 +360,26 @@ class ClientAIAnalyzer {
         xhr.onreadystatechange = function() {
           if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status === 200) {
+              // SSE로 받은 결과가 있으면 그것 사용
               if (result) {
                 resolve(result);
               } else {
-                reject(new Error('서버 응답을 받지 못했습니다.'));
+                // SSE가 아닌 일반 JSON 응답 처리
+                try {
+                  const jsonResult = JSON.parse(xhr.responseText);
+                  resolve(jsonResult);
+                } catch (e) {
+                  reject(new Error('서버 응답을 파싱할 수 없습니다.'));
+                }
               }
             } else {
               reject(new Error(`서버 분석 실패 (${xhr.status}): ${xhr.responseText}`));
             }
           }
+        };
+        
+        xhr.onerror = function() {
+          reject(new Error('네트워크 오류가 발생했습니다.'));
         };
         
         xhr.send(formData);
