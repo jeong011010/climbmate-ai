@@ -10,7 +10,83 @@ from gpt4_analyzer import analyze_with_gpt4_vision
 from database import save_analysis_result
 
 @celery_app.task(bind=True)
-def analyze_image_async(self, image_data, wall_angle=None):
+def analyze_colors_with_clip_async(self, image_base64, hold_data):
+    """
+    CLIP 색상 분석 비동기 작업
+    
+    Args:
+        image_base64: Base64 인코딩된 이미지 데이터
+        hold_data: 홀드 감지 결과
+    
+    Returns:
+        list: 색상 분석된 홀드 데이터
+    """
+    try:
+        # 진행률 업데이트: 이미지 디코딩
+        self.update_state(
+            state='PROGRESS',
+            meta={'progress': 10, 'message': '📸 이미지 디코딩 중...', 'step': 'decode'}
+        )
+        
+        # Base64 이미지 디코딩
+        image_bytes = base64.b64decode(image_base64)
+        nparr = np.frombuffer(image_bytes, np.uint8)
+        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        
+        if image is None:
+            raise ValueError("잘못된 이미지 파일")
+        
+        # 진행률 업데이트: CLIP 분석 시작
+        self.update_state(
+            state='PROGRESS',
+            meta={'progress': 30, 'message': '🎨 CLIP 색상 분석 중...', 'step': 'clip_analysis'}
+        )
+        
+        # 홀드 데이터를 마스크로 변환 (간단한 구현)
+        masks = []
+        for hold in hold_data:
+            # 홀드 중심점 주변을 마스크로 생성
+            mask = np.zeros(image.shape[:2], dtype=np.uint8)
+            center_x, center_y = int(hold['center'][0]), int(hold['center'][1])
+            radius = int(np.sqrt(hold['area']) / 2)
+            cv2.circle(mask, (center_x, center_y), radius, 255, -1)
+            masks.append(mask)
+        
+        # CLIP 색상 분석
+        colored_holds = clustering.clip_ai_color_clustering(
+            hold_data,
+            None,
+            image,
+            masks,
+            eps=0.3,
+            use_dbscan=False
+        )
+        
+        # 진행률 업데이트: 완료
+        self.update_state(
+            state='SUCCESS',
+            meta={
+                'progress': 100, 
+                'message': '✅ CLIP 색상 분석 완료', 
+                'step': 'complete',
+                'result': colored_holds
+            }
+        )
+        
+        return colored_holds
+        
+    except Exception as e:
+        # 오류 발생 시 상태 업데이트
+        self.update_state(
+            state='FAILURE',
+            meta={
+                'progress': 0,
+                'message': f'❌ CLIP 분석 실패: {str(e)}',
+                'step': 'error',
+                'error': str(e)
+            }
+        )
+        raise e
     """
     비동기 이미지 분석 작업
     

@@ -325,20 +325,66 @@ class ClientAIAnalyzer {
         wallAngle: wallAngle
       });
       
-      // 🚀 일반 POST 요청으로 분석 (SSE fallback 포함)
-      return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        let result = null;
-        
+      // 🚀 비동기 작업 큐 방식으로 분석
+      return new Promise(async (resolve, reject) => {
         try {
-          xhr.open('POST', `${API_URL}/api/analyze-stream`);  // SSE 엔드포인트 시도
-          console.log('🚀 SSE 엔드포인트 호출:', `${API_URL}/api/analyze-stream`);
-          console.log('✅ xhr.open() 성공');
-        } catch (openError) {
-          console.error('❌ xhr.open() 실패:', openError);
-          reject(new Error(`요청 열기 실패: ${openError.message}`));
-          return;
+          // 1단계: 분석 작업 시작
+          console.log('🚀 비동기 분석 작업 시작');
+          
+          const startResponse = await fetch(`${API_URL}/api/analyze-stream`, {
+            method: 'POST',
+            body: formData
+          });
+          
+          if (!startResponse.ok) {
+            throw new Error(`작업 시작 실패: ${startResponse.status}`);
+          }
+          
+          const startData = await startResponse.json();
+          const taskId = startData.task_id;
+          console.log('✅ 작업 시작됨, Task ID:', taskId);
+          
+          // 2단계: 진행률 폴링
+          const pollStatus = async () => {
+            try {
+              const statusResponse = await fetch(`${API_URL}/api/analyze-status/${taskId}`);
+              if (!statusResponse.ok) {
+                throw new Error(`상태 확인 실패: ${statusResponse.status}`);
+              }
+              
+              const statusData = await statusResponse.json();
+              console.log('📊 진행률:', statusData.progress + '%', statusData.message);
+              
+              // UI 업데이트
+              if (typeof window.updateAnalysisProgress === 'function') {
+                window.updateAnalysisProgress({
+                  message: statusData.message,
+                  progress: statusData.progress,
+                  step: statusData.step
+                });
+              }
+              
+              if (statusData.status === 'SUCCESS') {
+                console.log('✅ 분석 완료!');
+                resolve(statusData.result);
+              } else if (statusData.status === 'FAILURE') {
+                reject(new Error(statusData.message || '분석 실패'));
+              } else {
+                // 진행 중이면 1초 후 다시 확인
+                setTimeout(pollStatus, 1000);
+              }
+            } catch (error) {
+              reject(error);
+            }
+          };
+          
+          // 폴링 시작
+          pollStatus();
+          
+        } catch (error) {
+          reject(error);
         }
+      });
         
         // SSE를 위한 헤더 설정 (Connection 헤더는 브라우저가 자동 설정)
         try {

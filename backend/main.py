@@ -592,6 +592,30 @@ async def get_analysis_status(task_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"상태 확인 실패: {str(e)}")
 
+@app.post("/api/gpt4-analyze")
+async def gpt4_analyze(request: dict):
+    """
+    GPT-4 문제 분석 API
+    """
+    try:
+        image_base64 = request.get('image_base64')
+        holds = request.get('holds')
+        wall_angle = request.get('wall_angle')
+        
+        if not image_base64 or not holds:
+            raise HTTPException(status_code=400, detail="이미지와 홀드 데이터가 필요합니다")
+        
+        # GPT-4 분석 실행
+        analysis = analyze_with_gpt4_vision(image_base64, holds, wall_angle)
+        
+        return {
+            "success": True,
+            "analysis": analysis
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"GPT-4 분석 실패: {str(e)}")
+
 @app.post("/api/analyze-sync")
 async def analyze_image_sync(
     file: UploadFile = File(...),
