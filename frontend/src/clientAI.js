@@ -358,14 +358,15 @@ class ClientAIAnalyzer {
                   window.updateAnalysisProgress(data);
                 }
                 
-                // 최종 결과 처리
-                if (data.step === 'complete' && data.problems) {
+                // 최종 결과 처리 - complete 단계에서 모든 데이터 수집
+                if (data.step === 'complete') {
                   result = {
-                    problems: data.problems,
-                    statistics: data.statistics,
-                    annotated_image_base64: data.annotated_image_base64,
-                    message: data.message
+                    problems: data.problems || [],
+                    statistics: data.statistics || {},
+                    annotated_image_base64: data.annotated_image_base64 || '',
+                    message: data.message || '분석 완료'
                   };
+                  console.log('✅ 최종 결과 수신:', result);
                 }
               } catch (e) {
                 console.log('JSON 파싱 실패:', e, line);

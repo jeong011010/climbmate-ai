@@ -831,8 +831,11 @@ async def analyze_image_stream(
                     print(f"🖼️ 이미지 청크 {chunk_num}/{total_chunks} 전송: {len(chunk)}bytes")
                     yield await send_progress_update(f"🖼️ 이미지 전송 ({chunk_num}/{total_chunks})", 99 + (chunk_num * 0.1), "result_image_chunk", image_chunk=chunk, chunk_info={"current": chunk_num, "total": total_chunks})
             
-            # 완료
-            yield await send_progress_update("✅ 분석 완료!", 100, "complete")
+            # 완료 - 최종 결과 포함
+            yield await send_progress_update("✅ 분석 완료!", 100, "complete", 
+                                           problems=problems_clean, 
+                                           statistics=statistics, 
+                                           annotated_image_base64=annotated_image)
             
         except Exception as e:
             print(f"❌ 분석 오류: {e}")
