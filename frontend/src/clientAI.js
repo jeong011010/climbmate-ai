@@ -216,7 +216,7 @@ class ClientAIAnalyzer {
       }
     }
     
-    return holds.slice(0, 30);
+    return holds; // 첫 커밋 때처럼 제한 없이 모든 홀드 반환
   }
   
   /**
@@ -264,6 +264,51 @@ class ClientAIAnalyzer {
     const union = area1 + area2 - intersection;
     
     return intersection / (union + 1e-6);
+  }
+
+  /**
+   * 🚀 서버 사이드 전체 분석 (YOLO + 마스크 + CLIP)
+   */
+  async analyzeWithServerSide(imageElement) {
+    try {
+      console.log('🚀 서버 사이드 전체 분석 시작...');
+      
+      // 이미지를 Base64로 변환
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      canvas.width = imageElement.width;
+      canvas.height = imageElement.height;
+      ctx.drawImage(imageElement, 0, 0);
+      
+      const imageDataBase64 = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
+      
+      console.log(`📤 이미지 전송: ${imageElement.width}x${imageElement.height}, ${Math.round(imageDataBase64.length * 0.75 / 1024)}KB`);
+      
+      const response = await fetch(`${API_URL}/api/analyze-full`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          holds: [], // 서버에서 YOLO로 감지하므로 빈 배열
+          image_data_base64: imageDataBase64
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`서버 분석 실패: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      console.log(`✅ 서버 분석 완료: ${result.colored_holds.length}개 홀드`);
+      
+      return result.colored_holds;
+      
+    } catch (error) {
+      console.error('❌ 서버 분석 실패:', error);
+      throw error;
+    }
   }
 
   /**
@@ -487,19 +532,13 @@ class ClientAIAnalyzer {
    */
   async analyzeImage(imageFile) {
     try {
-      console.log('🚀 클라이언트 사이드 AI 분석 시작...');
-      
-      // 모델 로딩
-      const modelsLoaded = await this.loadModels();
+      console.log('🚀 서버 사이드 AI 분석 시작...');
       
       // 이미지 로드
       const imageElement = await this.loadImage(imageFile);
       
-      // YOLO로 홀드 감지
-      const holds = await this.detectHoldsWithYOLO(imageElement);
-      
-      // 서버 CLIP API로 색상 분석
-      const coloredHolds = await this.analyzeColorsWithServerCLIP(imageElement, holds);
+      // 🚀 서버 사이드 전체 분석 (YOLO + 마스크 + CLIP)
+      const coloredHolds = await this.analyzeWithServerSide(imageElement);
       
       // 색상별 그룹화
       const colorGroups = this.groupByColor(coloredHolds);
@@ -513,19 +552,17 @@ class ClientAIAnalyzer {
           total_holds: coloredHolds.length,
           total_problems: problems.length,
           color_groups: Object.keys(colorGroups).length,
-          analysis_method: modelsLoaded ? 'client_side_onnx' : 'client_side_mock'
+          analysis_method: 'server_side_full'
         },
-        message: `클라이언트 분석 완료 ${modelsLoaded ? '(실제 YOLO+CLIP)' : '(모의 데이터)'}`,
-        note: modelsLoaded 
-          ? '✅ 사용자 브라우저에서 커스텀 YOLO + CLIP 모델을 실행했습니다.'
-          : '⚠️ AI 모델 파일이 없어 모의 분석을 수행했습니다.'
+        message: `서버 사이드 분석 완료 (YOLO + CLIP)`,
+        note: '✅ 서버에서 YOLO + 마스크 생성 + CLIP 모델을 실행했습니다.'
       };
       
-      console.log('✅ 클라이언트 사이드 분석 완료!', result);
+      console.log('✅ 서버 사이드 분석 완료!', result);
       return result;
       
     } catch (error) {
-      console.error('❌ 클라이언트 사이드 분석 실패:', error);
+      console.error('❌ 서버 사이드 분석 실패:', error);
       throw error;
     }
   }

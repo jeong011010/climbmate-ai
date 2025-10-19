@@ -812,9 +812,9 @@ function App() {
 
                   <div className="bg-white/80 backdrop-blur-sm p-5 rounded-xl shadow-md transition-all duration-300 hover:translate-y-[-3px] hover:shadow-lg">
                     <h4 className="text-sm mb-3 text-slate-600 font-semibold text-center">🏋️ 유형</h4>
-                    <div className="text-lg font-bold text-slate-800 mb-2 text-center">{selectedProblem.climb_type.primary_type}</div>
+                    <div className="text-lg font-bold text-slate-800 mb-2 text-center">{selectedProblem.climb_type?.primary_type || '일반'}</div>
                     <div className="flex flex-wrap gap-2 justify-center">
-                      {selectedProblem.climb_type.types.slice(0, 3).map((type, idx) => (
+                      {selectedProblem.climb_type?.types?.slice(0, 3).map((type, idx) => (
                         <span key={idx} className="px-3 py-1 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-full text-xs font-semibold shadow-md">
                           {type}
                         </span>
