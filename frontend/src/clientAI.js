@@ -339,21 +339,8 @@ class ClientAIAnalyzer {
       
       console.log(`✅ 서버 분석 완료: ${result.problems.length}개 문제`);
       
-      // 백엔드 응답을 프론트엔드 형식으로 변환
-      const coloredHolds = [];
-      result.problems.forEach((problem, index) => {
-        if (problem.holds && Array.isArray(problem.holds)) {
-          problem.holds.forEach(hold => {
-            coloredHolds.push({
-              ...hold,
-              problem_id: problem.db_id || index + 1,
-              problem_color: problem.color || 'unknown'
-            });
-          });
-        }
-      });
-      
-      return coloredHolds;
+      // 백엔드 응답을 그대로 반환 (이미 올바른 형식)
+      return result;
       
     } catch (error) {
       console.error('❌ 서버 분석 실패:', error);
