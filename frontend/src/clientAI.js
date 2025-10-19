@@ -351,12 +351,7 @@ class ClientAIAnalyzer {
           return;
         }
         
-        // 연결 상태 확인 (강화된 디버깅)
-        xhr.onloadstart = function() {
-          console.log('📡 SSE 연결 시작');
-          console.log('📡 요청 URL:', xhr.responseURL || 'unknown');
-          console.log('📡 요청 상태:', xhr.readyState);
-        };
+        // 연결 상태 확인 (강화된 디버깅) - onloadstart는 아래에서 정의
         
         xhr.onload = function() {
           console.log('📡 SSE 연결 완료');
@@ -370,8 +365,9 @@ class ClientAIAnalyzer {
           console.error('❌ 오류 텍스트:', xhr.statusText);
         };
         
-        // 실시간 진행 상황 수신 (SSE)
-        xhr.onprogress = function() {
+        // 실시간 진행 상황 수신 (SSE) - 강화된 이벤트 리스너
+        xhr.onprogress = function(event) {
+          console.log('📡 onprogress 이벤트 발생!');
           console.log('📡 SSE 데이터 수신:', xhr.responseText.length, 'bytes');
           console.log('📡 SSE 원본 데이터:', xhr.responseText);
           
@@ -457,6 +453,23 @@ class ClientAIAnalyzer {
         
         xhr.onerror = function() {
           reject(new Error('네트워크 오류가 발생했습니다.'));
+        };
+        
+        // 추가 이벤트 리스너들
+        xhr.onloadstart = function() {
+          console.log('📡 SSE 연결 시작');
+          console.log('📡 요청 URL:', xhr.responseURL || 'unknown');
+          console.log('📡 요청 상태:', xhr.readyState);
+        };
+        
+        xhr.ontimeout = function() {
+          console.error('❌ ontimeout 이벤트 발생');
+          reject(new Error('요청 시간 초과'));
+        };
+        
+        xhr.onabort = function() {
+          console.error('❌ onabort 이벤트 발생');
+          reject(new Error('요청이 중단되었습니다'));
         };
         
         // xhr.send() 호출 전 디버깅
