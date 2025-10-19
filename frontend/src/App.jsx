@@ -372,8 +372,13 @@ function App() {
     if (!result || !result.problems) return
     
     const rect = e.target.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
+    
+    // 터치 이벤트와 마우스 이벤트 모두 지원
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY
+    
+    const x = clientX - rect.left
+    const y = clientY - rect.top
     
     // 이미지의 실제 크기 (원본 이미지 기준)
     const img = e.target
@@ -696,6 +701,7 @@ function App() {
                  result ? 'cursor-pointer hover:opacity-90 transition-opacity' : ''
                }`}
                onClick={result ? handleImageClick : undefined}
+               onTouchEnd={result ? handleImageClick : undefined}
                onDoubleClick={result ? () => setShowImageModal(true) : undefined}
              />
              {result && selectedProblem && (
