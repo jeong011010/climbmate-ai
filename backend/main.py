@@ -12,18 +12,6 @@ import base64
 import psutil
 import gc
 import torch
-import redis
-from celery_app import analyze_image_task
-
-# 🚀 메모리 최적화: 스레드 수 제한 (메모리 절약)
-os.environ.setdefault("OMP_NUM_THREADS", "1")
-os.environ.setdefault("MKL_NUM_THREADS", "1")
-os.environ.setdefault("NUMEXPR_NUM_THREADS", "1")
-try:
-    torch.set_num_threads(1)
-except:
-    pass
-
 # holdcheck 모듈 경로 추가
 holdcheck_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'holdcheck')
 sys.path.insert(0, holdcheck_path)
@@ -31,10 +19,6 @@ sys.path.insert(0, holdcheck_path)
 # backend 모듈 경로 추가
 backend_path = os.path.dirname(__file__)
 sys.path.insert(0, backend_path)
-
-# Redis 연결 설정
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-redis_client = redis.from_url(REDIS_URL)
 
 from preprocess import preprocess
 from clustering import clip_ai_color_clustering, analyze_problem
@@ -165,56 +149,7 @@ async def root():
     """헬스체크"""
     return {"status": "ok", "message": "ClimbMate API is running"}
 
-@app.post("/api/analyze")
-async def analyze_image(
-    file: UploadFile = File(...),
-    wall_angle: str = None
-):
-    """
-    🚀 비동기 클라이밍 벽 이미지 분석 (즉시 응답 + 백그라운드 처리)
-    
-    Parameters:
-    - file: 이미지 파일
-    - wall_angle: 벽 각도 (overhang, slab, face, null)
-    
-    Returns:
-    - task_id: 작업 ID (상태 확인용)
-    - status: 작업 상태
-    """
-    try:
-        # 이미지 읽기
-        contents = await file.read()
-        
-        # Base64 인코딩
-        image_data_base64 = base64.b64encode(contents).decode('utf-8')
-        
-        # 분석 파라미터 설정
-        params = {
-            'conf': 0.4,
-            'brightness_normalization': False,
-            'brightness_filter': False,
-            'min_brightness': 0,
-            'max_brightness': 100,
-            'saturation_filter': False,
-            'min_saturation': 0,
-            'mask_refinement': 5,
-            'use_clip_ai': True
-        }
-        
-        # Celery 작업 시작
-        task = analyze_image_task.delay(image_data_base64, params)
-        
-        print(f"🚀 분석 작업 시작: {task.id}")
-        
-        return {
-            "task_id": task.id,
-            "status": "started",
-            "message": "AI 분석이 시작되었습니다. /api/analysis-status/{task_id}로 진행상황을 확인하세요."
-        }
-        
-    except Exception as e:
-        print(f"❌ 분석 요청 실패: {e}")
-        raise HTTPException(status_code=500, detail=f"Analysis request failed: {str(e)}")
+# Celery 엔드포인트 제거 (클라이언트 사이드 AI 사용)
 
 @app.post("/api/analyze-stream")
 async def analyze_image_stream(
