@@ -732,15 +732,9 @@ async def analyze_image_stream(
             
             hold_data_clean = clean_hold_data(hold_data)
             
-            # 홀드 데이터를 작은 청크로 분할하여 전송
+            # 홀드 데이터 전송 (첫 커밋 때처럼 제한 없이)
             print(f"🔍 홀드 데이터 전송 시작: {len(hold_data_clean)}개")
-            chunk_size = 100  # t2.small 업그레이드로 메모리 여유 생김 - 더 많은 홀드 처리 가능
-            for i in range(0, len(hold_data_clean), chunk_size):
-                chunk = hold_data_clean[i:i+chunk_size]
-                chunk_num = i // chunk_size + 1
-                total_chunks = (len(hold_data_clean) + chunk_size - 1) // chunk_size
-                print(f"🔍 홀드 데이터 청크 {chunk_num}/{total_chunks} 전송: {len(chunk)}개")
-                yield await send_progress_update(f"🔍 홀드 데이터 전송 ({chunk_num}/{total_chunks})", 96 + (chunk_num * 0.5), "result_holds_chunk", hold_data_chunk=chunk, chunk_info={"current": chunk_num, "total": total_chunks})
+            yield await send_progress_update(f"🔍 홀드 데이터 전송 완료", 96, "result_holds", hold_data=hold_data_clean)
             
             # 문제 데이터에서 프론트엔드에 필요한 데이터만 추출
             def clean_problem_data(problems):
