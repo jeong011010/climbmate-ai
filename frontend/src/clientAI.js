@@ -326,20 +326,27 @@ class ClientAIAnalyzer {
         let isSSE = false;
         
         xhr.open('POST', `${API_URL}/api/analyze-stream`);  // SSE 엔드포인트 시도
+        console.log('🚀 SSE 엔드포인트 호출:', `${API_URL}/api/analyze-stream`);
         
         // 실시간 진행 상황 수신 (SSE)
         xhr.onprogress = function() {
+          console.log('📡 SSE 데이터 수신:', xhr.responseText.length, 'bytes');
           const lines = xhr.responseText.split('\n');
           
           for (const line of lines) {
             if (line.startsWith('data: ')) {
               isSSE = true;
+              console.log('📨 SSE 메시지:', line);
               try {
                 const data = JSON.parse(line.slice(6));
+                console.log('✅ SSE 파싱 성공:', data);
                 
                 // 전역 함수 호출하여 UI 업데이트
                 if (typeof window.updateAnalysisProgress === 'function') {
+                  console.log('🔄 UI 업데이트 호출:', data.message, data.progress + '%');
                   window.updateAnalysisProgress(data);
+                } else {
+                  console.warn('❌ window.updateAnalysisProgress 함수가 없음!');
                 }
                 
                 // 최종 결과 저장
@@ -351,7 +358,7 @@ class ClientAIAnalyzer {
                   };
                 }
               } catch (e) {
-                console.warn('SSE 메시지 파싱 실패:', line);
+                console.warn('❌ SSE 메시지 파싱 실패:', line, e);
               }
             }
           }
