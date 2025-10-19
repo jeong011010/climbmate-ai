@@ -295,7 +295,24 @@ function App() {
       console.error('❌ 클라이언트 사이드 분석 실패:', error)
       setLoading(false)
       setCurrentAnalysisStep('분석 실패')
-      alert(`❌ 클라이언트 사이드 분석 실패: ${error.message}\n\n브라우저가 AI 모델을 지원하지 않거나 메모리가 부족할 수 있습니다.`)
+      
+      // 에러 타입별 구체적인 메시지 제공
+      let errorMessage = '분석 중 오류가 발생했습니다.';
+      if (error.message.includes('네트워크')) {
+        errorMessage = '네트워크 연결을 확인해주세요.';
+      } else if (error.message.includes('메모리') || error.message.includes('메모리가 부족')) {
+        errorMessage = '브라우저 메모리가 부족합니다. 다른 탭을 닫고 다시 시도해주세요.';
+      } else if (error.message.includes('지원하지 않')) {
+        errorMessage = '브라우저가 AI 모델을 지원하지 않습니다. Chrome 또는 Firefox 최신 버전을 사용해주세요.';
+      } else if (error.message.includes('404')) {
+        errorMessage = '서버를 찾을 수 없습니다. 잠시 후 다시 시도해주세요.';
+      } else if (error.message.includes('500')) {
+        errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+      } else {
+        errorMessage = error.message || '알 수 없는 오류가 발생했습니다.';
+      }
+      
+      alert(`❌ 클라이언트 사이드 분석 실패: ${errorMessage}`)
     }
   }
 

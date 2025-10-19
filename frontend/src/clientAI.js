@@ -276,6 +276,11 @@ class ClientAIAnalyzer {
     try {
       console.log('🚀 서버 사이드 전체 분석 시작...');
       
+      // 이미지 유효성 검사
+      if (!imageElement || !imageElement.width || !imageElement.height) {
+        throw new Error('유효하지 않은 이미지입니다.');
+      }
+      
       // 이미지를 Base64로 변환
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
@@ -286,16 +291,26 @@ class ClientAIAnalyzer {
       
       const imageDataBase64 = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
       
+      // Base64 데이터 유효성 검사
+      if (!imageDataBase64 || imageDataBase64.length < 1000) {
+        throw new Error('이미지 변환에 실패했습니다.');
+      }
+      
       console.log(`📤 이미지 전송: ${imageElement.width}x${imageElement.height}, ${Math.round(imageDataBase64.length * 0.75 / 1024)}KB`);
       
-      // Base64를 Blob으로 변환
-      const byteCharacters = atob(imageDataBase64);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      // Base64를 Blob으로 변환 (에러 처리 추가)
+      let byteCharacters, byteArray, blob;
+      try {
+        byteCharacters = atob(imageDataBase64);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        byteArray = new Uint8Array(byteNumbers);
+        blob = new Blob([byteArray], { type: 'image/jpeg' });
+      } catch (error) {
+        throw new Error(`이미지 데이터 변환 실패: ${error.message}`);
       }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: 'image/jpeg' });
       
       // FormData 생성
       const formData = new FormData();
@@ -310,16 +325,31 @@ class ClientAIAnalyzer {
       });
       
       if (!response.ok) {
-        throw new Error(`서버 분석 실패: ${response.status}`);
+        const errorText = await response.text().catch(() => '알 수 없는 에러');
+        throw new Error(`서버 분석 실패 (${response.status}): ${errorText}`);
       }
       
       const result = await response.json();
+      
+      // 응답 데이터 유효성 검사
+      if (!result || !result.colored_holds || !Array.isArray(result.colored_holds)) {
+        throw new Error('서버 응답 형식이 올바르지 않습니다.');
+      }
+      
       console.log(`✅ 서버 분석 완료: ${result.colored_holds.length}개 홀드`);
       
       return result.colored_holds;
       
     } catch (error) {
       console.error('❌ 서버 분석 실패:', error);
+      // 더 구체적인 에러 메시지 제공
+      if (error.message.includes('Failed to fetch')) {
+        throw new Error('네트워크 연결을 확인해주세요.');
+      } else if (error.message.includes('404')) {
+        throw new Error('서버 엔드포인트를 찾을 수 없습니다.');
+      } else if (error.message.includes('500')) {
+        throw new Error('서버 내부 오류가 발생했습니다.');
+      }
       throw error;
     }
   }
@@ -361,7 +391,7 @@ class ClientAIAnalyzer {
       console.log(`📤 이미지 전송: ${targetWidth}x${targetHeight}, ${Math.round(imageDataBase64.length/1024)}KB`);
       
       // 서버 CLIP API 호출
-      const response = await fetch('/api/analyze-colors', {
+      const response = await fetch(`${API_URL}/api/analyze-colors`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
