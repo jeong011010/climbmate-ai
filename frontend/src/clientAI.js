@@ -323,8 +323,9 @@ class ClientAIAnalyzer {
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         let result = null;
+        let lastProcessedLength = 0;
         
-        xhr.open('POST', `${API_URL}/api/analyze`);
+        xhr.open('POST', `${API_URL}/api/analyze-stream`);  // 스트림 엔드포인트 사용
         
         xhr.onreadystatechange = function() {
           if (xhr.readyState === XMLHttpRequest.DONE) {
@@ -342,7 +343,10 @@ class ClientAIAnalyzer {
         
         // SSE 메시지 처리
         xhr.onprogress = function(event) {
-          const lines = event.target.responseText.split('\n');
+          const newData = event.target.responseText.substring(lastProcessedLength);
+          lastProcessedLength = event.target.responseText.length;
+          
+          const lines = newData.split('\n');
           for (const line of lines) {
             if (line.startsWith('data: ')) {
               try {
@@ -364,7 +368,7 @@ class ClientAIAnalyzer {
                   };
                 }
               } catch (e) {
-                // JSON 파싱 실패는 무시
+                console.log('JSON 파싱 실패:', e, line);
               }
             }
           }
