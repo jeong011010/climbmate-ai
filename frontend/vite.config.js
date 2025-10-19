@@ -64,5 +64,8 @@ export default defineConfig({
         changeOrigin: true
       }
     }
+  },
+  define: {
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString())
   }
 })
