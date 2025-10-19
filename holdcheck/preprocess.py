@@ -438,8 +438,8 @@ def extract_colors_with_clip_ai_batch(hold_images, masks):
         text_features = model.encode_text(text_tokens)
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
     
-    # 🚀 메모리 최적화: 배치 크기를 환경변수로 설정 (기본값: 16)
-    batch_size = int(os.getenv("CLIP_BATCH_SIZE", "2"))  # 메모리 절약을 위해 더 작게 설정
+    # 🚀 최적화: 배치 크기를 32로 설정 (성능과 메모리 균형)
+    batch_size = int(os.getenv("CLIP_BATCH_SIZE", "32"))  # 성능 우선
     print(f"📊 CLIP 배치 크기: {batch_size}")
     
     all_similarities = []
@@ -1467,8 +1467,8 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
     # 🚀 캐싱된 YOLO 모델 사용 (속도 대폭 향상)
     model = get_yolo_model(model_path)
     
-    # 🚀 메모리 최적화: YOLO 해상도를 환경변수로 설정 (기본값: 384)
-    yolo_img_size = int(os.getenv("YOLO_IMG_SIZE", "384"))  # 640 → 384 (메모리 절약)
+    # 🚀 최적화: YOLO 해상도를 640으로 설정 (정확도 우선)
+    yolo_img_size = int(os.getenv("YOLO_IMG_SIZE", "640"))  # 최고 정확도
     print(f"📊 YOLO 이미지 크기: {yolo_img_size}")
     
     results = model(padded_image, conf=conf, imgsz=yolo_img_size)[0]
@@ -1489,14 +1489,13 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
         valid_indices = []
         preprocessed_data = {}  # 전처리 결과 캐싱
         
-        # 🚨 CRITICAL: 홀드 개수가 너무 많으면 메모리 부족 위험!
-        max_holds = int(os.getenv("MAX_HOLDS", "50"))  # 기본값: 50개로 제한
+        # 🚨 홀드 개수 제한 (서버 메모리 보호)
+        max_holds = int(os.getenv("MAX_HOLDS", "100"))  # 기본값: 100개로 상향
         if len(masks) > max_holds:
             print(f"⚠️  경고: 홀드가 {len(masks)}개 감지되었습니다! (최대 {max_holds}개)")
             print(f"⚠️  메모리 절약을 위해 상위 {max_holds}개만 처리합니다.")
-            print(f"⚠️  더 많은 홀드를 처리하려면 MAX_HOLDS 환경변수를 늘려주세요.")
             
-            # 면적이 큰 홀드부터 선택 (confidence가 높은 것 우선)
+            # 면적이 큰 홀드부터 선택
             mask_areas = []
             for mask in masks:
                 area = np.sum(mask > 0)
