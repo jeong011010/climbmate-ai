@@ -858,9 +858,12 @@ async def analyze_image_stream(
     headers = {
         "Cache-Control": "no-cache",
         "Connection": "keep-alive",
-        "Content-Type": "text/event-stream",
-        "X-Accel-Buffering": "no"
+        "Content-Type": "text/event-stream; charset=utf-8",
+        "X-Accel-Buffering": "no",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Cache-Control"
     }
+    print("📡 SSE 응답 헤더 설정:", headers)
     return StreamingResponse(generate(), media_type="text/event-stream", headers=headers)
 
 @app.get("/api/health")

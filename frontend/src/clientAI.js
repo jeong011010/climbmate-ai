@@ -328,6 +328,26 @@ class ClientAIAnalyzer {
         xhr.open('POST', `${API_URL}/api/analyze-stream`);  // SSE 엔드포인트 시도
         console.log('🚀 SSE 엔드포인트 호출:', `${API_URL}/api/analyze-stream`);
         
+        // SSE를 위한 헤더 설정
+        xhr.setRequestHeader('Accept', 'text/event-stream');
+        xhr.setRequestHeader('Cache-Control', 'no-cache');
+        xhr.setRequestHeader('Connection', 'keep-alive');
+        
+        console.log('📡 SSE 헤더 설정 완료');
+        
+        // 연결 상태 확인
+        xhr.onloadstart = function() {
+          console.log('📡 SSE 연결 시작');
+        };
+        
+        xhr.onload = function() {
+          console.log('📡 SSE 연결 완료');
+        };
+        
+        xhr.onerror = function() {
+          console.error('❌ SSE 연결 오류');
+        };
+        
         // 실시간 진행 상황 수신 (SSE)
         xhr.onprogress = function() {
           console.log('📡 SSE 데이터 수신:', xhr.responseText.length, 'bytes');
