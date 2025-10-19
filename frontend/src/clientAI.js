@@ -288,15 +288,25 @@ class ClientAIAnalyzer {
       
       console.log(`📤 이미지 전송: ${imageElement.width}x${imageElement.height}, ${Math.round(imageDataBase64.length * 0.75 / 1024)}KB`);
       
-      const response = await fetch(`${API_URL}/api/analyze-full`, {
+      // Base64를 Blob으로 변환
+      const byteCharacters = atob(imageDataBase64);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'image/jpeg' });
+      
+      // FormData 생성
+      const formData = new FormData();
+      formData.append('file', blob, 'image.jpg');
+      if (wallAngle) {
+        formData.append('wall_angle', wallAngle);
+      }
+      
+      const response = await fetch(`${API_URL}/api/analyze`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          holds: [], // 서버에서 YOLO로 감지하므로 빈 배열
-          image_data_base64: imageDataBase64
-        })
+        body: formData
       });
       
       if (!response.ok) {
