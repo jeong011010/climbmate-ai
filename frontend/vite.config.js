@@ -35,9 +35,11 @@ export default defineConfig({
       workbox: {
         // 🚀 ONNX Runtime Web WASM 파일 크기 제한 증가 (23.7MB)
         maximumFileSizeToCacheInBytes: 50 * 1024 * 1024, // 50MB
+        // 🔧 /docs, /redoc, /openapi.json 캐시 제외
+        navigateFallbackDenylist: [/^\/docs/, /^\/redoc/, /^\/openapi\.json/, /^\/api\//],
         runtimeCaching: [
           {
-            urlPattern: /^http:\/\/.*\/api/i,
+            urlPattern: /^https?:\/\/.*\/api/i,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'api-cache',
