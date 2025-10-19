@@ -332,13 +332,28 @@ class ClientAIAnalyzer {
       const result = await response.json();
       
       // 응답 데이터 유효성 검사
-      if (!result || !result.colored_holds || !Array.isArray(result.colored_holds)) {
+      if (!result || !result.problems || !Array.isArray(result.problems)) {
+        console.error('서버 응답:', result);
         throw new Error('서버 응답 형식이 올바르지 않습니다.');
       }
       
-      console.log(`✅ 서버 분석 완료: ${result.colored_holds.length}개 홀드`);
+      console.log(`✅ 서버 분석 완료: ${result.problems.length}개 문제`);
       
-      return result.colored_holds;
+      // 백엔드 응답을 프론트엔드 형식으로 변환
+      const coloredHolds = [];
+      result.problems.forEach((problem, index) => {
+        if (problem.holds && Array.isArray(problem.holds)) {
+          problem.holds.forEach(hold => {
+            coloredHolds.push({
+              ...hold,
+              problem_id: problem.db_id || index + 1,
+              problem_color: problem.color || 'unknown'
+            });
+          });
+        }
+      });
+      
+      return coloredHolds;
       
     } catch (error) {
       console.error('❌ 서버 분석 실패:', error);
