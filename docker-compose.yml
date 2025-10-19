@@ -1,10 +1,50 @@
 services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+
   backend:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - CLIP_MODEL=ViT-B/32
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+    volumes:
+      - ./backend/climbmate.db:/app/backend/climbmate.db
+      - ./backend/models:/app/backend/models
+      - ./holdcheck:/app/holdcheck
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      replicas: 2  # 동시 요청 처리를 위해 2개 인스턴스
+
+  # 추가 백엔드 인스턴스 (동시 요청 처리용)
+  backend-2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8000"
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - CLIP_MODEL=ViT-B/32
@@ -23,34 +63,24 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    deploy:
-      replicas: 1  # 기본 1개 인스턴스, 필요시 2-3개로 증가 가능
 
-  # 추가 백엔드 인스턴스 (필요시 활성화)
-  # backend-2:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "8001:8000"
-  #   environment:
-  #     - OPENAI_API_KEY=${OPENAI_API_KEY:-}
-  #     - CLIP_MODEL=ViT-B/32
-  #   volumes:
-  #     - ./backend/climbmate.db:/app/backend/climbmate.db
-  #     - ./backend/models:/app/backend/models
-  #     - ./holdcheck:/app/holdcheck
-  #   restart: unless-stopped
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "3"
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A celery_app worker --loglevel=info --concurrency=2
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - CLIP_MODEL=ViT-B/32
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - ./backend/climbmate.db:/app/backend/climbmate.db
+      - ./backend/models:/app/backend/models
+      - ./holdcheck:/app/holdcheck
+    depends_on:
+      - redis
+      - backend
+    restart: unless-stopped
 
   frontend:
     build:
@@ -88,3 +118,4 @@ services:
 volumes:
   db-data:
   model-data:
+  redis_data:

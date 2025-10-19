@@ -529,6 +529,75 @@ async def analyze_image_stream(
     wall_angle: str = None
 ):
     """
+    비동기 이미지 분석 시작 (작업 큐에 추가)
+    """
+    try:
+        # 이미지 읽기
+        contents = await file.read()
+        image_base64 = base64.b64encode(contents).decode('utf-8')
+        
+        # 비동기 작업 큐에 추가
+        from ai_tasks import analyze_image_async
+        task = analyze_image_async.delay(image_base64, wall_angle)
+        
+        return {
+            "task_id": task.id,
+            "status": "PENDING",
+            "message": "🚀 분석 작업이 시작되었습니다"
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"작업 시작 실패: {str(e)}")
+
+@app.get("/api/analyze-status/{task_id}")
+async def get_analysis_status(task_id: str):
+    """
+    분석 작업 상태 확인
+    """
+    try:
+        from ai_tasks import analyze_image_async
+        task = analyze_image_async.AsyncResult(task_id)
+        
+        if task.state == 'PENDING':
+            response = {
+                'status': task.state,
+                'progress': 0,
+                'message': '작업 대기 중...'
+            }
+        elif task.state == 'PROGRESS':
+            response = {
+                'status': task.state,
+                'progress': task.info.get('progress', 0),
+                'message': task.info.get('message', ''),
+                'step': task.info.get('step', ''),
+                **task.info
+            }
+        elif task.state == 'SUCCESS':
+            response = {
+                'status': task.state,
+                'progress': 100,
+                'message': '✅ 분석 완료!',
+                'result': task.result
+            }
+        else:  # FAILURE
+            response = {
+                'status': task.state,
+                'progress': 0,
+                'message': task.info.get('message', '분석 실패'),
+                'error': task.info.get('error', '')
+            }
+        
+        return response
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"상태 확인 실패: {str(e)}")
+
+@app.post("/api/analyze-sync")
+async def analyze_image_sync(
+    file: UploadFile = File(...),
+    wall_angle: str = None
+):
+    """
     클라이밍 벽 이미지 분석 (실시간 진행률 전송)
     
     Parameters:
@@ -867,7 +936,14 @@ async def analyze_image_stream(
         "Transfer-Encoding": "chunked"
     }
     print("📡 SSE 응답 헤더 설정:", headers)
-    return StreamingResponse(generate(), media_type="text/event-stream", headers=headers)
+    # SSE 스트림 플러시 강화
+    return StreamingResponse(
+        generate(), 
+        media_type="text/event-stream", 
+        headers=headers,
+        # 스트림 즉시 전송을 위한 설정
+        background=None
+    )
 
 @app.get("/api/health")
 async def health_check():
@@ -983,5 +1059,14 @@ async def test_gpt4():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # 동시 요청 처리를 위한 워커 설정
+    uvicorn.run(
+        app, 
+        host="0.0.0.0", 
+        port=8000,
+        workers=2,  # 2개 워커로 동시 요청 처리
+        loop="asyncio",  # 비동기 루프 최적화
+        access_log=True,  # 접근 로그 활성화
+        log_level="info"
+    )
 
