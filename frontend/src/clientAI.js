@@ -319,58 +319,24 @@ class ClientAIAnalyzer {
         formData.append('wall_angle', wallAngle);
       }
       
-      // SSE를 사용한 실시간 진행상황 수신
+      // 일반 POST 요청으로 분석 실행
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         let result = null;
-        let lastProcessedLength = 0;
         
-        xhr.open('POST', `${API_URL}/api/analyze-stream`);  // 스트림 엔드포인트 사용
+        xhr.open('POST', `${API_URL}/api/analyze`);  // 일반 엔드포인트 사용
         
         xhr.onreadystatechange = function() {
           if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status === 200) {
-              if (result) {
-                resolve(result);
-              } else {
-                reject(new Error('서버 응답을 받지 못했습니다.'));
+              try {
+                const response = JSON.parse(xhr.responseText);
+                resolve(response);
+              } catch (e) {
+                reject(new Error('서버 응답을 파싱할 수 없습니다.'));
               }
             } else {
               reject(new Error(`서버 분석 실패 (${xhr.status}): ${xhr.responseText}`));
-            }
-          }
-        };
-        
-        // SSE 메시지 처리
-        xhr.onprogress = function(event) {
-          const newData = event.target.responseText.substring(lastProcessedLength);
-          lastProcessedLength = event.target.responseText.length;
-          
-          const lines = newData.split('\n');
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              try {
-                const data = JSON.parse(line.substring(6));
-                console.log(`📊 진행상황: ${data.message} (${data.progress}%)`);
-                
-                // 진행상황을 전역으로 전송 (App.jsx에서 받을 수 있도록)
-                if (window.updateAnalysisProgress) {
-                  window.updateAnalysisProgress(data);
-                }
-                
-                // 최종 결과 처리 - complete 단계에서 모든 데이터 수집
-                if (data.step === 'complete') {
-                  result = {
-                    problems: data.problems || [],
-                    statistics: data.statistics || {},
-                    annotated_image_base64: data.annotated_image_base64 || '',
-                    message: data.message || '분석 완료'
-                  };
-                  console.log('✅ 최종 결과 수신:', result);
-                }
-              } catch (e) {
-                console.log('JSON 파싱 실패:', e, line);
-              }
             }
           }
         };
