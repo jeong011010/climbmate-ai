@@ -1,0 +1,117 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - REDIS_URL=redis://redis:6379/0
+      # 🚀 메모리 최적화 환경변수 (극한 최적화)
+      - CLIP_MODEL=ViT-B/32
+      - CLIP_BATCH_SIZE=1
+      - YOLO_IMG_SIZE=160
+      - MAX_IMAGE_SIZE=160
+      - MAX_HOLDS=10
+      - OMP_NUM_THREADS=1
+      - MKL_NUM_THREADS=1
+      - NUMEXPR_NUM_THREADS=1
+    volumes:
+      - ./backend/climbmate.db:/app/backend/climbmate.db
+      - ./backend/models:/app/backend/models
+      - ./holdcheck:/app/holdcheck
+    depends_on:
+      - redis
+    restart: unless-stopped
+    # 🚀 로그 로테이션 설정
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A celery_app worker --loglevel=info --concurrency=1
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - REDIS_URL=redis://redis:6379/0
+      # 🚀 메모리 최적화 환경변수 (극한 최적화)
+      - CLIP_MODEL=ViT-B/32
+      - CLIP_BATCH_SIZE=1
+      - YOLO_IMG_SIZE=160
+      - MAX_IMAGE_SIZE=160
+      - MAX_HOLDS=10
+      - OMP_NUM_THREADS=1
+      - MKL_NUM_THREADS=1
+      - NUMEXPR_NUM_THREADS=1
+    volumes:
+      - ./backend/climbmate.db:/app/backend/climbmate.db
+      - ./backend/models:/app/backend/models
+      - ./holdcheck:/app/holdcheck
+    depends_on:
+      - redis
+      - backend
+    restart: unless-stopped
+    # 🚀 로그 로테이션 설정
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    expose:
+      - "80"
+    depends_on:
+      - backend
+    environment:
+            - VITE_API_URL=https://climbmate.store
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+
+  # certbot:  # 🚀 메모리 최적화: certbot 컨테이너 비활성화 (필요시 수동 실행)
+  #   image: certbot/certbot
+  #   volumes:
+  #     - ./certbot/conf:/etc/letsencrypt
+  #     - ./certbot/www:/var/www/certbot
+  #   entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+volumes:
+  db-data:
+  model-data:
+  redis-data:
+
