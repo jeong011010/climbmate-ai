@@ -734,7 +734,7 @@ async def analyze_image_stream(
             
             # 홀드 데이터를 작은 청크로 분할하여 전송
             print(f"🔍 홀드 데이터 전송 시작: {len(hold_data_clean)}개")
-            chunk_size = 30  # clip_features 제거로 데이터가 작아져서 30개씩 전송 가능
+            chunk_size = 100  # t2.small 업그레이드로 메모리 여유 생김 - 더 많은 홀드 처리 가능
             for i in range(0, len(hold_data_clean), chunk_size):
                 chunk = hold_data_clean[i:i+chunk_size]
                 chunk_num = i // chunk_size + 1
