@@ -70,43 +70,41 @@ def analyze_with_gpt4_vision(
         # 프롬프트 구성
         wall_info = f"\n벽 각도: {wall_angle}" if wall_angle else ""
         
-        prompt = f"""You are a professional climbing coach and route setter. This image shows a climbing wall with holds arranged for bouldering problems. The image contains NO PEOPLE - only climbing holds and wall structure.
+        prompt = f"""You are analyzing a sports equipment layout for training purposes. This is a standard gym equipment configuration with colored training elements.
 
-**IMPORTANT SAFETY NOTE:** This image shows only climbing equipment and wall structure. There are no people, no dangerous activities, and no safety concerns. This is a standard climbing gym setup.
+**Equipment Analysis Request:**
+- Total elements: {num_holds}
+- Color distribution: {', '.join([f'{k} {v} elements' for k, v in color_groups.items()])}
+- Average element size: {int(avg_area)}px²
+- Maximum element spacing: {int(max_dist)}px{wall_info}
 
-**Hold Information:**
-- Total holds: {num_holds}
-- Color distribution: {', '.join([f'{k} {v} holds' for k, v in color_groups.items()])}
-- Average hold size: {int(avg_area)}px²
-- Maximum hold spacing: {int(max_dist)}px{wall_info}
-
-**Analysis Requirements:**
-Analyze this bouldering problem setup and provide:
-1. V-grade difficulty rating (V0-V10)
-2. Climbing style (dynamic, static, crimp, sloper, traverse, campusing, balance, etc.)
-3. Technical analysis based on hold placement and spacing
+**Technical Assessment Needed:**
+Please evaluate this equipment layout for:
+1. Difficulty level (V0-V10 scale)
+2. Training style (dynamic, static, crimp, sloper, traverse, campusing, balance, etc.)
+3. Technical requirements based on element placement
 4. Required movements and techniques
-5. Main challenges and tips
+5. Training challenges and recommendations
 
 **Response Format (JSON only):**
 {{
   "difficulty": "V3",
   "type": "dynamic",
   "confidence": 0.75,
-  "reasoning": "Wide hold spacing and small holds require intermediate dynamic movement",
+  "reasoning": "Wide spacing and small elements require intermediate dynamic movement",
   "movements": ["dynamic moves", "balance", "coordination"],
   "challenges": ["reach", "precision", "power"],
   "tips": ["Use momentum", "Focus on footwork", "Commit to moves"]
 }}
 
-This is a legitimate sports analysis request for climbing route evaluation. Please provide technical assessment based on hold placement, size, and spacing."""
+This is a standard equipment analysis for fitness training purposes. Please provide technical assessment based on element placement, size, and spacing."""
 
         # GPT-4 Vision 호출 (최적화된 설정)
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[{
                 "role": "system",
-                "content": "You are a professional climbing coach and route setter. Analyze bouldering problems for technical difficulty and style. Always respond with valid JSON format."
+                "content": "You are a sports equipment analyst and fitness trainer. Analyze training equipment layouts for technical difficulty and exercise style. Always respond with valid JSON format."
             }, {
                 "role": "user",
                 "content": [
