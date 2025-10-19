@@ -319,19 +319,37 @@ class ClientAIAnalyzer {
         formData.append('wall_angle', wallAngle);
       }
       
+      console.log('📦 FormData 생성 완료:', {
+        fileSize: blob.size,
+        fileType: blob.type,
+        wallAngle: wallAngle
+      });
+      
       // 🚀 일반 POST 요청으로 분석 (SSE fallback 포함)
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         let result = null;
         
-        xhr.open('POST', `${API_URL}/api/analyze-stream`);  // SSE 엔드포인트 시도
-        console.log('🚀 SSE 엔드포인트 호출:', `${API_URL}/api/analyze-stream`);
+        try {
+          xhr.open('POST', `${API_URL}/api/analyze-stream`);  // SSE 엔드포인트 시도
+          console.log('🚀 SSE 엔드포인트 호출:', `${API_URL}/api/analyze-stream`);
+          console.log('✅ xhr.open() 성공');
+        } catch (openError) {
+          console.error('❌ xhr.open() 실패:', openError);
+          reject(new Error(`요청 열기 실패: ${openError.message}`));
+          return;
+        }
         
         // SSE를 위한 헤더 설정 (Connection 헤더는 브라우저가 자동 설정)
-        xhr.setRequestHeader('Accept', 'text/event-stream');
-        xhr.setRequestHeader('Cache-Control', 'no-cache');
-        
-        console.log('📡 SSE 헤더 설정 완료');
+        try {
+          xhr.setRequestHeader('Accept', 'text/event-stream');
+          xhr.setRequestHeader('Cache-Control', 'no-cache');
+          console.log('📡 SSE 헤더 설정 완료');
+        } catch (headerError) {
+          console.error('❌ 헤더 설정 실패:', headerError);
+          reject(new Error(`헤더 설정 실패: ${headerError.message}`));
+          return;
+        }
         
         // 연결 상태 확인 (강화된 디버깅)
         xhr.onloadstart = function() {
@@ -441,7 +459,16 @@ class ClientAIAnalyzer {
           reject(new Error('네트워크 오류가 발생했습니다.'));
         };
         
-        xhr.send(formData);
+        // xhr.send() 호출 전 디버깅
+        console.log('🚀 xhr.send() 호출 시작');
+        try {
+          xhr.send(formData);
+          console.log('✅ xhr.send() 호출 완료');
+        } catch (sendError) {
+          console.error('❌ xhr.send() 실패:', sendError);
+          reject(new Error(`요청 전송 실패: ${sendError.message}`));
+          return;
+        }
       });
       
     } catch (error) {
