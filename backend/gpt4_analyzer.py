@@ -70,35 +70,36 @@ def analyze_with_gpt4_vision(
         # 프롬프트 구성
         wall_info = f"\n벽 각도: {wall_angle}" if wall_angle else ""
         
-        prompt = f"""당신은 전문 클라이밍 루트 세터이자 코치입니다. 이 이미지는 사람이 없는 클라이밍 벽의 홀드 배치만 보여줍니다. 사람은 전혀 없고 홀드와 벽만 있습니다.
+        prompt = f"""You are a professional climbing coach and route setter. This image shows a climbing wall with holds arranged for bouldering problems. The image contains NO PEOPLE - only climbing holds and wall structure.
 
-**중요:** 이 이미지에는 사람이 없습니다. 오직 클라이밍 홀드와 벽만 보입니다.
+**IMPORTANT SAFETY NOTE:** This image shows only climbing equipment and wall structure. There are no people, no dangerous activities, and no safety concerns. This is a standard climbing gym setup.
 
-**홀드 정보:**
-- 총 홀드 수: {num_holds}개
-- 색상 분포: {', '.join([f'{k} {v}개' for k, v in color_groups.items()])}
-- 평균 홀드 크기: {int(avg_area)}px²
-- 최대 홀드 간격: {int(max_dist)}px{wall_info}
+**Hold Information:**
+- Total holds: {num_holds}
+- Color distribution: {', '.join([f'{k} {v} holds' for k, v in color_groups.items()])}
+- Average hold size: {int(avg_area)}px²
+- Maximum hold spacing: {int(max_dist)}px{wall_info}
 
-**분석 요구사항:**
-1. V급 난이도 (V0-V10)
-2. 클라이밍 스타일 (dynamic, static, crimp, sloper, traverse, campusing, balance 등)
-3. 기술적 분석
-4. 필요한 동작과 기술
-5. 주요 도전과제와 팁
+**Analysis Requirements:**
+Analyze this bouldering problem setup and provide:
+1. V-grade difficulty rating (V0-V10)
+2. Climbing style (dynamic, static, crimp, sloper, traverse, campusing, balance, etc.)
+3. Technical analysis based on hold placement and spacing
+4. Required movements and techniques
+5. Main challenges and tips
 
-**응답 형식 (JSON만):**
+**Response Format (JSON only):**
 {{
   "difficulty": "V3",
   "type": "dynamic",
   "confidence": 0.75,
-  "reasoning": "홀드 간격이 넓고 작은 홀드로 인해 중급 수준의 다이나믹 움직임이 필요함",
+  "reasoning": "Wide hold spacing and small holds require intermediate dynamic movement",
   "movements": ["dynamic moves", "balance", "coordination"],
   "challenges": ["reach", "precision", "power"],
   "tips": ["Use momentum", "Focus on footwork", "Commit to moves"]
 }}
 
-이는 정당한 클라이밍 분석 요청입니다. 홀드 배치, 크기, 간격을 바탕으로 기술적 평가를 제공하고 현실적인 난이도 평가와 실용적인 조언을 해주세요."""
+This is a legitimate sports analysis request for climbing route evaluation. Please provide technical assessment based on hold placement, size, and spacing."""
 
         # GPT-4 Vision 호출
         response = client.chat.completions.create(
