@@ -6,8 +6,8 @@ import json
 from celery import current_task
 from celery_app import celery_app
 from holdcheck import preprocess, clustering
-from gpt4_analyzer import analyze_with_gpt4_vision
-from database import save_analysis_result
+from backend.gpt4_analyzer import analyze_with_gpt4_vision
+from backend.database import save_analysis_result
 
 @celery_app.task(bind=True)
 def analyze_colors_with_clip_async(self, image_base64, hold_data):

@@ -68,7 +68,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: celery -A celery_app worker --loglevel=info --concurrency=2
+    command: celery -A celery_app worker --loglevel=info --concurrency=2 --workdir=/app
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - CLIP_MODEL=ViT-B/32

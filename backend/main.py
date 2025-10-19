@@ -30,7 +30,7 @@ except ImportError as e:
     DB_AVAILABLE = False
 
 try:
-    from gpt4_analyzer import analyze_with_gpt4_vision, get_gpt4_status
+    from backend.gpt4_analyzer import analyze_with_gpt4_vision, get_gpt4_status
     GPT4_AVAILABLE = True
 except ImportError as e:
     print(f"⚠️ GPT-4 모듈 없음: {e}")
@@ -1064,7 +1064,7 @@ async def test_gpt4():
         ]
         
         # GPT-4 테스트 호출
-        from gpt4_analyzer import analyze_with_gpt4_vision
+        from backend.gpt4_analyzer import analyze_with_gpt4_vision
         result = analyze_with_gpt4_vision(test_image_base64, test_holds, "face")
         
         return {
