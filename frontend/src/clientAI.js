@@ -272,7 +272,7 @@ class ClientAIAnalyzer {
   /**
    * 🚀 서버 사이드 전체 분석 (YOLO + 마스크 + CLIP)
    */
-  async analyzeWithServerSide(imageElement) {
+  async analyzeWithServerSide(imageElement, wallAngle = null) {
     try {
       console.log('🚀 서버 사이드 전체 분석 시작...');
       
@@ -543,7 +543,7 @@ class ClientAIAnalyzer {
   /**
    * 전체 분석 프로세스
    */
-  async analyzeImage(imageFile) {
+  async analyzeImage(imageFile, wallAngle = null) {
     try {
       console.log('🚀 서버 사이드 AI 분석 시작...');
       
@@ -551,7 +551,7 @@ class ClientAIAnalyzer {
       const imageElement = await this.loadImage(imageFile);
       
       // 🚀 서버 사이드 전체 분석 (YOLO + 마스크 + CLIP)
-      const coloredHolds = await this.analyzeWithServerSide(imageElement);
+      const coloredHolds = await this.analyzeWithServerSide(imageElement, wallAngle);
       
       // 색상별 그룹화
       const colorGroups = this.groupByColor(coloredHolds);

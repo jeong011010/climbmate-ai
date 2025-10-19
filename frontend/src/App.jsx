@@ -273,7 +273,7 @@ function App() {
       setLoadingProgress(40)
 
       // 사용자 브라우저에서 직접 분석
-      const clientResult = await analyzer.analyzeImage(image)
+      const clientResult = await analyzer.analyzeImage(image, wallAngle)
 
       setLoading(false)
       setLoadingProgress(100)
