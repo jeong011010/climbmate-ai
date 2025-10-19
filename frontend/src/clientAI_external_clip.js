@@ -1,14 +1,14 @@
 /**
- * 🚀 클라이언트 사이드 AI 처리 (ONNX Runtime Web)
- * 사용자 브라우저에서 직접 YOLO + CLIP 모델 실행
+ * 🚀 클라이언트 사이드 AI 처리 (YOLO + 외부 CLIP API)
+ * YOLO는 브라우저에서, CLIP은 외부 API에서 실행
  */
 
 class ClientAIAnalyzer {
   constructor() {
     this.yoloSession = null;
-    this.clipSession = null;
     this.isLoaded = false;
     this.ort = null;
+    this.huggingFaceToken = null; // Hugging Face API 토큰
   }
 
   /**
@@ -36,10 +36,10 @@ class ClientAIAnalyzer {
     try {
       const ort = await this.loadONNXRuntime();
       
-      console.log('🚀 YOLO 모델 로딩 시작...');
-      console.log('⏳ 처음 사용 시 104MB 다운로드 (이후에는 캐시 사용)');
+      console.log('🚀 AI 모델 다운로드 및 로딩 시작...');
+      console.log('⏳ YOLO만 브라우저에서 로드 (104MB)');
       
-      // YOLO 모델만 로드 (CLIP은 서버에서 실행)
+      // YOLO 모델만 로드
       try {
         console.log('  📦 YOLO 모델 다운로드 중... (104MB)');
         this.yoloSession = await ort.InferenceSession.create('/models/yolo.onnx');
@@ -49,17 +49,13 @@ class ClientAIAnalyzer {
         this.yoloSession = null;
       }
       
-      // CLIP은 서버 API 사용 (브라우저 로드 안함)
-      console.log('  ℹ️  CLIP: 서버 API 사용 (브라우저 로드 불필요)');
-      this.clipSession = null;
-      
       this.isLoaded = true;
       
       if (this.yoloSession) {
-        console.log('🎉 YOLO 로드 완료! (CLIP은 서버에서 실행)');
+        console.log('🎉 YOLO 모델 로드 완료! CLIP은 외부 API 사용');
         return true;
       } else {
-        console.log('⚠️ YOLO 로드 실패 - 모의 모드로 전환');
+        console.log('⚠️  YOLO 모델 로드 실패 - 모의 모드로 전환');
         return false;
       }
       
@@ -80,20 +76,17 @@ class ClientAIAnalyzer {
     canvas.width = targetSize;
     canvas.height = targetSize;
     
-    // 이미지를 캔버스에 그리기 (리사이즈)
     ctx.drawImage(imageElement, 0, 0, targetSize, targetSize);
     
-    // 이미지 데이터 가져오기
     const imageData = ctx.getImageData(0, 0, targetSize, targetSize);
     const { data } = imageData;
     
-    // [H, W, C] → [C, H, W] 변환 및 정규화
     const tensor = new Float32Array(3 * targetSize * targetSize);
     
     for (let i = 0; i < targetSize * targetSize; i++) {
-      tensor[i] = data[i * 4] / 255.0;  // R
-      tensor[targetSize * targetSize + i] = data[i * 4 + 1] / 255.0;  // G
-      tensor[2 * targetSize * targetSize + i] = data[i * 4 + 2] / 255.0;  // B
+      tensor[i] = data[i * 4] / 255.0;
+      tensor[targetSize * targetSize + i] = data[i * 4 + 1] / 255.0;
+      tensor[2 * targetSize * targetSize + i] = data[i * 4 + 2] / 255.0;
     }
     
     return tensor;
@@ -110,20 +103,15 @@ class ClientAIAnalyzer {
     try {
       console.log('🔍 YOLO로 홀드 감지 중...');
       
-      // 이미지를 640x640 텐서로 변환
       const inputTensor = await this.imageToTensor(imageElement, 640);
       
-      // ONNX Runtime 추론
       const feeds = {
         'images': new this.ort.Tensor('float32', inputTensor, [1, 3, 640, 640])
       };
       
       const results = await this.yoloSession.run(feeds);
-      
-      // 결과 처리 (YOLO 출력 형식에 따라 다름)
       const outputData = results[Object.keys(results)[0]].data;
       
-      // 홀드 추출
       const holds = this.processYOLOOutput(outputData, imageElement.width, imageElement.height);
       
       console.log(`✅ YOLO: ${holds.length}개 홀드 감지 완료`);
@@ -136,64 +124,11 @@ class ClientAIAnalyzer {
   }
 
   /**
-   * YOLO 출력 처리 (YOLOv8 format)
+   * YOLO 출력 처리
    */
   processYOLOOutput(data, originalWidth, originalHeight) {
     const holds = [];
-    
-    // YOLOv8 출력: [1, 84, 8400] -> Transposed: [1, 8400, 84]
-    // 각 detection: [cx, cy, w, h, class_conf_0, class_conf_1, ...]
-    
-    const numBoxes = 8400;
-    const numElements = 84;
-    
-    // data.length가 84 * 8400 = 705,600인지 확인
-    if (data.length !== numBoxes * numElements) {
-      console.warn(`⚠️ 예상치 못한 YOLO 출력 크기: ${data.length}`);
-      // Fallback to old logic
-      return this.processYOLOOutputFallback(data, originalWidth, originalHeight);
-    }
-    
-    for (let i = 0; i < numBoxes; i++) {
-      // YOLOv8 출력은 [84, 8400] 형태
-      const cx = data[i];
-      const cy = data[numBoxes + i];
-      const w = data[2 * numBoxes + i];
-      const h = data[3 * numBoxes + i];
-      
-      // 클래스 0 (hold)의 신뢰도
-      const confidence = data[4 * numBoxes + i];
-      
-      if (confidence > 0.5) {
-        // 좌표 변환 (640x640 -> 원본 크기)
-        const x = (cx - w / 2) * originalWidth / 640;
-        const y = (cy - h / 2) * originalHeight / 640;
-        const width = w * originalWidth / 640;
-        const height = h * originalHeight / 640;
-        
-        // 유효성 검사
-        if (width > 5 && height > 5 && x >= 0 && y >= 0) {
-          holds.push({
-            x: Math.max(0, x),
-            y: Math.max(0, y),
-            width: Math.min(width, originalWidth - x),
-            height: Math.min(height, originalHeight - y),
-            confidence: confidence
-          });
-        }
-      }
-    }
-    
-    // NMS (Non-Maximum Suppression) - 겹치는 박스 제거
-    return this.applyNMS(holds);
-  }
-  
-  /**
-   * Fallback YOLO 출력 처리
-   */
-  processYOLOOutputFallback(data, originalWidth, originalHeight) {
-    const holds = [];
-    const numDetections = Math.min(100, Math.floor(data.length / 6));
+    const numDetections = Math.min(100, data.length / 6);
     
     for (let i = 0; i < numDetections; i++) {
       const offset = i * 6;
@@ -215,99 +150,60 @@ class ClientAIAnalyzer {
       }
     }
     
-    return holds.slice(0, 30);
-  }
-  
-  /**
-   * NMS (Non-Maximum Suppression)
-   */
-  applyNMS(boxes, iouThreshold = 0.5) {
-    if (boxes.length === 0) return [];
-    
-    // 신뢰도 순으로 정렬
-    boxes.sort((a, b) => b.confidence - a.confidence);
-    
-    const selected = [];
-    const suppressed = new Set();
-    
-    for (let i = 0; i < boxes.length; i++) {
-      if (suppressed.has(i)) continue;
-      
-      selected.push(boxes[i]);
-      
-      for (let j = i + 1; j < boxes.length; j++) {
-        if (suppressed.has(j)) continue;
-        
-        const iou = this.calculateIOU(boxes[i], boxes[j]);
-        if (iou > iouThreshold) {
-          suppressed.add(j);
-        }
-      }
-    }
-    
-    return selected;
-  }
-  
-  /**
-   * IoU 계산
-   */
-  calculateIOU(box1, box2) {
-    const x1 = Math.max(box1.x, box2.x);
-    const y1 = Math.max(box1.y, box2.y);
-    const x2 = Math.min(box1.x + box1.width, box2.x + box2.width);
-    const y2 = Math.min(box1.y + box1.height, box2.y + box2.height);
-    
-    const intersection = Math.max(0, x2 - x1) * Math.max(0, y2 - y1);
-    const area1 = box1.width * box1.height;
-    const area2 = box2.width * box2.height;
-    const union = area1 + area2 - intersection;
-    
-    return intersection / (union + 1e-6);
+    return holds.slice(0, 20);
   }
 
   /**
-   * 서버 CLIP API로 색상 분석
+   * Hugging Face CLIP API로 색상 분석
    */
-  async analyzeColorsWithServerCLIP(imageElement, holds) {
+  async analyzeColorsWithHuggingFace(imageElement, holds) {
     try {
-      console.log('🎨 서버 CLIP API로 색상 분석 중...');
+      console.log('🎨 Hugging Face CLIP API로 색상 분석 중...');
       
-      // 이미지를 Base64로 변환
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = imageElement.width;
-      canvas.height = imageElement.height;
-      ctx.drawImage(imageElement, 0, 0);
-      const imageDataBase64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+      const coloredHolds = [];
       
-      // 서버 CLIP API 호출
-      const response = await fetch('/api/analyze-colors', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          holds: holds,
-          image_data_base64: imageDataBase64
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Server CLIP API error: ${response.status}`);
+      for (const hold of holds) {
+        // 홀드 영역 추출
+        const holdCanvas = this.extractHoldRegion(imageElement, hold, 224);
+        const imageData = holdCanvas.toDataURL('image/jpeg', 0.8);
+        
+        // Hugging Face CLIP API 호출
+        const response = await fetch('https://api-inference.huggingface.co/models/openai/clip-vit-base-patch32', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.huggingFaceToken || 'YOUR_HF_TOKEN'}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            inputs: {
+              image: imageData,
+              text: ['red', 'blue', 'yellow', 'green', 'purple', 'orange', 'pink', 'white', 'black']
+            }
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Hugging Face API error: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        // 결과에서 가장 높은 점수의 색상 선택
+        const bestColor = result.scores ? 
+          result.labels[result.scores.indexOf(Math.max(...result.scores))] : 
+          'unknown';
+        
+        coloredHolds.push({
+          ...hold,
+          color: bestColor
+        });
       }
       
-      const result = await response.json();
-      
-      if (result.success) {
-        console.log(`✅ 서버 CLIP: ${result.colored_holds.length}개 홀드 색상 분석 완료`);
-        return result.colored_holds;
-      } else {
-        throw new Error('Server CLIP API returned error');
-      }
+      console.log('✅ Hugging Face CLIP: 색상 분석 완료');
+      return coloredHolds;
       
     } catch (error) {
-      console.error('❌ 서버 CLIP API 실패:', error);
-      console.log('⚠️ Mock 색상 분석으로 전환');
+      console.error('❌ Hugging Face CLIP API 실패:', error);
       return this.analyzeColorsMock(holds);
     }
   }
@@ -322,7 +218,6 @@ class ClientAIAnalyzer {
     canvas.width = targetSize;
     canvas.height = targetSize;
     
-    // 홀드 영역만 잘라서 그리기
     ctx.drawImage(
       imageElement,
       hold.x, hold.y, hold.width, hold.height,
@@ -333,31 +228,13 @@ class ClientAIAnalyzer {
   }
 
   /**
-   * CLIP 특징 벡터로 색상 결정
-   */
-  determineColorFromFeatures(features) {
-    // 특징 벡터의 통계로 색상 추정 (간단한 휴리스틱)
-    const sum = Array.from(features).reduce((a, b) => a + b, 0);
-    const avg = sum / features.length;
-    
-    const colors = [
-      'red', 'blue', 'yellow', 'green', 'purple', 
-      'orange', 'pink', 'white', 'black', 'gray'
-    ];
-    
-    // 특징 벡터 평균값으로 색상 매핑
-    const index = Math.abs(Math.floor(avg * 1000)) % colors.length;
-    return colors[index];
-  }
-
-  /**
    * 모의 홀드 감지
    */
   detectHoldsMock(imageElement) {
     console.log('🔍 모의 홀드 감지 중...');
     
     const holds = [];
-    const numHolds = 8 + Math.floor(Math.random() * 8); // 8-16개
+    const numHolds = 8 + Math.floor(Math.random() * 8);
     
     for (let i = 0; i < numHolds; i++) {
       holds.push({
@@ -444,7 +321,6 @@ class ClientAIAnalyzer {
    */
   calculateDifficulty(holds) {
     const count = holds.length;
-    const avgY = holds.reduce((sum, h) => sum + h.y, 0) / holds.length;
     
     if (count <= 4) return 'V1-V2';
     if (count <= 7) return 'V3-V4';
@@ -467,7 +343,7 @@ class ClientAIAnalyzer {
     try {
       console.log('🚀 클라이언트 사이드 AI 분석 시작...');
       
-      // 모델 로딩
+      // 모델 로딩 (YOLO만)
       const modelsLoaded = await this.loadModels();
       
       // 이미지 로드
@@ -476,8 +352,8 @@ class ClientAIAnalyzer {
       // YOLO로 홀드 감지
       const holds = await this.detectHoldsWithYOLO(imageElement);
       
-      // 서버 CLIP API로 색상 분석
-      const coloredHolds = await this.analyzeColorsWithServerCLIP(imageElement, holds);
+      // Hugging Face CLIP API로 색상 분석
+      const coloredHolds = await this.analyzeColorsWithHuggingFace(imageElement, holds);
       
       // 색상별 그룹화
       const colorGroups = this.groupByColor(coloredHolds);
@@ -491,11 +367,11 @@ class ClientAIAnalyzer {
           total_holds: coloredHolds.length,
           total_problems: problems.length,
           color_groups: Object.keys(colorGroups).length,
-          analysis_method: modelsLoaded ? 'client_side_onnx' : 'client_side_mock'
+          analysis_method: modelsLoaded ? 'client_yolo_external_clip' : 'client_side_mock'
         },
-        message: `클라이언트 분석 완료 ${modelsLoaded ? '(실제 YOLO+CLIP)' : '(모의 데이터)'}`,
+        message: `클라이언트 분석 완료 ${modelsLoaded ? '(YOLO + 외부 CLIP API)' : '(모의 데이터)'}`,
         note: modelsLoaded 
-          ? '✅ 사용자 브라우저에서 커스텀 YOLO + CLIP 모델을 실행했습니다.'
+          ? '✅ 브라우저에서 YOLO 실행 + 외부 CLIP API 사용'
           : '⚠️ AI 모델 파일이 없어 모의 분석을 수행했습니다.'
       };
       
