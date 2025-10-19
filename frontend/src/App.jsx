@@ -508,7 +508,7 @@ function App() {
                 <div key={problem.id} className="glass-card p-4">
                   <div className="text-center mb-3">
                     <span className="text-3xl">{colorEmoji[problem.color_name] || '⭕'}</span>
-                    <h3 className="text-lg font-bold mt-2">{problem.color_name.toUpperCase()}</h3>
+                    <h3 className="text-lg font-bold mt-2">{(problem.color_name || 'UNKNOWN').toUpperCase()}</h3>
                   </div>
                   
                   <div className="space-y-2">
@@ -666,7 +666,7 @@ function App() {
              />
              {result && selectedProblem && (
                <div className="absolute top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-full text-base font-bold shadow-lg animate-pulse-slow">
-                 {colorEmoji[selectedProblem.color_name]} {selectedProblem.color_name.toUpperCase()} 선택됨
+                 {colorEmoji[selectedProblem.color_name] || '⭕'} {(selectedProblem.color_name || 'UNKNOWN').toUpperCase()} 선택됨
                </div>
              )}
            </div>
@@ -789,7 +789,7 @@ function App() {
                <div className="glass-card p-6 mx-auto mb-6 w-full text-center shadow-lg">
                  <div className="flex justify-between items-center mb-4">
                    <h3 className="text-2xl text-slate-800 font-extrabold flex-1">
-                     {colorEmoji[selectedProblem.color_name]} {selectedProblem.color_name.toUpperCase()} 문제
+                     {colorEmoji[selectedProblem.color_name] || '⭕'} {(selectedProblem.color_name || 'UNKNOWN').toUpperCase()} 문제
                    </h3>
                    <button
                      onClick={() => setShowFeedbackModal(true)}
@@ -909,7 +909,7 @@ function App() {
                         <div className={`text-xl font-bold mb-1 ${
                           selectedProblem?.id === problem.id ? 'text-white' : 'text-slate-800'
                         }`}>
-                          {problem.color_name.toUpperCase()}
+                          {(problem.color_name || 'UNKNOWN').toUpperCase()}
                         </div>
                         <div className={`text-base font-medium ${
                           selectedProblem?.id === problem.id ? 'text-white' : 'text-slate-600'
