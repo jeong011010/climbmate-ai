@@ -319,21 +319,49 @@ class ClientAIAnalyzer {
         formData.append('wall_angle', wallAngle);
       }
       
-      // 일반 POST 요청으로 분석 실행
+      // SSE (Server-Sent Events)로 실시간 진행 상황 업데이트
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         let result = null;
         
-        xhr.open('POST', `${API_URL}/api/analyze`);  // 일반 엔드포인트 사용
+        xhr.open('POST', `${API_URL}/api/analyze-stream`);  // SSE 엔드포인트 사용
+        
+        // 실시간 진행 상황 수신
+        xhr.onprogress = function() {
+          const lines = xhr.responseText.split('\n');
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(line.slice(6));
+                
+                // 전역 함수 호출하여 UI 업데이트
+                if (typeof window.updateAnalysisProgress === 'function') {
+                  window.updateAnalysisProgress(data);
+                }
+                
+                // 최종 결과 저장
+                if (data.step === 'complete') {
+                  result = {
+                    problems: data.problems || [],
+                    statistics: data.statistics || {},
+                    annotated_image: data.annotated_image_base64 || ''
+                  };
+                }
+              } catch (e) {
+                console.warn('SSE 메시지 파싱 실패:', line);
+              }
+            }
+          }
+        };
         
         xhr.onreadystatechange = function() {
           if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status === 200) {
-              try {
-                const response = JSON.parse(xhr.responseText);
-                resolve(response);
-              } catch (e) {
-                reject(new Error('서버 응답을 파싱할 수 없습니다.'));
+              if (result) {
+                resolve(result);
+              } else {
+                reject(new Error('서버 응답을 받지 못했습니다.'));
               }
             } else {
               reject(new Error(`서버 분석 실패 (${xhr.status}): ${xhr.responseText}`));

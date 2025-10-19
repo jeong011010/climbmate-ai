@@ -87,7 +87,8 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
         if _clip_model is None:
             print("   🔄 CLIP 모델 로딩 중...")
             _clip_device = "cuda" if torch.cuda.is_available() else "cpu"
-            _clip_model, preprocess = clip.load("ViT-B/32", device=_clip_device)
+            model, preprocess = clip.load("ViT-B/32", device=_clip_device)
+            _clip_model = (model, preprocess)
             print(f"   ✅ CLIP 모델 로딩 완료 (Device: {_clip_device})")
         else:
             print("   ✅ CLIP 모델 캐시 사용 (Device: {})".format(_clip_device))
@@ -149,11 +150,12 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
         
         if _clip_model is None or _clip_device != device:
             print("   🔄 CLIP 모델 로딩 중...")
-            _clip_model, _ = clip.load("ViT-B/32", device=device)
+            model, preprocess = clip.load("ViT-B/32", device=device)
+            _clip_model = (model, preprocess)
             _clip_device = device
             print("   ✅ CLIP 모델 로딩 완료")
-        
-        model, _ = _clip_model
+        else:
+            model, preprocess = _clip_model
         
         # 🤖 CLIP AI 개선: 모든 홀드에 대해 CLIP AI로 색상 판단
         print("   🤖 CLIP AI 색상 판단 개선 중...")
