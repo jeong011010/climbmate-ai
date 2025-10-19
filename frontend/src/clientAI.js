@@ -331,6 +331,7 @@ class ClientAIAnalyzer {
         // 실시간 진행 상황 수신 (SSE)
         xhr.onprogress = function() {
           console.log('📡 SSE 데이터 수신:', xhr.responseText.length, 'bytes');
+          console.log('📡 SSE 원본 데이터:', xhr.responseText);
           const lines = xhr.responseText.split('\n');
           
           for (const line of lines) {
