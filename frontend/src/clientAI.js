@@ -319,17 +319,59 @@ class ClientAIAnalyzer {
         formData.append('wall_angle', wallAngle);
       }
       
-      const response = await fetch(`${API_URL}/api/analyze`, {
-        method: 'POST',
-        body: formData
+      // SSE를 사용한 실시간 진행상황 수신
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        let result = null;
+        
+        xhr.open('POST', `${API_URL}/api/analyze`);
+        
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+              if (result) {
+                resolve(result);
+              } else {
+                reject(new Error('서버 응답을 받지 못했습니다.'));
+              }
+            } else {
+              reject(new Error(`서버 분석 실패 (${xhr.status}): ${xhr.responseText}`));
+            }
+          }
+        };
+        
+        // SSE 메시지 처리
+        xhr.onprogress = function(event) {
+          const lines = event.target.responseText.split('\n');
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(line.substring(6));
+                console.log(`📊 진행상황: ${data.message} (${data.progress}%)`);
+                
+                // 진행상황을 전역으로 전송 (App.jsx에서 받을 수 있도록)
+                if (window.updateAnalysisProgress) {
+                  window.updateAnalysisProgress(data);
+                }
+                
+                // 최종 결과 처리
+                if (data.step === 'complete' && data.problems) {
+                  result = {
+                    problems: data.problems,
+                    statistics: data.statistics,
+                    annotated_image_base64: data.annotated_image_base64,
+                    message: data.message
+                  };
+                }
+              } catch (e) {
+                // JSON 파싱 실패는 무시
+              }
+            }
+          }
+        };
+        
+        xhr.send(formData);
       });
-      
-      if (!response.ok) {
-        const errorText = await response.text().catch(() => '알 수 없는 에러');
-        throw new Error(`서버 분석 실패 (${response.status}): ${errorText}`);
-      }
-      
-      const result = await response.json();
       
       // 응답 데이터 유효성 검사
       if (!result || !result.problems || !Array.isArray(result.problems)) {

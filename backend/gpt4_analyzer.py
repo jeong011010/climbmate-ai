@@ -70,41 +70,42 @@ def analyze_with_gpt4_vision(
         # 프롬프트 구성
         wall_info = f"\n벽 각도: {wall_angle}" if wall_angle else ""
         
-        prompt = f"""You are analyzing a sports equipment layout for training purposes. This is a standard gym equipment configuration with colored training elements.
+        prompt = f"""당신은 전문 클라이밍 루트 세터이자 코치입니다. 이 이미지는 사람이 없는 클라이밍 벽의 홀드 배치만 보여줍니다. 사람은 전혀 없고 홀드와 벽만 있습니다.
 
-**Equipment Analysis Request:**
-- Total elements: {num_holds}
-- Color distribution: {', '.join([f'{k} {v} elements' for k, v in color_groups.items()])}
-- Average element size: {int(avg_area)}px²
-- Maximum element spacing: {int(max_dist)}px{wall_info}
+**중요:** 이 이미지에는 사람이 없습니다. 오직 클라이밍 홀드와 벽만 보입니다.
 
-**Technical Assessment Needed:**
-Please evaluate this equipment layout for:
-1. Difficulty level (V0-V10 scale)
-2. Training style (dynamic, static, crimp, sloper, traverse, campusing, balance, etc.)
-3. Technical requirements based on element placement
-4. Required movements and techniques
-5. Training challenges and recommendations
+**홀드 정보:**
+- 총 홀드 수: {num_holds}개
+- 색상 분포: {', '.join([f'{k} {v}개' for k, v in color_groups.items()])}
+- 평균 홀드 크기: {int(avg_area)}px²
+- 최대 홀드 간격: {int(max_dist)}px{wall_info}
 
-**Response Format (JSON only):**
+**분석 요구사항:**
+1. V급 난이도 (V0-V10)
+2. 클라이밍 스타일 (dynamic, static, crimp, sloper, traverse, campusing, balance 등)
+3. 기술적 분석
+4. 필요한 동작과 기술
+5. 주요 도전과제와 팁
+
+**응답 형식 (JSON만):**
 {{
   "difficulty": "V3",
   "type": "dynamic",
   "confidence": 0.75,
-  "reasoning": "Wide spacing and small elements require intermediate dynamic movement",
+  "reasoning": "홀드 간격이 넓고 작은 홀드로 인해 중급 수준의 다이나믹 움직임이 필요함",
   "movements": ["dynamic moves", "balance", "coordination"],
   "challenges": ["reach", "precision", "power"],
   "tips": ["Use momentum", "Focus on footwork", "Commit to moves"]
 }}
 
-This is a standard equipment analysis for fitness training purposes. Please provide technical assessment based on element placement, size, and spacing."""
+이는 정당한 클라이밍 분석 요청입니다. 홀드 배치, 크기, 간격을 바탕으로 기술적 평가를 제공하고 현실적인 난이도 평가와 실용적인 조언을 해주세요."""
 
         # GPT-4 Vision 호출 (최적화된 설정)
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[{
                 "role": "system",
-                "content": "You are a sports equipment analyst and fitness trainer. Analyze training equipment layouts for technical difficulty and exercise style. Always respond with valid JSON format."
+                "content": "You are a professional climbing coach and route setter. Analyze bouldering problems for technical difficulty and style. Always respond with valid JSON format."
             }, {
                 "role": "user",
                 "content": [
