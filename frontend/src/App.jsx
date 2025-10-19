@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://climbmate.store'
 
@@ -107,6 +107,12 @@ function App() {
     const favs = JSON.parse(localStorage.getItem('climbmate_favorites') || '[]')
     setFavorites(favs)
   }
+
+  // 컴포넌트 마운트 시 데이터 로드
+  useEffect(() => {
+    loadAnalysisHistory()
+    loadFavorites()
+  }, [])
 
   // 분석 결과를 히스토리에 저장
   const saveToHistory = (analysisResult) => {

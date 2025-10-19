@@ -323,7 +323,6 @@ class ClientAIAnalyzer {
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         let result = null;
-        let isSSE = false;
         
         xhr.open('POST', `${API_URL}/api/analyze-stream`);  // SSE 엔드포인트 시도
         console.log('🚀 SSE 엔드포인트 호출:', `${API_URL}/api/analyze-stream`);
@@ -368,7 +367,6 @@ class ClientAIAnalyzer {
             console.log('📡 처리 중인 라인:', line);
             
             if (line.startsWith('data: ')) {
-              isSSE = true;
               console.log('📨 SSE 메시지 발견:', line);
               try {
                 const jsonData = line.slice(6).trim();
@@ -424,7 +422,7 @@ class ClientAIAnalyzer {
                 try {
                   const jsonResult = JSON.parse(xhr.responseText);
                   resolve(jsonResult);
-                } catch (e) {
+                } catch (parseError) {
                   reject(new Error('서버 응답을 파싱할 수 없습니다.'));
                 }
               }
@@ -440,17 +438,6 @@ class ClientAIAnalyzer {
         
         xhr.send(formData);
       });
-      
-      // 응답 데이터 유효성 검사
-      if (!result || !result.problems || !Array.isArray(result.problems)) {
-        console.error('서버 응답:', result);
-        throw new Error('서버 응답 형식이 올바르지 않습니다.');
-      }
-      
-      console.log(`✅ 서버 분석 완료: ${result.problems.length}개 문제`);
-      
-      // 백엔드 응답을 그대로 반환 (이미 올바른 형식)
-      return result;
       
     } catch (error) {
       console.error('❌ 서버 분석 실패:', error);
@@ -666,7 +653,6 @@ class ClientAIAnalyzer {
    */
   calculateDifficulty(holds) {
     const count = holds.length;
-    const avgY = holds.reduce((sum, h) => sum + h.y, 0) / holds.length;
     
     if (count <= 4) return 'V1-V2';
     if (count <= 7) return 'V3-V4';
@@ -677,7 +663,7 @@ class ClientAIAnalyzer {
   /**
    * 문제 유형 추측
    */
-  guessType(holds) {
+  guessType() {
     const types = ['Balance', 'Power', 'Technique', 'Endurance', 'Coordination'];
     return types[Math.floor(Math.random() * types.length)];
   }
