@@ -4,6 +4,9 @@
  * 사용자 브라우저에서 직접 YOLO 모델 실행 + 서버 CLIP API
  */
 
+// API URL 설정
+const API_URL = import.meta.env.VITE_API_URL || 'https://climbmate.store'
+
 class ClientAIAnalyzer {
   constructor() {
     this.yoloSession = null;
