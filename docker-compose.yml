@@ -28,12 +28,12 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.frontend
+      args:
+        VITE_API_URL: https://climbmate.store
     expose:
       - "80"
     depends_on:
       - backend
-    environment:
-      - VITE_API_URL=https://climbmate.store
     restart: unless-stopped
 
   nginx:

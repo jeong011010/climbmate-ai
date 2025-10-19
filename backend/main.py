@@ -101,9 +101,15 @@ async def analyze_image(
         
         # 🚀 최적화: 전처리 (홀드 감지)
         print(f"🔍 홀드 감지 시작...")
+        # 배포 환경에 따른 모델 경로 설정
+        if os.path.exists("/app/holdcheck/roboflow_weights/weights.pt"):
+            model_path = "/app/holdcheck/roboflow_weights/weights.pt"  # Docker 환경
+        else:
+            model_path = "/Users/kimjazz/Desktop/project/climbmate/holdcheck/roboflow_weights/weights.pt"  # 로컬 환경
+        
         hold_data_raw, masks = preprocess(
             image,
-            model_path="/app/holdcheck/roboflow_weights/weights.pt",
+            model_path=model_path,
             mask_refinement=1,  # 속도 우선
             conf=0.4,  # 확실한 홀드만
             use_clip_ai=True
@@ -526,9 +532,15 @@ async def analyze_image_stream(
             yield await send_progress_update("🔍 홀드 감지 중...", 10, "detection")
             
             # 🚀 최적화: 전처리 (홀드 감지)
+            # 배포 환경에 따른 모델 경로 설정
+            if os.path.exists("/app/holdcheck/roboflow_weights/weights.pt"):
+                model_path = "/app/holdcheck/roboflow_weights/weights.pt"  # Docker 환경
+            else:
+                model_path = "/Users/kimjazz/Desktop/project/climbmate/holdcheck/roboflow_weights/weights.pt"  # 로컬 환경
+            
             hold_data_raw, masks = preprocess(
                 image,
-                model_path="/app/holdcheck/roboflow_weights/weights.pt",
+                model_path=model_path,
                 mask_refinement=1,  # 속도 우선
                 conf=0.4,  # 확실한 홀드만
                 use_clip_ai=True
