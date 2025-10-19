@@ -1,0 +1,87 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+model_converter_env/
+*.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+docs/
+
+# Test files
+tests/
+test_*.py
+*_test.py
+
+# Docker
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# Node modules (frontend가 backend 빌드에 포함되지 않도록)
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# AI Models (서버에서 직접 생성)
+frontend/public/models/*.onnx
+frontend/public/models/*.onnx.data
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Environment
+.env.local
+.env.*.local
+
