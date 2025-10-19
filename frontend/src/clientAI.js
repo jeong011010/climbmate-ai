@@ -332,14 +332,29 @@ class ClientAIAnalyzer {
         xhr.onprogress = function() {
           console.log('📡 SSE 데이터 수신:', xhr.responseText.length, 'bytes');
           console.log('📡 SSE 원본 데이터:', xhr.responseText);
+          
+          // SSE 데이터가 없으면 경고
+          if (xhr.responseText.length === 0) {
+            console.warn('⚠️ SSE 데이터가 비어있습니다!');
+            return;
+          }
+          
           const lines = xhr.responseText.split('\n');
+          console.log('📡 SSE 라인 수:', lines.length);
           
           for (const line of lines) {
+            if (line.trim() === '') continue; // 빈 줄 스킵
+            
+            console.log('📡 처리 중인 라인:', line);
+            
             if (line.startsWith('data: ')) {
               isSSE = true;
-              console.log('📨 SSE 메시지:', line);
+              console.log('📨 SSE 메시지 발견:', line);
               try {
-                const data = JSON.parse(line.slice(6));
+                const jsonData = line.slice(6).trim();
+                console.log('📨 JSON 데이터:', jsonData);
+                
+                const data = JSON.parse(jsonData);
                 console.log('✅ SSE 파싱 성공:', data);
                 
                 // 전역 함수 호출하여 UI 업데이트
@@ -359,7 +374,20 @@ class ClientAIAnalyzer {
                   };
                 }
               } catch (e) {
-                console.warn('❌ SSE 메시지 파싱 실패:', line, e);
+                console.error('❌ SSE 메시지 파싱 실패:', line, e);
+              }
+            } else if (line.includes('{') && line.includes('}')) {
+              // SSE 형식이 아닌 JSON 응답일 수도 있음
+              console.log('📨 일반 JSON 응답으로 처리:', line);
+              try {
+                const data = JSON.parse(line);
+                console.log('✅ JSON 파싱 성공:', data);
+                
+                if (typeof window.updateAnalysisProgress === 'function') {
+                  window.updateAnalysisProgress(data);
+                }
+              } catch (e) {
+                console.error('❌ JSON 파싱 실패:', line, e);
               }
             }
           }
