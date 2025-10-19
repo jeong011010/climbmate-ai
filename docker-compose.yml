@@ -23,6 +23,34 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    deploy:
+      replicas: 1  # 기본 1개 인스턴스, 필요시 2-3개로 증가 가능
+
+  # 추가 백엔드 인스턴스 (필요시 활성화)
+  # backend-2:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8001:8000"
+  #   environment:
+  #     - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+  #     - CLIP_MODEL=ViT-B/32
+  #   volumes:
+  #     - ./backend/climbmate.db:/app/backend/climbmate.db
+  #     - ./backend/models:/app/backend/models
+  #     - ./holdcheck:/app/holdcheck
+  #   restart: unless-stopped
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "3"
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
 
   frontend:
     build:

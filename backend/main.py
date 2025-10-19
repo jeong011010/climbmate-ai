@@ -518,7 +518,9 @@ async def send_progress_update(message: str, progress: int, step: str = None, **
     }
     # JSON 인코딩 시 한글과 특수문자 처리
     json_str = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
-    return f"data: {json_str}\n\n"
+    sse_message = f"data: {json_str}\n\n"
+    print(f"📡 SSE 전송: {message} ({progress}%)")
+    return sse_message
 
 @app.post("/api/analyze-stream")
 async def analyze_image_stream(
