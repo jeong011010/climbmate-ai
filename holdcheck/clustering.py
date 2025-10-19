@@ -154,7 +154,7 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
             _clip_device = device
             print("   ✅ CLIP 모델 로딩 완료")
         
-        model = _clip_model
+        model, _ = _clip_model
         
         # 🤖 CLIP AI 개선: 모든 홀드에 대해 CLIP AI로 색상 판단
         print("   🤖 CLIP AI 색상 판단 개선 중...")
