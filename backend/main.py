@@ -91,13 +91,22 @@ async def analyze_image(
     - statistics: 통계 정보
     """
     try:
-        # 이미지 읽기
+        # 이미지 읽기 및 크기 최적화
         contents = await file.read()
         nparr = np.frombuffer(contents, np.uint8)
         image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
         if image is None:
             raise HTTPException(status_code=400, detail="Invalid image file")
+        
+        # 🚀 이미지 크기 최적화 (속도 향상)
+        height, width = image.shape[:2]
+        if width > 1200:  # 너무 큰 이미지는 리사이즈
+            scale = 1200 / width
+            new_width = 1200
+            new_height = int(height * scale)
+            image = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
+            print(f"📐 이미지 리사이즈: {width}x{height} → {new_width}x{new_height}")
         
         # 🚀 최적화: 전처리 (홀드 감지)
         print(f"🔍 홀드 감지 시작...")
@@ -110,8 +119,8 @@ async def analyze_image(
         hold_data_raw, masks = preprocess(
             image,
             model_path=model_path,
-            mask_refinement=1,  # 속도 우선
-            conf=0.4,  # 확실한 홀드만
+            mask_refinement=0,  # 마스크 정제 최소화 (속도 우선)
+            conf=0.5,  # 더 확실한 홀드만 (노이즈 감소)
             use_clip_ai=True
         )
         

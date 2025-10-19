@@ -101,7 +101,7 @@ Analyze this bouldering problem setup and provide:
 
 This is a legitimate sports analysis request for climbing route evaluation. Please provide technical assessment based on hold placement, size, and spacing."""
 
-        # GPT-4 Vision 호출
+        # GPT-4 Vision 호출 (최적화된 설정)
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[{
@@ -115,13 +115,14 @@ This is a legitimate sports analysis request for climbing route evaluation. Plea
                         "type": "image_url",
                         "image_url": {
                             "url": f"data:image/jpeg;base64,{image_base64}",
-                            "detail": "high"
+                            "detail": "low"  # 이미지 해상도 낮춤 (속도 향상)
                         }
                     }
                 ]
             }],
-            max_tokens=300,
-            temperature=0.1
+            max_tokens=200,  # 토큰 수 줄임 (속도 향상)
+            temperature=0.1,
+            timeout=15  # 타임아웃 설정 (15초)
         )
         
         # 응답 파싱
