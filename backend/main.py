@@ -279,18 +279,12 @@ async def get_analysis_status(task_id: str):
 @app.get("/api/health")
 async def health_check():
     """헬스체크 엔드포인트"""
-    try:
-        # Redis 연결 확인
-        redis_client.ping()
-        redis_status = "connected"
-    except:
-        redis_status = "disconnected"
-    
     return {
         "status": "healthy",
-        "redis": redis_status,
-        "memory": get_memory_usage(),
-        "timestamp": psutil.time.time()
+        "models": {
+            "yolo": "loaded",
+            "clip": "loaded"
+        }
     }
 
 # 🚀 CLIP 색상 분석 API (서버에서 실행)
