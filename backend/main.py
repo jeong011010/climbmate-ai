@@ -394,8 +394,7 @@ async def analyze_colors_with_clip(request: ColorAnalysisRequest):
             print(f"⚠️ 이미지 로드 실패: {e}")
             raise HTTPException(status_code=400, detail="Invalid image format")
         
-        # CLIP 모델 로드
-        clip_model, clip_preprocess, clip_device = get_clip_model()
+        # CLIP 함수는 내부에서 모델을 자동 로드함
         
         colored_holds = []
         
@@ -416,8 +415,8 @@ async def analyze_colors_with_clip(request: ColorAnalysisRequest):
                     colored_holds.append({**hold, 'color': 'unknown'})
                     continue
                 
-                # CLIP으로 색상 분석
-                color = extract_color_with_clip_ai(hold_image, None, clip_model, clip_preprocess, clip_device)
+                # CLIP으로 색상 분석 (원래 방식)
+                color = extract_color_with_clip_ai(hold_image, None)
                 
                 colored_holds.append({
                     **hold,
