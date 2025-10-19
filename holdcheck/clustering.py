@@ -148,8 +148,147 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
         # 🚀 성능 최적화: 전역 캐시 사용
         device = "cuda" if torch.cuda.is_available() else "cpu"
         
-        # 🚀 CLIP 모델 재호출 방지 - preprocess.py에서 이미 분석 완료
-        print("   ⚡ CLIP 모델 재호출 생략 (이미 분석 완료)")
+        # 🚀 모든 홀드를 한 번에 CLIP으로 색상 분석
+        print("   🎨 모든 홀드를 한 번에 CLIP으로 색상 분석 중...")
+        
+        if _clip_model is None or _clip_device != device:
+            print("   🔄 CLIP 모델 로딩 중...")
+            model, preprocess = clip.load("ViT-B/32", device=device)
+            _clip_model = (model, preprocess)
+            _clip_device = device
+            print("   ✅ CLIP 모델 로딩 완료")
+        else:
+            print("   ⚡ CLIP 모델 캐시 사용")
+            model, preprocess = _clip_model
+        
+        # 🎯 모든 색상 프롬프트 (검정색 포함)
+        color_prompts = [
+            "a black climbing hold", "a very dark black climbing hold", "a dark black climbing hold",
+            "a white climbing hold", "a bright white climbing hold", "a pure white climbing hold",
+            "a gray climbing hold", "a light gray climbing hold", "a dark gray climbing hold",
+            "an orange climbing hold", "a bright orange climbing hold", "a vivid orange climbing hold",
+            "a yellow climbing hold", "a bright yellow climbing hold", "a pure yellow climbing hold",
+            "a red climbing hold", "a bright red climbing hold", "a vivid red climbing hold",
+            "a pink climbing hold", "a bright pink climbing hold", "a hot pink climbing hold",
+            "a blue climbing hold", "a light blue climbing hold", "a sky blue climbing hold",
+            "a green climbing hold", "a bright green climbing hold", "a forest green climbing hold",
+            "a purple climbing hold", "a bright purple climbing hold", "a violet climbing hold",
+            "a brown climbing hold", "a dark brown climbing hold", "a light brown climbing hold"
+        ]
+        
+        color_map = {
+            "black": ["black", "very dark black", "dark black"],
+            "white": ["white", "bright white", "pure white"],
+            "gray": ["gray", "light gray", "dark gray"],
+            "orange": ["orange", "bright orange", "vivid orange"],
+            "yellow": ["yellow", "bright yellow", "pure yellow"],
+            "red": ["red", "bright red", "vivid red"],
+            "pink": ["pink", "bright pink", "hot pink"],
+            "blue": ["blue", "light blue", "sky blue"],
+            "green": ["green", "bright green", "forest green"],
+            "purple": ["purple", "bright purple", "violet"],
+            "brown": ["brown", "dark brown", "light brown"]
+        }
+        
+        # 텍스트 특징 추출
+        if _clip_text_features is None:
+            print("   📝 텍스트 특징 추출 중...")
+            text_tokens = clip.tokenize(color_prompts).to(device)
+            with torch.no_grad():
+                text_features = model.encode_text(text_tokens)
+                text_features = text_features / text_features.norm(dim=-1, keepdim=True)
+            _clip_text_features = text_features
+            print("   ✅ 텍스트 특징 추출 완료")
+        else:
+            print("   ⚡ 캐시된 텍스트 특징 사용")
+            text_features = _clip_text_features
+        
+        # 모든 홀드의 CLIP 특징 추출
+        print(f"   🖼️ {len(hold_data)}개 홀드의 CLIP 특징 추출 중...")
+        batch_size = 32
+        all_image_features = []
+        valid_indices = []
+        
+        for batch_start in range(0, len(hold_data), batch_size):
+            batch_end = min(batch_start + batch_size, len(hold_data))
+            batch_holds = hold_data[batch_start:batch_end]
+            
+            processed_images = []
+            batch_valid_indices = []
+            
+            for i, hold in enumerate(batch_holds):
+                actual_idx = batch_start + i
+                mask = masks[hold["id"]].astype(np.uint8) * 255
+                y_coords, x_coords = np.where(mask > 0)
+                if len(y_coords) == 0:
+                    continue
+                
+                y_min, y_max = y_coords.min(), y_coords.max()
+                x_min, x_max = x_coords.min(), x_coords.max()
+                hold_image = original_image[y_min:y_max+1, x_min:x_max+1]
+                hold_pil = Image.fromarray(cv2.cvtColor(hold_image, cv2.COLOR_BGR2RGB))
+                
+                processed_images.append(preprocess(hold_pil))
+                batch_valid_indices.append(actual_idx)
+            
+            if processed_images:
+                image_tensor = torch.stack(processed_images).to(device)
+                with torch.no_grad():
+                    image_features = model.encode_image(image_tensor)
+                    image_features = image_features / image_features.norm(dim=-1, keepdim=True)
+                
+                all_image_features.append(image_features.cpu().numpy())
+                valid_indices.extend(batch_valid_indices)
+        
+        if not all_image_features:
+            print("   ⚠️ 처리할 홀드가 없습니다.")
+            return hold_data
+        
+        # 모든 이미지 특징 합치기
+        all_image_features = np.vstack(all_image_features)
+        print(f"   ✅ {len(all_image_features)}개 홀드의 CLIP 특징 추출 완료")
+        
+        # 유사도 계산 (모든 홀드)
+        clip_features_tensor = torch.from_numpy(all_image_features).float().to(device)
+        similarities = (clip_features_tensor @ text_features.T).cpu().numpy()
+        
+        # 색상 그룹 할당 (모든 홀드)
+        color_groups = {}
+        for i, orig_idx in enumerate(valid_indices):
+            best_idx = np.argmax(similarities[i])
+            best_prompt = color_prompts[best_idx]
+            confidence = similarities[i][best_idx]
+            
+            # 색상 이름 추출
+            color_name = "unknown"
+            for color, keywords in color_map.items():
+                for keyword in keywords:
+                    if keyword in best_prompt:
+                        color_name = color
+                        break
+                if color_name != "unknown":
+                    break
+            
+            # 홀드에 색상 정보 저장
+            hold_data[orig_idx]["color_name"] = color_name
+            hold_data[orig_idx]["color_confidence"] = confidence
+            
+            # 그룹핑
+            if color_name not in color_groups:
+                color_groups[color_name] = []
+            color_groups[color_name].append(orig_idx)
+        
+        # 색상별 그룹 ID 할당
+        group_id = 0
+        for color, indices in color_groups.items():
+            for idx in indices:
+                hold_data[idx]["group"] = group_id
+            group_id += 1
+        
+        print(f"   ✅ 색상별 그룹핑 완료: {len(color_groups)}개 그룹")
+        for color, indices in color_groups.items():
+            print(f"   {color}: {len(indices)}개")
+        
         return hold_data
         
         # 🤖 CLIP AI 개선: 모든 홀드에 대해 CLIP AI로 색상 판단

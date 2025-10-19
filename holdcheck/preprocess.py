@@ -277,7 +277,7 @@ def extract_color_with_clip_ai(image, mask):
 
 def extract_colors_with_clip_ai_batch(hold_images, masks):
     """
-    🚀 CLIP AI 배치 처리로 여러 홀드의 색상을 한 번에 추출
+    🚀 CLIP AI 배치 처리로 모든 홀드의 색상을 한 번에 추출 (검정색 포함)
     
     Args:
         hold_images: 홀드 이미지 리스트 (BGR)
@@ -289,64 +289,9 @@ def extract_colors_with_clip_ai_batch(hold_images, masks):
     if not hold_images:
         return []
     
-    print("   🚀 RGB 기반 검정색 사전 감지 중... (CLIP 없이)")
+    print(f"   🚀 CLIP AI로 모든 홀드 색상 분석 중... ({len(hold_images)}개)")
     
-    # 🚀 성능 최적화: 검정색 사전 감지를 최대한 간소화 (속도 우선)
-    black_candidates = []
-    
-    for i, (image, mask) in enumerate(zip(hold_images, masks)):
-        # 🚀 빠른 샘플링: 마스크에서 임의로 100개 픽셀만 추출
-        y_coords, x_coords = np.where(mask > 0)
-        if len(y_coords) == 0:
-            continue
-        
-        # 랜덤 샘플링으로 속도 향상
-        sample_count = min(100, len(y_coords))
-        sample_indices = np.random.choice(len(y_coords), sample_count, replace=False)
-        sampled_y = y_coords[sample_indices]
-        sampled_x = x_coords[sample_indices]
-        
-        pixels = image[sampled_y, sampled_x]
-        if len(pixels) > 10:
-            # 🚀 극단적 최적화: 매우 간단한 검정색 감지만 수행
-            avg_rgb = np.mean(pixels, axis=0)
-            avg_brightness = np.mean(avg_rgb)
-            channel_diff = np.max(avg_rgb) - np.min(avg_rgb)
-            
-            # 검정색 후보: 어둡고(< 80) 무채색(채널차 < 30)
-            if avg_brightness < 80 and channel_diff < 30:
-                black_candidates.append((i, "high"))
-    
-    print(f"   ✅ RGB 검정색 감지 완료: {len(black_candidates)}개 후보")
-    
-    # 🔥 검정색이 아닌 홀드들만 CLIP으로 처리
-    non_black_hold_images = []
-    non_black_masks = []
-    non_black_indices = []
-    
-    for i, (image, mask) in enumerate(zip(hold_images, masks)):
-        is_black = any(candidate[0] == i for candidate in black_candidates)
-        if not is_black:
-            non_black_hold_images.append(image)
-            non_black_masks.append(mask)
-            non_black_indices.append(i)
-    
-    print(f"   🎨 CLIP으로 처리할 홀드: {len(non_black_hold_images)}개")
-    
-    if len(non_black_hold_images) == 0:
-        # 모든 홀드가 검정색인 경우
-        results = []
-        for i, (image, mask) in enumerate(zip(hold_images, masks)):
-            y_coords, x_coords = np.where(mask > 0)
-            if len(y_coords) > 0:
-                pixels = image[y_coords, x_coords]
-                avg_rgb = np.mean(pixels, axis=0)
-                rgb = avg_rgb.astype(int)
-                hsv = cv2.cvtColor(np.uint8([[rgb]]), cv2.COLOR_BGR2HSV)[0][0]
-                results.append(("black", 0.9, rgb.tolist(), hsv.tolist(), None))
-        return results
-    
-    # 이제 CLIP 모델 로드 (한 번만!)
+    # CLIP 모델 로드 (한 번만!)
     print("   🔄 CLIP 모델 로딩 중... (한 번만!)")
     model, preprocess, device = get_clip_model()
     
@@ -395,10 +340,10 @@ def extract_colors_with_clip_ai_batch(hold_images, masks):
     all_image_features = []
     valid_indices = []
     
-    for batch_start in range(0, len(non_black_hold_images), batch_size):
-        batch_end = min(batch_start + batch_size, len(non_black_hold_images))
-        batch_images = non_black_hold_images[batch_start:batch_end]
-        batch_masks = non_black_masks[batch_start:batch_end]
+    for batch_start in range(0, len(hold_images), batch_size):
+        batch_end = min(batch_start + batch_size, len(hold_images))
+        batch_images = hold_images[batch_start:batch_end]
+        batch_masks = masks[batch_start:batch_end]
         
         processed_images = []
         batch_valid_indices = []
@@ -490,18 +435,6 @@ def extract_colors_with_clip_ai_batch(hold_images, masks):
             hsv = [0, 0, 128]
         
         results.append((orig_idx, color_name, confidence, rgb.tolist(), hsv.tolist(), image_features[i].cpu().numpy()))
-    
-    # 검정색 홀드들도 결과에 추가
-    for candidate_idx, conf_level in black_candidates:
-        image = hold_images[candidate_idx]
-        mask = masks[candidate_idx]
-        y_coords, x_coords = np.where(mask > 0)
-        if len(y_coords) > 0:
-            pixels = image[y_coords, x_coords]
-            rgb = np.mean(pixels, axis=0).astype(int)[::-1]  # BGR -> RGB
-            hsv = cv2.cvtColor(np.uint8([[rgb]]), cv2.COLOR_BGR2HSV)[0][0]
-            confidence = 0.95 if conf_level == "high" else 0.90
-            results.append((candidate_idx, "black", confidence, rgb.tolist(), hsv.tolist(), None))
     
     # 원래 인덱스 순서로 정렬
     results.sort(key=lambda x: x[0])
