@@ -289,7 +289,7 @@ def extract_colors_with_clip_ai_batch(hold_images, masks):
     if not hold_images:
         return []
     
-    model, preprocess, device = get_clip_model()
+    print("   🚀 RGB 기반 검정색 사전 감지 중... (CLIP 없이)")
     
     # 🚀 성능 최적화: 검정색 사전 감지를 최대한 간소화 (속도 우선)
     black_candidates = []
@@ -316,6 +316,39 @@ def extract_colors_with_clip_ai_batch(hold_images, masks):
             # 검정색 후보: 어둡고(< 80) 무채색(채널차 < 30)
             if avg_brightness < 80 and channel_diff < 30:
                 black_candidates.append((i, "high"))
+    
+    print(f"   ✅ RGB 검정색 감지 완료: {len(black_candidates)}개 후보")
+    
+    # 🔥 검정색이 아닌 홀드들만 CLIP으로 처리
+    non_black_hold_images = []
+    non_black_masks = []
+    non_black_indices = []
+    
+    for i, (image, mask) in enumerate(zip(hold_images, masks)):
+        is_black = any(candidate[0] == i for candidate in black_candidates)
+        if not is_black:
+            non_black_hold_images.append(image)
+            non_black_masks.append(mask)
+            non_black_indices.append(i)
+    
+    print(f"   🎨 CLIP으로 처리할 홀드: {len(non_black_hold_images)}개")
+    
+    if len(non_black_hold_images) == 0:
+        # 모든 홀드가 검정색인 경우
+        results = []
+        for i, (image, mask) in enumerate(zip(hold_images, masks)):
+            y_coords, x_coords = np.where(mask > 0)
+            if len(y_coords) > 0:
+                pixels = image[y_coords, x_coords]
+                avg_rgb = np.mean(pixels, axis=0)
+                rgb = avg_rgb.astype(int)
+                hsv = cv2.cvtColor(np.uint8([[rgb]]), cv2.COLOR_BGR2HSV)[0][0]
+                results.append(("black", 0.9, rgb.tolist(), hsv.tolist(), None))
+        return results
+    
+    # 이제 CLIP 모델 로드 (한 번만!)
+    print("   🔄 CLIP 모델 로딩 중... (한 번만!)")
+    model, preprocess, device = get_clip_model()
     
     # 색상 프롬프트 정의 (다양한 표현 유지)
     color_prompts = [
@@ -362,10 +395,10 @@ def extract_colors_with_clip_ai_batch(hold_images, masks):
     all_image_features = []
     valid_indices = []
     
-    for batch_start in range(0, len(hold_images), batch_size):
-        batch_end = min(batch_start + batch_size, len(hold_images))
-        batch_images = hold_images[batch_start:batch_end]
-        batch_masks = masks[batch_start:batch_end]
+    for batch_start in range(0, len(non_black_hold_images), batch_size):
+        batch_end = min(batch_start + batch_size, len(non_black_hold_images))
+        batch_images = non_black_hold_images[batch_start:batch_end]
+        batch_masks = non_black_masks[batch_start:batch_end]
         
         processed_images = []
         batch_valid_indices = []
@@ -419,49 +452,12 @@ def extract_colors_with_clip_ai_batch(hold_images, masks):
         confidence = float(similarities[i][best_idx])
         best_prompt = color_prompts[best_idx]
         
-        # 🎯 검정색 후보에 대한 특별 처리
-        is_black_candidate = False
-        black_confidence_level = None
-        
-        for candidate_idx, conf_level in black_candidates:
-            if candidate_idx == orig_idx:
-                is_black_candidate = True
-                black_confidence_level = conf_level
+        # 일반 홀드 처리 (검정색은 이미 제외됨)
+        color_name = "unknown"
+        for color, keywords in color_map.items():
+            if any(keyword in best_prompt for keyword in keywords):
+                color_name = color
                 break
-        
-        if is_black_candidate:
-            print(f"   🖤 홀드 {orig_idx}: 검정색 후보 ({black_confidence_level}) - 강제 검정색 분류")
-            
-            # 신뢰도에 따른 강제 분류
-            if black_confidence_level == "very_high":
-                color_name = "black"
-                confidence = 0.98
-            elif black_confidence_level == "high":
-                color_name = "black"
-                confidence = 0.95
-            else:  # medium
-                color_name = "black"
-                confidence = 0.90
-            
-            print(f"      ✅ 검정색으로 강제 분류 (신뢰도: {black_confidence_level}, confidence: {confidence})")
-            
-            # 추가 검증: 다른 색상으로 분류될 가능성 체크
-            other_color_similarities = []
-            for j, prompt in enumerate(color_prompts):
-                if "black" not in prompt.lower():
-                    other_color_similarities.append(similarities[i][j])
-            
-            if other_color_similarities:
-                max_other_similarity = max(other_color_similarities)
-                if max_other_similarity > 0.3:  # 다른 색상 유사도가 높으면 경고
-                    print(f"      ⚠️ 다른 색상 유사도도 높음: {max_other_similarity:.3f}")
-        else:
-            # 일반 홀드 처리
-            color_name = "unknown"
-            for color, keywords in color_map.items():
-                if any(keyword in best_prompt for keyword in keywords):
-                    color_name = color
-                    break
         
         # RGB/HSV 추출 (기존 로직 재사용)
         y_coords, x_coords = np.where(mask > 0)
@@ -493,9 +489,27 @@ def extract_colors_with_clip_ai_batch(hold_images, masks):
             rgb = [128, 128, 128]
             hsv = [0, 0, 128]
         
-        results.append((color_name, confidence, rgb.tolist(), hsv.tolist(), image_features[i].cpu().numpy()))
+        results.append((orig_idx, color_name, confidence, rgb.tolist(), hsv.tolist(), image_features[i].cpu().numpy()))
     
-    return results
+    # 검정색 홀드들도 결과에 추가
+    for candidate_idx, conf_level in black_candidates:
+        image = hold_images[candidate_idx]
+        mask = masks[candidate_idx]
+        y_coords, x_coords = np.where(mask > 0)
+        if len(y_coords) > 0:
+            pixels = image[y_coords, x_coords]
+            rgb = np.mean(pixels, axis=0).astype(int)[::-1]  # BGR -> RGB
+            hsv = cv2.cvtColor(np.uint8([[rgb]]), cv2.COLOR_BGR2HSV)[0][0]
+            confidence = 0.95 if conf_level == "high" else 0.90
+            results.append((candidate_idx, "black", confidence, rgb.tolist(), hsv.tolist(), None))
+    
+    # 원래 인덱스 순서로 정렬
+    results.sort(key=lambda x: x[0])
+    
+    # 인덱스 제거하고 반환
+    final_results = [(color_name, confidence, rgb, hsv, clip_features) for _, color_name, confidence, rgb, hsv, clip_features in results]
+    
+    return final_results
 
 # -------------------------------
 # 📌 Resize + Padding

@@ -148,14 +148,9 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
         # 🚀 성능 최적화: 전역 캐시 사용
         device = "cuda" if torch.cuda.is_available() else "cpu"
         
-        if _clip_model is None or _clip_device != device:
-            print("   🔄 CLIP 모델 로딩 중...")
-            model, preprocess = clip.load("ViT-B/32", device=device)
-            _clip_model = (model, preprocess)
-            _clip_device = device
-            print("   ✅ CLIP 모델 로딩 완료")
-        else:
-            model, preprocess = _clip_model
+        # 🚀 CLIP 모델 재호출 방지 - preprocess.py에서 이미 분석 완료
+        print("   ⚡ CLIP 모델 재호출 생략 (이미 분석 완료)")
+        return hold_data
         
         # 🤖 CLIP AI 개선: 모든 홀드에 대해 CLIP AI로 색상 판단
         print("   🤖 CLIP AI 색상 판단 개선 중...")
