@@ -63,22 +63,14 @@ app = FastAPI(title="ClimbMate API", version="1.0.0")
 # 🚀 성능 최적화: 시작 시 CLIP 모델 미리 로딩
 @app.on_event("startup")
 async def startup_event():
-    """서버 시작 시 CLIP 모델 미리 로딩"""
+    """서버 시작 시 초기화"""
     try:
-        print("🚀 서버 시작 - CLIP 모델 미리 로딩...")
-        import clustering
-        import torch
-        import clip
-        
-        if clustering._clip_model is None:
-            clustering._clip_device = "cuda" if torch.cuda.is_available() else "cpu"
-            model, preprocess = clip.load("ViT-B/32", device=clustering._clip_device)
-            clustering._clip_model = (model, preprocess)
-            print(f"✅ CLIP 모델 미리 로딩 완료 (Device: {clustering._clip_device})")
-        else:
-            print("✅ CLIP 모델 이미 로딩됨")
+        print("🚀 서버 시작 완료")
+        print("⚡ CLIP 모델은 첫 요청 시 자동 로딩됩니다 (메모리 최적화)")
+        # CLIP 모델은 메모리 부족 방지를 위해 첫 요청 시 lazy loading
+        # clustering.py와 preprocess.py의 get_clip_model()에서 자동 캐싱
     except Exception as e:
-        print(f"⚠️ CLIP 모델 미리 로딩 실패: {e}")
+        print(f"⚠️ 서버 시작 실패: {e}")
 
 # CORS 설정 (React 개발 서버용)
 app.add_middleware(
