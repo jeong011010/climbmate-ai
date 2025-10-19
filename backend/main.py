@@ -861,7 +861,9 @@ async def analyze_image_stream(
         "Content-Type": "text/event-stream; charset=utf-8",
         "X-Accel-Buffering": "no",
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Cache-Control"
+        "Access-Control-Allow-Headers": "Cache-Control, Accept",
+        "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+        "Transfer-Encoding": "chunked"
     }
     print("📡 SSE 응답 헤더 설정:", headers)
     return StreamingResponse(generate(), media_type="text/event-stream", headers=headers)
