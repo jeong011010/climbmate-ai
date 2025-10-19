@@ -146,6 +146,7 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
         
         # 🚀 성능 최적화: 전역 캐시 사용
         global _clip_model, _clip_text_features, _clip_device
+        
         device = "cuda" if torch.cuda.is_available() else "cpu"
         
         if _clip_model is None or _clip_device != device:
