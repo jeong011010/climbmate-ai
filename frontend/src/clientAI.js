@@ -273,13 +273,34 @@ class ClientAIAnalyzer {
     try {
       console.log('🎨 서버 CLIP API로 색상 분석 중...');
       
-      // 이미지를 Base64로 변환
+      // 이미지를 Base64로 변환 (고품질)
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      canvas.width = imageElement.width;
-      canvas.height = imageElement.height;
-      ctx.drawImage(imageElement, 0, 0);
-      const imageDataBase64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+      
+      // 원본 크기 유지 (너무 크면 리사이즈)
+      let targetWidth = imageElement.width;
+      let targetHeight = imageElement.height;
+      
+      // 최대 크기 제한 (메모리 절약)
+      const maxSize = 2048;
+      if (targetWidth > maxSize || targetHeight > maxSize) {
+        const ratio = Math.min(maxSize / targetWidth, maxSize / targetHeight);
+        targetWidth = Math.round(targetWidth * ratio);
+        targetHeight = Math.round(targetHeight * ratio);
+      }
+      
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      
+      // 고품질 렌더링
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(imageElement, 0, 0, targetWidth, targetHeight);
+      
+      // 고품질 JPEG로 변환 (품질 0.95)
+      const imageDataBase64 = canvas.toDataURL('image/jpeg', 0.95).split(',')[1];
+      
+      console.log(`📤 이미지 전송: ${targetWidth}x${targetHeight}, ${Math.round(imageDataBase64.length/1024)}KB`);
       
       // 서버 CLIP API 호출
       const response = await fetch('/api/analyze-colors', {

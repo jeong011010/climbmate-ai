@@ -372,13 +372,27 @@ async def analyze_colors_with_clip(request: ColorAnalysisRequest):
     try:
         from holdcheck.preprocess import get_clip_model, extract_color_with_clip_ai
         
-        # 이미지 디코딩
-        image_data = base64.b64decode(request.image_data_base64)
+        # 이미지 디코딩 및 검증
+        try:
+            image_data = base64.b64decode(request.image_data_base64)
+            if len(image_data) < 100:  # 너무 작은 이미지
+                raise ValueError("Image data too small")
+        except Exception as e:
+            print(f"⚠️ Base64 디코딩 실패: {e}")
+            raise HTTPException(status_code=400, detail="Invalid image data")
+        
         from PIL import Image
         import io
         
-        pil_image = Image.open(io.BytesIO(image_data))
-        image = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
+        # 이미지 로드 및 검증
+        try:
+            pil_image = Image.open(io.BytesIO(image_data))
+            if pil_image.size[0] < 10 or pil_image.size[1] < 10:  # 너무 작은 이미지
+                raise ValueError("Image too small")
+            image = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
+        except Exception as e:
+            print(f"⚠️ 이미지 로드 실패: {e}")
+            raise HTTPException(status_code=400, detail="Invalid image format")
         
         # CLIP 모델 로드
         clip_model, clip_preprocess, clip_device = get_clip_model()
