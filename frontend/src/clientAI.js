@@ -583,28 +583,11 @@ class ClientAIAnalyzer {
       const imageElement = await this.loadImage(imageFile);
       
       // 🚀 서버 사이드 전체 분석 (YOLO + 마스크 + CLIP)
-      const coloredHolds = await this.analyzeWithServerSide(imageElement, wallAngle);
+      const serverResult = await this.analyzeWithServerSide(imageElement, wallAngle);
       
-      // 색상별 그룹화
-      const colorGroups = this.groupByColor(coloredHolds);
-      
-      // 문제 생성
-      const problems = this.generateProblems(colorGroups);
-      
-      const result = {
-        problems: problems,
-        statistics: {
-          total_holds: coloredHolds.length,
-          total_problems: problems.length,
-          color_groups: Object.keys(colorGroups).length,
-          analysis_method: 'server_side_full'
-        },
-        message: `서버 사이드 분석 완료 (YOLO + CLIP)`,
-        note: '✅ 서버에서 YOLO + 마스크 생성 + CLIP 모델을 실행했습니다.'
-      };
-      
-      console.log('✅ 서버 사이드 분석 완료!', result);
-      return result;
+      // 서버에서 이미 완성된 결과를 그대로 반환
+      console.log('✅ 서버 사이드 분석 완료!', serverResult);
+      return serverResult;
       
     } catch (error) {
       console.error('❌ 서버 사이드 분석 실패:', error);
