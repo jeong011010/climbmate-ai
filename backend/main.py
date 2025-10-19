@@ -853,7 +853,7 @@ async def analyze_image_stream(
             print(f"❌ 분석 오류: {e}")
             yield await send_progress_update(f"❌ 분석 실패: {str(e)}", 0, "error")
     
-    return StreamingResponse(generate(), media_type="text/plain")
+    return StreamingResponse(generate(), media_type="text/event-stream")
 
 @app.get("/api/health")
 async def health_check():

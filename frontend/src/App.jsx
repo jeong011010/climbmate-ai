@@ -281,15 +281,17 @@ function App() {
       const { default: ClientAIAnalyzer } = await import('./clientAI.js')
       const analyzer = new ClientAIAnalyzer()
 
+      // 초기 상태만 설정 (이후 SSE에서 실시간 업데이트)
       setCurrentAnalysisStep('서버로 이미지 전송 중...')
-      setLoadingProgress(10)
+      setLoadingProgress(5)
 
-      // 사용자 브라우저에서 직접 분석
+      // 사용자 브라우저에서 직접 분석 (SSE로 실시간 진행상황 수신)
       const clientResult = await analyzer.analyzeImage(image, wallAngle)
 
+      // 분석 완료 후 최종 상태 설정
       setLoading(false)
       setLoadingProgress(100)
-      setCurrentAnalysisStep('분석 완료!')
+      setCurrentAnalysisStep('✅ 분석 완료!')
       setResult(clientResult)
 
       // 통계 업데이트
