@@ -81,9 +81,17 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
     has_clip_features = all("clip_features" in hold for hold in hold_data)
     
     if not has_clip_features:
-        # CLIP 모델 로드
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-        model, preprocess = clip.load("ViT-B/32", device=device)
+        # 🚀 성능 최적화: 전역 CLIP 모델 캐시 사용
+        global _clip_model, _clip_text_features, _clip_device
+        
+        if _clip_model is None:
+            print("   🔄 CLIP 모델 로딩 중...")
+            _clip_device = "cuda" if torch.cuda.is_available() else "cpu"
+            _clip_model, preprocess = clip.load("ViT-B/32", device=_clip_device)
+            print(f"   ✅ CLIP 모델 로딩 완료 (Device: {_clip_device})")
+        else:
+            print("   ✅ CLIP 모델 캐시 사용 (Device: {})".format(_clip_device))
+            model, preprocess = _clip_model
         
         # 각 홀드의 이미지 특징 추출
         print("   🔍 CLIP 특징 벡터 추출 중...")

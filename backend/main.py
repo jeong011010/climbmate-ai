@@ -60,6 +60,26 @@ class FeedbackRequest(BaseModel):
 
 app = FastAPI(title="ClimbMate API", version="1.0.0")
 
+# 🚀 성능 최적화: 시작 시 CLIP 모델 미리 로딩
+@app.on_event("startup")
+async def startup_event():
+    """서버 시작 시 CLIP 모델 미리 로딩"""
+    try:
+        print("🚀 서버 시작 - CLIP 모델 미리 로딩...")
+        import clustering
+        import torch
+        import clip
+        
+        if clustering._clip_model is None:
+            clustering._clip_device = "cuda" if torch.cuda.is_available() else "cpu"
+            model, preprocess = clip.load("ViT-B/32", device=clustering._clip_device)
+            clustering._clip_model = (model, preprocess)
+            print(f"✅ CLIP 모델 미리 로딩 완료 (Device: {clustering._clip_device})")
+        else:
+            print("✅ CLIP 모델 이미 로딩됨")
+    except Exception as e:
+        print(f"⚠️ CLIP 모델 미리 로딩 실패: {e}")
+
 # CORS 설정 (React 개발 서버용)
 app.add_middleware(
     CORSMiddleware,
