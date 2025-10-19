@@ -1,6 +1,7 @@
 /**
- * 🚀 클라이언트 사이드 AI 처리 (ONNX Runtime Web)
- * 사용자 브라우저에서 직접 YOLO + CLIP 모델 실행
+ * 🚀 클라이언트 사이드 AI 처리 v2.1.0 (ONNX Runtime Web)
+ * 브라우저: YOLO 실행 | 서버: CLIP 실행
+ * 사용자 브라우저에서 직접 YOLO 모델 실행 + 서버 CLIP API
  */
 
 class ClientAIAnalyzer {
