@@ -28,9 +28,7 @@ from sklearn.cluster import KMeans
 # -------------------------------
 # 🚀 모델 싱글톤 (캐싱) - 성능 최적화
 # -------------------------------
-_clip_model = None
-_clip_preprocess = None
-_clip_device = None
+# CLIP 모델은 clustering 모듈과 공유 (import 시점에 참조)
 _yolo_model = None
 _yolo_model_path = None
 
@@ -47,16 +45,21 @@ def get_yolo_model(model_path="/app/holdcheck/roboflow_weights/weights.pt"):
     return _yolo_model
 
 def get_clip_model():
-    """🤖 CLIP 모델을 싱글톤으로 로드 (메모리 절약)"""
-    global _clip_model, _clip_preprocess, _clip_device
+    """🤖 CLIP 모델을 싱글톤으로 로드 (clustering 모듈과 공유)"""
+    # clustering 모듈의 전역 캐시를 사용
+    import clustering
     
-    if _clip_model is None:
+    if clustering._clip_model is None:
         print("🤖 CLIP 모델 로딩 중...")
-        _clip_device = "cuda" if torch.cuda.is_available() else "cpu"
-        _clip_model, _clip_preprocess = clip.load("ViT-B/32", device=_clip_device)
-        print(f"✅ CLIP 모델 로딩 완료 (Device: {_clip_device})")
+        clustering._clip_device = "cuda" if torch.cuda.is_available() else "cpu"
+        model, preprocess = clip.load("ViT-B/32", device=clustering._clip_device)
+        clustering._clip_model = (model, preprocess)
+        print(f"✅ CLIP 모델 로딩 완료 (Device: {clustering._clip_device})")
+    else:
+        print(f"✅ CLIP 모델 캐시 사용 (Device: {clustering._clip_device})")
     
-    return _clip_model, _clip_preprocess, _clip_device
+    model, preprocess = clustering._clip_model
+    return model, preprocess, clustering._clip_device
 
 # -------------------------------
 # 🤖 CLIP AI 기반 색상 추출
