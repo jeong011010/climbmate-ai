@@ -290,6 +290,88 @@ async def analyze_image(
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
+# 🚀 CLIP 색상 분석 API (서버에서 실행)
+class ColorAnalysisRequest(BaseModel):
+    holds: list
+    image_data_base64: str
+
+@app.post("/api/analyze-colors")
+async def analyze_colors_with_clip(request: ColorAnalysisRequest):
+    """
+    🎨 CLIP 모델로 홀드 색상 분석 (서버에서 실행)
+    브라우저: YOLO로 홀드 감지 → 서버: CLIP으로 색상 분석
+    """
+    try:
+        from holdcheck.preprocess import get_clip_model, extract_color_with_clip_ai
+        
+        # 이미지 디코딩 및 검증
+        try:
+            image_data = base64.b64decode(request.image_data_base64)
+            if len(image_data) < 100:
+                raise ValueError("Image data too small")
+        except Exception as e:
+            print(f"⚠️ Base64 디코딩 실패: {e}")
+            raise HTTPException(status_code=400, detail="Invalid image data")
+        
+        from PIL import Image
+        import io
+        
+        # 이미지 로드 및 검증
+        try:
+            pil_image = Image.open(io.BytesIO(image_data))
+            if pil_image.size[0] < 10 or pil_image.size[1] < 10:
+                raise ValueError("Image too small")
+            image = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
+        except Exception as e:
+            print(f"⚠️ 이미지 로드 실패: {e}")
+            raise HTTPException(status_code=400, detail="Invalid image format")
+        
+        colored_holds = []
+        
+        for hold in request.holds:
+            try:
+                # 홀드 영역 추출
+                x, y, w, h = int(hold['x']), int(hold['y']), int(hold['width']), int(hold['height'])
+                
+                # 경계 체크
+                x = max(0, min(x, image.shape[1] - 1))
+                y = max(0, min(y, image.shape[0] - 1))
+                w = max(1, min(w, image.shape[1] - x))
+                h = max(1, min(h, image.shape[0] - y))
+                
+                hold_image = image[y:y+h, x:x+w]
+                
+                if hold_image.size == 0:
+                    colored_holds.append({**hold, 'color': 'unknown'})
+                    continue
+                
+                # CLIP으로 색상 분석
+                color = extract_color_with_clip_ai(hold_image, None)
+                
+                colored_holds.append({
+                    **hold,
+                    'color': color
+                })
+                
+            except Exception as e:
+                print(f"⚠️ 홀드 색상 분석 실패: {e}")
+                colored_holds.append({
+                    **hold,
+                    'color': 'unknown'
+                })
+        
+        return {
+            "success": True,
+            "colored_holds": colored_holds,
+            "message": f"✅ CLIP으로 {len(colored_holds)}개 홀드 색상 분석 완료"
+        }
+        
+    except Exception as e:
+        print(f"❌ CLIP 색상 분석 실패: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"CLIP color analysis failed: {str(e)}")
+
 if DB_AVAILABLE:
     @app.post("/api/feedback")
     async def submit_feedback(feedback: FeedbackRequest):
