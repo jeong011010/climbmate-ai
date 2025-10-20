@@ -37,12 +37,12 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         
         # YOLO 홀드 감지
         from holdcheck.preprocess import preprocess
-        hold_result = preprocess(image)
+        hold_data, masks = preprocess(image)
         
-        if not hold_result or 'holds' not in hold_result:
+        if not hold_data or 'holds' not in hold_data:
             raise ValueError("홀드 감지 실패")
         
-        holds = hold_result['holds']
+        holds = hold_data['holds']
         
         # 2단계: CLIP 색상 분석
         self.update_state(
@@ -98,7 +98,7 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                 'total_holds': len(holds),
                 'total_problems': len(problems)
             },
-            'annotated_image': hold_result.get('annotated_image_base64', '')
+            'annotated_image': hold_data.get('annotated_image_base64', '')
         }
         
         return result
