@@ -167,4 +167,4 @@ async function analyzeImage(imageFile, wallAngle = null) {
 }
 
 export { ClientAI, analyzeImage }
-export default clientAI
+export default ClientAI
