@@ -33,14 +33,38 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
         if image is None:
-            raise ValueError("잘못된 이미지 파일")
+            self.update_state(
+                state='FAILURE',
+                meta={
+                    'error': '잘못된 이미지 파일',
+                    'message': '이미지를 읽을 수 없습니다. 올바른 이미지 파일인지 확인해주세요.',
+                    'error_type': 'INVALID_IMAGE'
+                }
+            )
+            return {
+                'status': 'error',
+                'error': '잘못된 이미지 파일',
+                'message': '이미지를 읽을 수 없습니다.'
+            }
         
         # YOLO 홀드 감지
         from holdcheck.preprocess import preprocess
         hold_data, masks = preprocess(image)
         
         if not hold_data:
-            raise ValueError("홀드 감지 실패")
+            self.update_state(
+                state='FAILURE',
+                meta={
+                    'error': '홀드 감지 실패',
+                    'message': '이미지에서 홀드를 찾을 수 없습니다. 다른 이미지를 시도해주세요.',
+                    'error_type': 'NO_HOLDS_DETECTED'
+                }
+            )
+            return {
+                'status': 'error',
+                'error': '홀드 감지 실패',
+                'message': '이미지에서 홀드를 찾을 수 없습니다.'
+            }
         
         # hold_data는 홀드 리스트입니다
         holds = hold_data
@@ -105,11 +129,24 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         return result
         
     except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"❌ 분석 오류: {error_details}")
+        
         self.update_state(
             state='FAILURE',
-            meta={'error': str(e), 'message': f'분석 실패: {str(e)}'}
+            meta={
+                'error': str(e),
+                'message': f'분석 실패: {str(e)}',
+                'error_type': 'GENERAL_ERROR',
+                'traceback': error_details[:500]  # 트레이스백 일부만 저장
+            }
         )
-        raise
+        return {
+            'status': 'error',
+            'error': str(e),
+            'message': f'분석 중 오류가 발생했습니다: {str(e)}'
+        }
 
 @celery_app.task(bind=True)
 def analyze_colors_with_clip_async(self, image_base64, hold_data):
@@ -136,7 +173,19 @@ def analyze_colors_with_clip_async(self, image_base64, hold_data):
         image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
         if image is None:
-            raise ValueError("잘못된 이미지 파일")
+            self.update_state(
+                state='FAILURE',
+                meta={
+                    'error': '잘못된 이미지 파일',
+                    'message': '이미지를 읽을 수 없습니다.',
+                    'error_type': 'INVALID_IMAGE'
+                }
+            )
+            return {
+                'status': 'error',
+                'error': '잘못된 이미지 파일',
+                'message': '이미지를 읽을 수 없습니다.'
+            }
         
         # 진행률 업데이트: CLIP 분석 시작
         self.update_state(
@@ -178,6 +227,10 @@ def analyze_colors_with_clip_async(self, image_base64, hold_data):
         return colored_holds
         
     except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"❌ CLIP 분석 오류: {error_details}")
+        
         # 오류 발생 시 상태 업데이트
         self.update_state(
             state='FAILURE',
@@ -185,10 +238,15 @@ def analyze_colors_with_clip_async(self, image_base64, hold_data):
                 'progress': 0,
                 'message': f'❌ CLIP 분석 실패: {str(e)}',
                 'step': 'error',
-                'error': str(e)
+                'error': str(e),
+                'error_type': 'CLIP_ERROR'
             }
         )
-        raise e
+        return {
+            'status': 'error',
+            'error': str(e),
+            'message': f'CLIP 색상 분석 실패: {str(e)}'
+        }
     """
     비동기 이미지 분석 작업
     
@@ -212,7 +270,19 @@ def analyze_colors_with_clip_async(self, image_base64, hold_data):
         image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
         if image is None:
-            raise ValueError("잘못된 이미지 파일")
+            self.update_state(
+                state='FAILURE',
+                meta={
+                    'error': '잘못된 이미지 파일',
+                    'message': '이미지를 읽을 수 없습니다.',
+                    'error_type': 'INVALID_IMAGE'
+                }
+            )
+            return {
+                'status': 'error',
+                'error': '잘못된 이미지 파일',
+                'message': '이미지를 읽을 수 없습니다.'
+            }
         
         # 진행률 업데이트: 홀드 감지 시작
         self.update_state(
@@ -232,7 +302,19 @@ def analyze_colors_with_clip_async(self, image_base64, hold_data):
         )
         
         if not hold_data_raw:
-            raise ValueError("홀드를 감지하지 못했습니다")
+            self.update_state(
+                state='FAILURE',
+                meta={
+                    'error': '홀드 감지 실패',
+                    'message': '이미지에서 홀드를 찾을 수 없습니다.',
+                    'error_type': 'NO_HOLDS_DETECTED'
+                }
+            )
+            return {
+                'status': 'error',
+                'error': '홀드 감지 실패',
+                'message': '이미지에서 홀드를 찾을 수 없습니다.'
+            }
         
         # 진행률 업데이트: 홀드 감지 완료
         self.update_state(
@@ -380,6 +462,10 @@ def analyze_colors_with_clip_async(self, image_base64, hold_data):
         return result
         
     except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"❌ 분석 오류: {error_details}")
+        
         # 오류 발생 시 상태 업데이트
         self.update_state(
             state='FAILURE',
@@ -387,7 +473,12 @@ def analyze_colors_with_clip_async(self, image_base64, hold_data):
                 'progress': 0,
                 'message': f'❌ 분석 실패: {str(e)}',
                 'step': 'error',
-                'error': str(e)
+                'error': str(e),
+                'error_type': 'GENERAL_ERROR'
             }
         )
-        raise e
+        return {
+            'status': 'error',
+            'error': str(e),
+            'message': f'분석 중 오류가 발생했습니다: {str(e)}'
+        }

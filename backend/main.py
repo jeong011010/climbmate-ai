@@ -573,23 +573,39 @@ async def get_analysis_status(task_id: str):
                 **task.info
             }
         elif task.state == 'SUCCESS':
-            response = {
-                'status': task.state,
-                'progress': 100,
-                'message': '✅ 분석 완료!',
-                'result': task.result
-            }
+            # 성공 상태이지만 결과가 에러인 경우 처리
+            result = task.result
+            if isinstance(result, dict) and result.get('status') == 'error':
+                response = {
+                    'status': 'FAILURE',
+                    'progress': 0,
+                    'message': result.get('message', '분석 실패'),
+                    'error': result.get('error', ''),
+                    'error_type': result.get('error_type', 'UNKNOWN')
+                }
+            else:
+                response = {
+                    'status': task.state,
+                    'progress': 100,
+                    'message': '✅ 분석 완료!',
+                    'result': result
+                }
         else:  # FAILURE
+            # task.info가 dict가 아닐 수 있으므로 안전하게 처리
+            info = task.info if isinstance(task.info, dict) else {}
             response = {
-                'status': task.state,
+                'status': 'FAILURE',
                 'progress': 0,
-                'message': task.info.get('message', '분석 실패'),
-                'error': task.info.get('error', '')
+                'message': info.get('message', '분석 실패'),
+                'error': info.get('error', str(task.info) if task.info else '알 수 없는 오류'),
+                'error_type': info.get('error_type', 'UNKNOWN')
             }
         
         return response
         
     except Exception as e:
+        import traceback
+        print(f"❌ 상태 확인 오류: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=f"상태 확인 실패: {str(e)}")
 
 @app.post("/api/gpt4-analyze")
