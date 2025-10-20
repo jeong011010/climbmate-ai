@@ -123,12 +123,18 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         problems = []
         for group_id, group_holds in problems_by_color.items():
             if len(group_holds) >= 3:  # 최소 3개 이상
+                # 색상 이름 추출 (첫 번째 홀드에서)
+                color_name = group_holds[0].get('clip_color_name', 'unknown')
+                color_rgb = group_holds[0].get('dominant_rgb', [128, 128, 128])
+                
                 # 규칙 기반 분석
                 analysis = analyze_problem(colored_holds, group_id, wall_angle)
                 if analysis:
                     problems.append({
-                        'group_id': group_id,
-                        'colored_holds': group_holds,
+                        'id': group_id,
+                        'color_name': color_name,
+                        'color_rgb': color_rgb,
+                        'holds': group_holds,
                         'hold_count': len(group_holds),
                         'analysis': analysis
                     })
