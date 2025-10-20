@@ -39,10 +39,11 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         from holdcheck.preprocess import preprocess
         hold_data, masks = preprocess(image)
         
-        if not hold_data or 'holds' not in hold_data:
+        if not hold_data:
             raise ValueError("홀드 감지 실패")
         
-        holds = hold_data['holds']
+        # hold_data는 홀드 리스트입니다
+        holds = hold_data
         
         # 2단계: CLIP 색상 분석
         self.update_state(
@@ -98,7 +99,7 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                 'total_holds': len(holds),
                 'total_problems': len(problems)
             },
-            'annotated_image': hold_data.get('annotated_image_base64', '')
+            'annotated_image': ''  # preprocess에서 이미지를 파일로 저장하므로 여기서는 빈 문자열
         }
         
         return result
