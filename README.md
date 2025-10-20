@@ -2,6 +2,43 @@
 
 > 볼더링 벽 사진만 찍으면 AI가 홀드를 감지하고, 문제를 분류하고, 난이도와 유형을 분석합니다.
 
+## 📌 **현재 상태 (체크포인트: 5f79dda)**
+
+**✅ 모든 핵심 기능이 완벽하게 동작하는 안정적인 상태**
+
+### 🏗️ **현재 아키텍처**
+```
+브라우저: 이미지 업로드 + 진행률 표시
+    ↓
+서버: 작업 큐 관리 (FastAPI + Celery)
+    ↓
+Celery Worker: YOLO + CLIP + GPT-4 분석
+    ↓
+결과 반환 (비동기 폴링)
+```
+
+### ✅ **완벽 동작하는 기능들**
+- **YOLO 홀드 감지**: 정확한 홀드 위치 및 크기 감지
+- **CLIP 색상 분석**: AI 기반 정확한 색상 분류
+- **GPT-4 문제 생성**: 한국어로 상세한 문제 분석
+- **비동기 처리**: Celery + Redis로 안정적인 백그라운드 처리
+- **실시간 진행률**: 폴링 방식으로 사용자에게 진행 상황 표시
+- **데이터베이스**: SQLite로 분석 결과 및 피드백 저장
+- **완전한 프론트엔드**: React로 완전한 UI 구현
+
+### ⚠️ **현재 제약사항**
+- **메모리 사용량**: 서버 메모리 1.9GB < 필요한 메모리 2GB
+- **Celery Worker 크래시**: 메모리 부족으로 인한 SIGKILL 오류 발생 가능
+- **모든 AI 모델이 서버에서 실행**: 브라우저 오프로딩 없음
+
+### 🎯 **이 체크포인트의 의미**
+- 모든 핵심 기능이 완벽하게 구현된 상태
+- 서버 메모리만 충분하다면 완벽하게 동작
+- 브라우저 오프로딩 시도 전의 안정적인 베이스라인
+- 향후 최적화 작업의 기준점
+
+---
+
 ## ✨ 주요 기능
 
 ### 📸 이미지 분석
@@ -97,25 +134,30 @@ cd frontend && npm install && cd ..
 
 ## 🛠️ 기술 스택
 
-### Frontend
-- React 19 + Vite
-- Tailwind CSS
-- Axios
-- PWA (Service Worker)
+### 백엔드 (서버 사이드)
+- **FastAPI**: Python 웹 프레임워크
+- **Celery**: 비동기 작업 큐 (Redis 브로커)
+- **YOLOv8-seg**: 홀드 감지 모델 (~500MB)
+- **CLIP ViT-B/32**: 색상 분석 AI (~1.5GB)
+- **GPT-4 Vision**: 문제 생성 AI (API 호출)
+- **SQLite**: 분석 결과 및 피드백 저장
 
-### Backend
-- FastAPI
-- YOLOv8-seg
-- CLIP AI
-- GPT-4 Vision
-- scikit-learn
+### 프론트엔드 (브라우저)
+- **React**: JavaScript 프레임워크
+- **Vite**: 빌드 도구
+- **Tailwind CSS**: 스타일링
+- **PWA**: 모바일 앱 지원
 
-### Database
-- SQLite (경량, 파일 기반)
+### 인프라
+- **Docker Compose**: 컨테이너 오케스트레이션
+- **Nginx**: 리버스 프록시
+- **AWS Lightsail**: 클라우드 호스팅 (1.9GB RAM)
+- **Let's Encrypt**: SSL 인증서
 
-### ML Pipeline
-- Random Forest / Gradient Boosting
-- 특징 추출: 25개 특징
+### 메모리 사용량
+- **서버 총 메모리**: ~2GB (YOLO + CLIP + Python)
+- **서버 한계**: 1.9GB (메모리 부족 문제 발생)
+- **브라우저**: ~150MB (React + 이미지 처리)
 - Cross-validation
 
 ---
