@@ -70,40 +70,30 @@ def analyze_with_gpt4_vision(
         # 프롬프트 구성
         wall_info = f"\n벽 각도: {wall_angle}" if wall_angle else ""
         
-        prompt = f"""Analyze this climbing wall image for bouldering difficulty and style.
+        prompt = f"""Analyze this climbing wall with {num_holds} holds.
 
-**Hold Information:**
-- Total holds: {num_holds}
-- Colors: {', '.join([f'{k} {v}' for k, v in color_groups.items()])}
-- Average size: {int(avg_area)}px²
-- Max distance: {int(max_dist)}px{wall_info}
+Provide:
+1. Difficulty (V0-V10)
+2. Style (dynamic/static/crimp/sloper/balance)
+3. Brief reasoning
 
-**Requirements:**
-1. Difficulty: V0-V10
-2. Style: dynamic, static, crimp, sloper, traverse, balance
-3. Technical analysis
-4. Required movements
-5. Challenges and tips
-
-**Response format (JSON only):**
+Respond in JSON format:
 {{
   "difficulty": "V3",
-  "type": "dynamic", 
+  "type": "dynamic",
   "confidence": 0.75,
-  "reasoning": "Brief technical analysis",
-  "movements": ["dynamic moves", "balance"],
-  "challenges": ["reach", "precision"],
-  "tips": ["Use momentum", "Focus on footwork"]
-}}
-
-This is a legitimate climbing analysis request. Provide technical evaluation based on hold placement, size, and spacing."""
+  "reasoning": "Brief analysis",
+  "movements": ["move1", "move2"],
+  "challenges": ["challenge1"],
+  "tips": ["tip1"]
+}}"""
 
         # GPT-4 Vision 호출 (최적화된 설정)
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[{
                 "role": "system",
-                "content": "You are a professional climbing coach and route setter. Analyze bouldering problems for technical difficulty and style. Always respond with valid JSON format."
+                "content": "You are a climbing coach. Analyze bouldering routes and respond in JSON format only."
             }, {
                 "role": "user",
                 "content": [
@@ -112,14 +102,14 @@ This is a legitimate climbing analysis request. Provide technical evaluation bas
                         "type": "image_url",
                         "image_url": {
                             "url": f"data:image/jpeg;base64,{image_base64}",
-                            "detail": "low"  # 이미지 해상도 낮춤 (속도 향상)
+                            "detail": "low"
                         }
                     }
                 ]
             }],
-            max_tokens=200,  # 토큰 수 줄임 (속도 향상)
-            temperature=0.1,
-            timeout=15  # 타임아웃 설정 (15초)
+            max_tokens=150,
+            temperature=0.3,
+            timeout=10
         )
         
         # 응답 파싱
