@@ -109,29 +109,27 @@ def analyze_image_async(self, image_base64, wall_angle=None):
             meta={'progress': 60, 'message': '🧩 문제 생성 중...', 'step': 'problem_generation'}
         )
         
-        # 색상별로 그룹핑
+        # 색상별로 그룹핑 (clip_color_name 기준)
         from holdcheck.clustering import analyze_problem
         problems_by_color = {}
         for hold in colored_holds:
-            group = hold.get('group')
-            if group and group not in problems_by_color:
-                problems_by_color[group] = []
-            if group:
-                problems_by_color[group].append(hold)
+            color_name = hold.get('clip_color_name', 'unknown')
+            if color_name not in problems_by_color:
+                problems_by_color[color_name] = []
+            problems_by_color[color_name].append(hold)
         
         # 각 색상 그룹을 문제로 분석
         problems = []
-        for group_id, group_holds in problems_by_color.items():
+        for color_name, group_holds in problems_by_color.items():
             if len(group_holds) >= 3:  # 최소 3개 이상
-                # 색상 이름 추출 (첫 번째 홀드에서)
-                color_name = group_holds[0].get('clip_color_name', 'unknown')
+                # 색상 RGB 추출 (첫 번째 홀드에서)
                 color_rgb = group_holds[0].get('dominant_rgb', [128, 128, 128])
                 
-                # 규칙 기반 분석
-                analysis = analyze_problem(colored_holds, group_id, wall_angle)
+                # 규칙 기반 분석 (group_id 대신 color_name 사용)
+                analysis = analyze_problem(colored_holds, f"ai_{color_name}", wall_angle)
                 if analysis:
                     problems.append({
-                        'id': group_id,
+                        'id': f"ai_{color_name}",
                         'color_name': color_name,
                         'color_rgb': color_rgb,
                         'holds': group_holds,
@@ -150,7 +148,7 @@ def analyze_image_async(self, image_base64, wall_angle=None):
             try:
                 gpt4_result = analyze_with_gpt4_vision(
                     image_base64,
-                    problem['colored_holds'],
+                    problem['holds'],  # colored_holds 대신 holds 사용
                     wall_angle
                 )
                 problem.update(gpt4_result)
