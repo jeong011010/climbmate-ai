@@ -70,22 +70,22 @@ def analyze_with_gpt4_vision(
         # 프롬프트 구성
         wall_info = f"\n벽 각도: {wall_angle}" if wall_angle else ""
         
-        prompt = f"""Analyze this climbing wall with {num_holds} holds.
+        prompt = f"""이 클라이밍 벽 이미지를 분석해주세요. {num_holds}개의 홀드가 있습니다.
 
-Provide:
-1. Difficulty (V0-V10)
-2. Style (dynamic/static/crimp/sloper/balance)
-3. Brief reasoning
+다음을 제공해주세요:
+1. 난이도 (V0-V10)
+2. 스타일 (dynamic/static/crimp/sloper/balance)
+3. 간단한 분석
 
-Respond in JSON format:
+JSON 형식으로 응답해주세요:
 {{
   "difficulty": "V3",
   "type": "dynamic",
   "confidence": 0.75,
-  "reasoning": "Brief analysis",
-  "movements": ["move1", "move2"],
-  "challenges": ["challenge1"],
-  "tips": ["tip1"]
+  "reasoning": "홀드 간격이 넓어서 다이나믹한 움직임이 필요합니다",
+  "movements": ["큰 리치", "다이나믹 점프"],
+  "challenges": ["밸런스 유지"],
+  "tips": ["코어를 활용하세요", "모멘텀을 사용하세요"]
 }}"""
 
         # GPT-4 Vision 호출 (최적화된 설정)
