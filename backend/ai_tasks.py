@@ -121,12 +121,14 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         # 각 색상 그룹을 문제로 분석
         problems = []
         for color_name, group_holds in problems_by_color.items():
+            print(f"🔍 분석 중: {color_name} ({len(group_holds)}개 홀드)")
             if len(group_holds) >= 3:  # 최소 3개 이상
                 # 색상 RGB 추출 (첫 번째 홀드에서)
                 color_rgb = group_holds[0].get('dominant_rgb', [128, 128, 128])
                 
                 # 규칙 기반 분석 (group_holds를 직접 전달, group_id는 None)
                 analysis = analyze_problem(group_holds, None, wall_angle)
+                print(f"📊 {color_name} 분석 결과: {analysis is not None}")
                 if analysis:
                     problems.append({
                         'id': f"ai_{color_name}",
@@ -136,6 +138,13 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                         'hold_count': len(group_holds),
                         'analysis': analysis
                     })
+                    print(f"✅ {color_name} 문제 추가됨")
+                else:
+                    print(f"❌ {color_name} 분석 실패")
+            else:
+                print(f"⚠️ {color_name}: 홀드 수 부족 ({len(group_holds)}개)")
+        
+        print(f"🎯 최종 문제 수: {len(problems)}개")
         
         # 4단계: GPT-4 분석
         self.update_state(
