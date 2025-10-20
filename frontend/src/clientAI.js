@@ -12,6 +12,13 @@ class ClientAI {
   /**
    * 이미지 분석 (비동기 작업 큐 방식)
    */
+  async analyzeImage(imageElement, wallAngle = null) {
+    return await this.analyzeWithServerSide(imageElement, wallAngle)
+  }
+
+  /**
+   * 서버 사이드 전체 분석 (내부 구현)
+   */
   async analyzeWithServerSide(imageElement, wallAngle = null) {
     try {
       console.log('🚀 서버 사이드 전체 분석 시작...')
@@ -96,7 +103,7 @@ class ClientAI {
                 // 진행 중이면 1초 후 다시 확인
                 setTimeout(pollStatus, 1000)
               }
-            } catch (error) {
+    } catch (error) {
               reject(error)
             }
           }
