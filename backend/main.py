@@ -537,7 +537,7 @@ async def analyze_image_stream(
         image_base64 = base64.b64encode(contents).decode('utf-8')
         
         # 비동기 작업 큐에 추가
-        from ai_tasks import analyze_image_async
+        from backend.ai_tasks import analyze_image_async
         task = analyze_image_async.delay(image_base64, wall_angle)
         
         return {
@@ -555,7 +555,7 @@ async def get_analysis_status(task_id: str):
     분석 작업 상태 확인
     """
     try:
-        from ai_tasks import analyze_image_async
+        from backend.ai_tasks import analyze_image_async
         task = analyze_image_async.AsyncResult(task_id)
         
         if task.state == 'PENDING':
