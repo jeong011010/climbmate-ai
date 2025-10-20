@@ -115,10 +115,15 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         
         # 디버깅: colored_holds 구조 확인
         print(f"🔍 colored_holds 샘플: {colored_holds[0] if colored_holds else 'None'}")
+        print(f"🔍 colored_holds 필드들: {list(colored_holds[0].keys()) if colored_holds else 'None'}")
         
         for hold in colored_holds:
-            color_name = hold.get('clip_color_name', 'unknown')
-            print(f"   홀드 {hold.get('id', '?')}: clip_color_name='{color_name}'")
+            # 여러 가능한 색상 필드 확인
+            color_name = (hold.get('clip_color_name') or 
+                        hold.get('color_name') or 
+                        hold.get('group', '').replace('ai_', '') or 
+                        'unknown')
+            print(f"   홀드 {hold.get('id', '?')}: clip_color_name='{hold.get('clip_color_name')}', color_name='{hold.get('color_name')}', group='{hold.get('group')}' -> '{color_name}'")
             if color_name not in problems_by_color:
                 problems_by_color[color_name] = []
             problems_by_color[color_name].append(hold)
