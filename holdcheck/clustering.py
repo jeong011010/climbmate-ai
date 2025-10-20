@@ -108,7 +108,7 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
             hold_image = original_image[y_min:y_max+1, x_min:x_max+1]
             hold_pil = Image.fromarray(cv2.cvtColor(hold_image, cv2.COLOR_BGR2RGB))
             
-            image_input = preprocess(hold_pil).unsqueeze(0).to(device)
+            image_input = preprocess(hold_pil).unsqueeze(0).to(_clip_device)
             with torch.no_grad():
                 image_feature = model.encode_image(image_input)
                 image_feature = image_feature / image_feature.norm(dim=-1, keepdim=True)
