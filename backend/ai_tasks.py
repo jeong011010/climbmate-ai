@@ -125,8 +125,8 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                 # 색상 RGB 추출 (첫 번째 홀드에서)
                 color_rgb = group_holds[0].get('dominant_rgb', [128, 128, 128])
                 
-                # 규칙 기반 분석 (group_id 대신 color_name 사용)
-                analysis = analyze_problem(colored_holds, f"ai_{color_name}", wall_angle)
+                # 규칙 기반 분석 (group_holds를 직접 전달, group_id는 None)
+                analysis = analyze_problem(group_holds, None, wall_angle)
                 if analysis:
                     problems.append({
                         'id': f"ai_{color_name}",
