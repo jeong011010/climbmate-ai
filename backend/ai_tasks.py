@@ -37,7 +37,7 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         
         # YOLO 홀드 감지
         from holdcheck.preprocess import preprocess
-        hold_result = preprocess(image, yolo_device='cpu')
+        hold_result = preprocess(image)
         
         if not hold_result or 'holds' not in hold_result:
             raise ValueError("홀드 감지 실패")
