@@ -103,6 +103,15 @@ def analyze_image_async(self, image_base64, wall_angle=None):
             use_dbscan=False
         )
         
+        # 디버깅: colored_holds 반환값 확인
+        print(f"🔍 colored_holds 타입: {type(colored_holds)}")
+        print(f"🔍 colored_holds 길이: {len(colored_holds) if colored_holds else 'None'}")
+        if colored_holds and len(colored_holds) > 0:
+            print(f"🔍 colored_holds 첫 번째 요소: {colored_holds[0]}")
+            print(f"🔍 colored_holds 첫 번째 요소 타입: {type(colored_holds[0])}")
+            if isinstance(colored_holds[0], dict):
+                print(f"🔍 colored_holds 첫 번째 요소 키들: {list(colored_holds[0].keys())}")
+        
         # 3단계: 문제 생성 (색상별 그룹핑)
         self.update_state(
             state='PROGRESS',
