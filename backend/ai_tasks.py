@@ -89,14 +89,35 @@ def analyze_image_async(self, image_base64, wall_angle=None):
             use_dbscan=False
         )
         
-        # 3단계: 문제 생성
+        # 3단계: 문제 생성 (색상별 그룹핑)
         self.update_state(
             state='PROGRESS',
             meta={'progress': 60, 'message': '🧩 문제 생성 중...', 'step': 'problem_generation'}
         )
         
+        # 색상별로 그룹핑
         from holdcheck.clustering import analyze_problem
-        problems = analyze_problem(colored_holds, holds, wall_angle)
+        problems_by_color = {}
+        for hold in colored_holds:
+            group = hold.get('group')
+            if group and group not in problems_by_color:
+                problems_by_color[group] = []
+            if group:
+                problems_by_color[group].append(hold)
+        
+        # 각 색상 그룹을 문제로 분석
+        problems = []
+        for group_id, group_holds in problems_by_color.items():
+            if len(group_holds) >= 3:  # 최소 3개 이상
+                # 규칙 기반 분석
+                analysis = analyze_problem(colored_holds, group_id, wall_angle)
+                if analysis:
+                    problems.append({
+                        'group_id': group_id,
+                        'colored_holds': group_holds,
+                        'hold_count': len(group_holds),
+                        'analysis': analysis
+                    })
         
         # 4단계: GPT-4 분석
         self.update_state(
