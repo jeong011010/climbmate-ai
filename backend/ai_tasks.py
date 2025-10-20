@@ -112,8 +112,13 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         # 색상별로 그룹핑 (clip_color_name 기준)
         from holdcheck.clustering import analyze_problem
         problems_by_color = {}
+        
+        # 디버깅: colored_holds 구조 확인
+        print(f"🔍 colored_holds 샘플: {colored_holds[0] if colored_holds else 'None'}")
+        
         for hold in colored_holds:
             color_name = hold.get('clip_color_name', 'unknown')
+            print(f"   홀드 {hold.get('id', '?')}: clip_color_name='{color_name}'")
             if color_name not in problems_by_color:
                 problems_by_color[color_name] = []
             problems_by_color[color_name].append(hold)
