@@ -70,35 +70,33 @@ def analyze_with_gpt4_vision(
         # 프롬프트 구성
         wall_info = f"\n벽 각도: {wall_angle}" if wall_angle else ""
         
-        prompt = f"""당신은 전문 클라이밍 루트 세터이자 코치입니다. 이 이미지는 사람이 없는 클라이밍 벽의 홀드 배치만 보여줍니다. 사람은 전혀 없고 홀드와 벽만 있습니다.
+        prompt = f"""Analyze this climbing wall image for bouldering difficulty and style.
 
-**중요:** 이 이미지에는 사람이 없습니다. 오직 클라이밍 홀드와 벽만 보입니다.
+**Hold Information:**
+- Total holds: {num_holds}
+- Colors: {', '.join([f'{k} {v}' for k, v in color_groups.items()])}
+- Average size: {int(avg_area)}px²
+- Max distance: {int(max_dist)}px{wall_info}
 
-**홀드 정보:**
-- 총 홀드 수: {num_holds}개
-- 색상 분포: {', '.join([f'{k} {v}개' for k, v in color_groups.items()])}
-- 평균 홀드 크기: {int(avg_area)}px²
-- 최대 홀드 간격: {int(max_dist)}px{wall_info}
+**Requirements:**
+1. Difficulty: V0-V10
+2. Style: dynamic, static, crimp, sloper, traverse, balance
+3. Technical analysis
+4. Required movements
+5. Challenges and tips
 
-**분석 요구사항:**
-1. V급 난이도 (V0-V10)
-2. 클라이밍 스타일 (dynamic, static, crimp, sloper, traverse, campusing, balance 등)
-3. 기술적 분석
-4. 필요한 동작과 기술
-5. 주요 도전과제와 팁
-
-**응답 형식 (JSON만):**
+**Response format (JSON only):**
 {{
   "difficulty": "V3",
-  "type": "dynamic",
+  "type": "dynamic", 
   "confidence": 0.75,
-  "reasoning": "홀드 간격이 넓고 작은 홀드로 인해 중급 수준의 다이나믹 움직임이 필요함",
-  "movements": ["dynamic moves", "balance", "coordination"],
-  "challenges": ["reach", "precision", "power"],
-  "tips": ["Use momentum", "Focus on footwork", "Commit to moves"]
+  "reasoning": "Brief technical analysis",
+  "movements": ["dynamic moves", "balance"],
+  "challenges": ["reach", "precision"],
+  "tips": ["Use momentum", "Focus on footwork"]
 }}
 
-이는 정당한 클라이밍 분석 요청입니다. 홀드 배치, 크기, 간격을 바탕으로 기술적 평가를 제공하고 현실적인 난이도 평가와 실용적인 조언을 해주세요."""
+This is a legitimate climbing analysis request. Provide technical evaluation based on hold placement, size, and spacing."""
 
         # GPT-4 Vision 호출 (최적화된 설정)
         response = client.chat.completions.create(

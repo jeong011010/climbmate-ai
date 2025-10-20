@@ -103,28 +103,15 @@ def analyze_image_async(self, image_base64, wall_angle=None):
             use_dbscan=False
         )
         
-        # 디버깅: colored_holds 반환값 확인
-        print(f"🔍 colored_holds 타입: {type(colored_holds)}")
-        print(f"🔍 colored_holds 길이: {len(colored_holds) if colored_holds else 'None'}")
-        if colored_holds and len(colored_holds) > 0:
-            print(f"🔍 colored_holds 첫 번째 요소: {colored_holds[0]}")
-            print(f"🔍 colored_holds 첫 번째 요소 타입: {type(colored_holds[0])}")
-            if isinstance(colored_holds[0], dict):
-                print(f"🔍 colored_holds 첫 번째 요소 키들: {list(colored_holds[0].keys())}")
-        
         # 3단계: 문제 생성 (색상별 그룹핑)
         self.update_state(
             state='PROGRESS',
             meta={'progress': 60, 'message': '🧩 문제 생성 중...', 'step': 'problem_generation'}
         )
         
-        # 색상별로 그룹핑 (clip_color_name 기준)
+        # 색상별로 그룹핑
         from holdcheck.clustering import analyze_problem
         problems_by_color = {}
-        
-        # 디버깅: colored_holds 구조 확인
-        print(f"🔍 colored_holds 샘플: {colored_holds[0] if colored_holds else 'None'}")
-        print(f"🔍 colored_holds 필드들: {list(colored_holds[0].keys()) if colored_holds else 'None'}")
         
         for hold in colored_holds:
             # 여러 가능한 색상 필드 확인
@@ -132,7 +119,6 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                         hold.get('color_name') or 
                         hold.get('group', '').replace('ai_', '') or 
                         'unknown')
-            print(f"   홀드 {hold.get('id', '?')}: clip_color_name='{hold.get('clip_color_name')}', color_name='{hold.get('color_name')}', group='{hold.get('group')}' -> '{color_name}'")
             if color_name not in problems_by_color:
                 problems_by_color[color_name] = []
             problems_by_color[color_name].append(hold)
@@ -140,14 +126,12 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         # 각 색상 그룹을 문제로 분석
         problems = []
         for color_name, group_holds in problems_by_color.items():
-            print(f"🔍 분석 중: {color_name} ({len(group_holds)}개 홀드)")
             if len(group_holds) >= 3:  # 최소 3개 이상
                 # 색상 RGB 추출 (첫 번째 홀드에서)
                 color_rgb = group_holds[0].get('dominant_rgb', [128, 128, 128])
                 
                 # 규칙 기반 분석 (group_holds를 직접 전달, group_id는 None)
                 analysis = analyze_problem(group_holds, None, wall_angle)
-                print(f"📊 {color_name} 분석 결과: {analysis is not None}")
                 if analysis:
                     problems.append({
                         'id': f"ai_{color_name}",
@@ -157,13 +141,6 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                         'hold_count': len(group_holds),
                         'analysis': analysis
                     })
-                    print(f"✅ {color_name} 문제 추가됨")
-                else:
-                    print(f"❌ {color_name} 분석 실패")
-            else:
-                print(f"⚠️ {color_name}: 홀드 수 부족 ({len(group_holds)}개)")
-        
-        print(f"🎯 최종 문제 수: {len(problems)}개")
         
         # 4단계: GPT-4 분석
         self.update_state(
