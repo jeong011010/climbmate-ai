@@ -172,7 +172,8 @@ def analyze_image_async(self, image_base64, wall_angle=None):
             'problems': convert_to_serializable(problems),
             'statistics': {
                 'total_holds': len(holds),
-                'total_problems': len(problems)
+                'total_problems': len(problems),
+                'analyzable_problems': len(problems)
             },
             'annotated_image': ''  # preprocess에서 이미지를 파일로 저장하므로 여기서는 빈 문자열
         }
