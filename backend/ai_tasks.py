@@ -8,6 +8,20 @@ from celery_app import celery_app
 from holdcheck import preprocess, clustering
 from backend.gpt4_analyzer import analyze_with_gpt4_vision
 
+def convert_to_serializable(obj):
+    """numpy 타입을 JSON 직렬화 가능한 타입으로 변환"""
+    if isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, dict):
+        return {key: convert_to_serializable(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_to_serializable(item) for item in obj]
+    return obj
+
 @celery_app.task(bind=True)
 def analyze_image_async(self, image_base64, wall_angle=None):
     """
@@ -144,9 +158,9 @@ def analyze_image_async(self, image_base64, wall_angle=None):
             meta={'progress': 100, 'message': '✅ 분석 완료!', 'step': 'complete'}
         )
         
-        # 결과 반환
+        # 결과 반환 (numpy 타입 변환)
         result = {
-            'problems': problems,
+            'problems': convert_to_serializable(problems),
             'statistics': {
                 'total_holds': len(holds),
                 'total_problems': len(problems)
