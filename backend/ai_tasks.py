@@ -80,7 +80,14 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         )
         
         from holdcheck.clustering import clip_ai_color_clustering
-        colored_holds = clip_ai_color_clustering(image, holds)
+        colored_holds = clip_ai_color_clustering(
+            holds,
+            None,
+            image,
+            masks,
+            eps=0.3,
+            use_dbscan=False
+        )
         
         # 3단계: 문제 생성
         self.update_state(
