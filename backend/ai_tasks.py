@@ -106,7 +106,7 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         # 3단계: 문제 생성 (색상별 그룹핑)
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 60, 'message': '🧩 문제 생성 중...', 'step': 'problem_generation'}
+            meta={'progress': 50, 'message': '🧩 문제 생성 중...', 'step': 'problem_generation'}
         )
         
         # 색상별로 그룹핑
@@ -145,20 +145,30 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         # 4단계: GPT-4 분석
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 80, 'message': '🤖 GPT-4 분석 중...', 'step': 'gpt4_analysis'}
+            meta={'progress': 70, 'message': '🤖 GPT-4 분석 중...', 'step': 'gpt4_analysis'}
         )
         
         # 각 문제에 GPT-4 분석 추가
-        for problem in problems:
+        for i, problem in enumerate(problems):
             try:
+                # 진행률 업데이트 (70% + 문제별 진행률)
+                progress = 70 + int((i + 1) / len(problems) * 25)  # 70% ~ 95%
+                self.update_state(
+                    state='PROGRESS',
+                    meta={
+                        'progress': progress,
+                        'message': f'🤖 GPT-4 분석 중... ({i+1}/{len(problems)})',
+                        'step': 'gpt4_analysis'
+                    }
+                )
+                
                 gpt4_result = analyze_with_gpt4_vision(
                     image_base64,
-                    problem['holds'],  # colored_holds 대신 holds 사용
+                    problem['holds'],
                     wall_angle
                 )
                 problem.update(gpt4_result)
             except Exception as e:
-                print(f"⚠️ GPT-4 분석 실패: {e}")
                 problem['gpt4_available'] = False
         
         # 5단계: 완료
@@ -183,7 +193,7 @@ def analyze_image_async(self, image_base64, wall_angle=None):
     except Exception as e:
         import traceback
         error_details = traceback.format_exc()
-        print(f"❌ 분석 오류: {error_details}")
+        # 로그 제거
         
         self.update_state(
             state='FAILURE',
@@ -516,7 +526,7 @@ def analyze_colors_with_clip_async(self, image_base64, hold_data):
     except Exception as e:
         import traceback
         error_details = traceback.format_exc()
-        print(f"❌ 분석 오류: {error_details}")
+        # 로그 제거
         
         # 오류 발생 시 상태 업데이트
         self.update_state(
