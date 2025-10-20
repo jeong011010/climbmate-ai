@@ -9,6 +9,108 @@ from holdcheck import preprocess, clustering
 from backend.gpt4_analyzer import analyze_with_gpt4_vision
 
 @celery_app.task(bind=True)
+def analyze_image_async(self, image_base64, wall_angle=None):
+    """
+    전체 이미지 분석 비동기 작업 (YOLO + CLIP + GPT-4)
+    
+    Args:
+        image_base64: Base64 인코딩된 이미지 데이터
+        wall_angle: 벽 각도 (overhang, slab, face, null)
+    
+    Returns:
+        dict: 전체 분석 결과
+    """
+    try:
+        # 1단계: 홀드 감지 (YOLO)
+        self.update_state(
+            state='PROGRESS',
+            meta={'progress': 10, 'message': '🔍 홀드 감지 중...', 'step': 'yolo_detection'}
+        )
+        
+        # Base64 이미지 디코딩
+        image_bytes = base64.b64decode(image_base64)
+        nparr = np.frombuffer(image_bytes, np.uint8)
+        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        
+        if image is None:
+            raise ValueError("잘못된 이미지 파일")
+        
+        # YOLO 홀드 감지
+        from holdcheck.preprocess import preprocess
+        hold_result = preprocess(image, yolo_device='cpu')
+        
+        if not hold_result or 'holds' not in hold_result:
+            raise ValueError("홀드 감지 실패")
+        
+        holds = hold_result['holds']
+        
+        # 2단계: CLIP 색상 분석
+        self.update_state(
+            state='PROGRESS',
+            meta={
+                'progress': 30,
+                'message': f'🎨 색상 분석 중... (홀드 {len(holds)}개 감지)',
+                'step': 'clip_analysis'
+            }
+        )
+        
+        from holdcheck.clustering import clip_ai_color_clustering
+        colored_holds = clip_ai_color_clustering(image, holds)
+        
+        # 3단계: 문제 생성
+        self.update_state(
+            state='PROGRESS',
+            meta={'progress': 60, 'message': '🧩 문제 생성 중...', 'step': 'problem_generation'}
+        )
+        
+        from holdcheck.clustering import analyze_problem
+        problems = analyze_problem(colored_holds, holds, wall_angle)
+        
+        # 4단계: GPT-4 분석
+        self.update_state(
+            state='PROGRESS',
+            meta={'progress': 80, 'message': '🤖 GPT-4 분석 중...', 'step': 'gpt4_analysis'}
+        )
+        
+        # 각 문제에 GPT-4 분석 추가
+        for problem in problems:
+            try:
+                gpt4_result = analyze_with_gpt4_vision(
+                    image_base64,
+                    problem['colored_holds'],
+                    wall_angle
+                )
+                problem.update(gpt4_result)
+            except Exception as e:
+                print(f"⚠️ GPT-4 분석 실패: {e}")
+                problem['gpt4_available'] = False
+        
+        # 5단계: 완료
+        self.update_state(
+            state='PROGRESS',
+            meta={'progress': 100, 'message': '✅ 분석 완료!', 'step': 'complete'}
+        )
+        
+        # 결과 반환
+        result = {
+            'problems': problems,
+            'statistics': {
+                'total_holds': len(holds),
+                'total_problems': len(problems)
+            },
+            'annotated_image': hold_result.get('annotated_image_base64', '')
+        }
+        
+        return result
+        
+    except Exception as e:
+        self.update_state(
+            state='FAILURE',
+            meta={'error': str(e), 'message': f'분석 실패: {str(e)}'}
+        )
+        raise
+
+@celery_app.task(bind=True)
 def analyze_colors_with_clip_async(self, image_base64, hold_data):
     """
     CLIP 색상 분석 비동기 작업
