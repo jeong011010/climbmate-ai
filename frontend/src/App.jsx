@@ -18,6 +18,7 @@ function App() {
   const [showImageModal, setShowImageModal] = useState(false)
   const [showControlPanel, setShowControlPanel] = useState(false)
   const [showFeedbackModal, setShowFeedbackModal] = useState(false)
+  const [colorFeedbackProblem, setColorFeedbackProblem] = useState(null)
   const [feedbackDifficulty, setFeedbackDifficulty] = useState('')
   const [feedbackType, setFeedbackType] = useState('')
   const [feedbackText, setFeedbackText] = useState('')
@@ -1021,6 +1022,17 @@ function App() {
                           </button>
                         )}
                         
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setColorFeedbackProblem(problem)
+                          }}
+                          className="text-xl text-gray-400 hover:text-purple-500 transition-colors"
+                          title="색상 피드백"
+                        >
+                          🎨
+                        </button>
+                        
                         {selectedProblem?.id === problem.id && (
                           <span className="text-3xl text-white animate-bounce-slow">✓</span>
                         )}
@@ -1331,6 +1343,66 @@ function App() {
           </div>
         </div>
       </div>
+
+      {/* 색상 피드백 모달 */}
+      {colorFeedbackProblem && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4"
+             onClick={() => setColorFeedbackProblem(null)}>
+          <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl"
+               onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-slate-800">🎨 색상 피드백</h3>
+              <button
+                onClick={() => setColorFeedbackProblem(null)}
+                className="text-3xl text-slate-400 hover:text-slate-600 transition-colors"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="mb-6">
+              <p className="text-slate-600 mb-4">
+                현재 색상: <span className="font-bold text-lg">{colorFeedbackProblem.color_name}</span>
+              </p>
+              <p className="text-sm text-slate-500">올바른 색상을 선택해주세요:</p>
+            </div>
+            
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              {['red', 'orange', 'yellow', 'green', 'mint', 'blue', 'purple', 'pink', 'brown', 'black', 'white', 'gray'].map(color => (
+                <button
+                  key={color}
+                  onClick={async () => {
+                    try {
+                      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/color-feedback`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          hold_ids: colorFeedbackProblem.holds.map(h => h.id),
+                          predicted_color: colorFeedbackProblem.color_name,
+                          correct_color: color
+                        })
+                      })
+                      
+                      if (response.ok) {
+                        alert('피드백이 제출되었습니다! 감사합니다 🎉')
+                        setColorFeedbackProblem(null)
+                      } else {
+                        alert('피드백 제출에 실패했습니다.')
+                      }
+                    } catch (error) {
+                      console.error('피드백 제출 오류:', error)
+                      alert('피드백 제출 중 오류가 발생했습니다.')
+                    }
+                  }}
+                  className="py-3 px-4 rounded-xl border-2 border-slate-200 hover:border-purple-500 hover:bg-purple-50 transition-all font-medium text-slate-700 hover:text-purple-700"
+                >
+                  {colorEmoji[color] || '⭕'} {color}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
