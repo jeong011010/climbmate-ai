@@ -169,35 +169,8 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                 problem['gpt4_available'] = False
         
         # 5단계: 홀드가 표시된 이미지 생성
-        import cv2
-        annotated = image.copy()
-        
-        # 색상 매핑 (BGR 형식)
-        color_map_bgr = {
-            "black": (0, 0, 0), "white": (255, 255, 255), "gray": (128, 128, 128),
-            "red": (0, 0, 255), "orange": (0, 165, 255), "yellow": (0, 255, 255),
-            "green": (0, 255, 0), "mint": (204, 255, 0), "blue": (255, 0, 0),
-            "purple": (255, 0, 128), "pink": (204, 102, 255), "brown": (42, 42, 165),
-            "unknown": (192, 192, 192)
-        }
-        
-        # 모든 홀드에 바운딩 박스와 색상 이름 표시
-        for hold in colored_holds:
-            if 'bbox' in hold:
-                x1, y1, x2, y2 = map(int, hold['bbox'])
-                color_name = hold.get('clip_color_name', 'unknown')
-                bbox_color = color_map_bgr.get(color_name, color_map_bgr["unknown"])
-                
-                # 바운딩 박스 그리기
-                cv2.rectangle(annotated, (x1, y1), (x2, y2), bbox_color, 3)
-                
-                # 색상 이름 표시
-                cv2.putText(annotated, color_name, (x1, y1 - 10),
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.7, bbox_color, 2, cv2.LINE_AA)
-        
-        # 이미지를 Base64로 인코딩
-        _, buffer = cv2.imencode('.jpg', annotated)
-        annotated_base64 = base64.b64encode(buffer).decode('utf-8')
+        # TODO: 임시로 비활성화 (Redis 크기 제한 테스트)
+        annotated_base64 = ''  # 빈 문자열로 테스트
         
         # 완료
         self.update_state(
