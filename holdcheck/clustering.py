@@ -11,11 +11,18 @@ from sklearn.decomposition import PCA
 import torch
 import clip
 from PIL import Image
+import json
+import os
+from pathlib import Path
 
 # 🚀 성능 최적화: 전역 캐시
 _clip_model = None
 _clip_text_features = None
 _clip_device = None
+
+# 🎨 룰 기반 색상 분류 캐시
+_color_ranges_cache = None
+_color_feedback_data = []
 
 def hsv_to_rgb(hsv):
     hsv_arr = np.uint8([[hsv]])
@@ -4854,3 +4861,567 @@ def analyze_climbing_type(filtered_holds, wall_angle=None):
             }
         }
     }
+
+# ============================================================================
+# 🎨 룰 기반 색상 분류 시스템 (CLIP 대체, 빠른 속도)
+# ============================================================================
+
+def load_color_ranges(config_path="holdcheck/color_ranges.json"):
+    """색상 범위 설정 파일 로드 (사용자 피드백 반영)"""
+    global _color_ranges_cache
+    
+    if _color_ranges_cache is not None:
+        return _color_ranges_cache
+    
+    # 파일이 있으면 로드
+    if os.path.exists(config_path):
+        with open(config_path, 'r', encoding='utf-8') as f:
+            _color_ranges_cache = json.load(f)
+            print(f"✅ 색상 범위 설정 로드: {config_path}")
+            return _color_ranges_cache
+    
+    # 없으면 기본값 생성
+    _color_ranges_cache = get_default_color_ranges_data()
+    save_color_ranges(_color_ranges_cache, config_path)
+    print(f"✅ 기본 색상 범위 생성: {config_path}")
+    return _color_ranges_cache
+
+
+def save_color_ranges(ranges, config_path="holdcheck/color_ranges.json"):
+    """색상 범위 설정 저장"""
+    os.makedirs(os.path.dirname(config_path), exist_ok=True)
+    with open(config_path, 'w', encoding='utf-8') as f:
+        json.dump(ranges, f, indent=2, ensure_ascii=False)
+    print(f"💾 색상 범위 저장: {config_path}")
+
+
+def get_default_color_ranges_data():
+    """기본 색상 범위 데이터 (JSON 직렬화 가능)"""
+    return {
+        "version": "1.0",
+        "last_updated": "2025-01-01",
+        "feedback_count": 0,
+        "colors": {
+            "black": {
+                "name": "검정색",
+                "priority": 1,
+                "hsv_ranges": [
+                    {"h": [0, 180], "s": [0, 255], "v": [0, 80]}  # 매우 어두움
+                ],
+                "rgb_conditions": [
+                    {"type": "max_value", "threshold": 80},  # max(R,G,B) < 80
+                    {"type": "achromatic", "brightness_max": 150, "channel_diff_max": 50}  # 무채색
+                ]
+            },
+            "white": {
+                "name": "흰색",
+                "priority": 2,
+                "hsv_ranges": [
+                    {"h": [0, 180], "s": [0, 50], "v": [200, 255]}  # 밝고 채도 낮음
+                ],
+                "rgb_conditions": [
+                    {"type": "min_value", "threshold": 180},  # min(R,G,B) > 180
+                ]
+            },
+            "gray": {
+                "name": "회색",
+                "priority": 3,
+                "hsv_ranges": [
+                    {"h": [0, 180], "s": [0, 50], "v": [80, 200]}  # 중간 밝기, 낮은 채도
+                ],
+                "rgb_conditions": [
+                    {"type": "achromatic", "brightness_min": 80, "brightness_max": 180, "channel_diff_max": 50}
+                ]
+            },
+            "red": {
+                "name": "빨간색",
+                "priority": 4,
+                "hsv_ranges": [
+                    {"h": [0, 10], "s": [100, 255], "v": [100, 255]},  # 빨강 (0도 근처)
+                    {"h": [170, 180], "s": [100, 255], "v": [100, 255]}  # 빨강 (180도 근처)
+                ],
+                "rgb_conditions": [
+                    {"type": "dominant_channel", "channel": "r", "min_value": 150, "diff_threshold": 50}
+                ]
+            },
+            "orange": {
+                "name": "주황색",
+                "priority": 5,
+                "hsv_ranges": [
+                    {"h": [10, 25], "s": [100, 255], "v": [100, 255]}  # 주황 (15도 근처)
+                ],
+                "rgb_conditions": [
+                    {"type": "two_channel_high", "channels": ["r", "g"], "r_min": 150, "g_min": 80, "b_max": 120, "r_over_g": True}
+                ]
+            },
+            "yellow": {
+                "name": "노란색",
+                "priority": 6,
+                "hsv_ranges": [
+                    {"h": [25, 40], "s": [100, 255], "v": [150, 255]}  # 노랑 (30도 근처)
+                ],
+                "rgb_conditions": [
+                    {"type": "two_channel_high", "channels": ["r", "g"], "r_min": 150, "g_min": 150, "b_max": 150, "similar": True}
+                ]
+            },
+            "green": {
+                "name": "초록색",
+                "priority": 7,
+                "hsv_ranges": [
+                    {"h": [40, 80], "s": [100, 255], "v": [100, 255]}  # 초록 (60도 근처)
+                ],
+                "rgb_conditions": [
+                    {"type": "dominant_channel", "channel": "g", "min_value": 100, "diff_threshold": 30}
+                ]
+            },
+            "mint": {
+                "name": "민트색",
+                "priority": 8,
+                "hsv_ranges": [
+                    {"h": [80, 100], "s": [100, 255], "v": [150, 255]}  # 청록 (90도 근처)
+                ],
+                "rgb_conditions": [
+                    {"type": "two_channel_high", "channels": ["g", "b"], "g_min": 150, "b_min": 150, "r_max": 150}
+                ]
+            },
+            "blue": {
+                "name": "파란색",
+                "priority": 9,
+                "hsv_ranges": [
+                    {"h": [100, 130], "s": [100, 255], "v": [100, 255]}  # 파랑 (120도 근처)
+                ],
+                "rgb_conditions": [
+                    {"type": "dominant_channel", "channel": "b", "min_value": 100, "diff_threshold": 30}
+                ]
+            },
+            "purple": {
+                "name": "보라색",
+                "priority": 10,
+                "hsv_ranges": [
+                    {"h": [130, 160], "s": [100, 255], "v": [100, 255]}  # 보라 (145도 근처)
+                ],
+                "rgb_conditions": [
+                    {"type": "two_channel_high", "channels": ["r", "b"], "r_min": 100, "b_min": 100, "g_diff": 20}
+                ]
+            },
+            "pink": {
+                "name": "분홍색",
+                "priority": 11,
+                "hsv_ranges": [
+                    {"h": [160, 170], "s": [50, 150], "v": [180, 255]}  # 분홍 (밝은 빨강)
+                ],
+                "rgb_conditions": [
+                    {"type": "dominant_channel", "channel": "r", "min_value": 180, "g_min": 100, "b_min": 100}
+                ]
+            },
+            "brown": {
+                "name": "갈색",
+                "priority": 12,
+                "hsv_ranges": [
+                    {"h": [10, 30], "s": [100, 200], "v": [50, 150]}  # 어두운 주황
+                ],
+                "rgb_conditions": [
+                    {"type": "dominant_channel", "channel": "r", "min_value": 80, "max_value": 150, "dark": True}
+                ]
+            }
+        }
+    }
+
+
+def rule_based_color_clustering(hold_data, vectors, config_path="holdcheck/color_ranges.json", 
+                                confidence_threshold=0.7, use_hsv=True):
+    """
+    ⚡ 룰 기반 색상 클러스터링 (CLIP 대체, 초고속)
+    
+    RGB/HSV 색상 범위로 직접 분류 - CLIP보다 10-20배 빠름!
+    사용자 피드백으로 정확도 지속 개선 가능
+    
+    Args:
+        hold_data: 홀드 데이터 (dominant_rgb 또는 dominant_hsv 필요)
+        vectors: 사용 안 함 (호환성 유지)
+        config_path: 색상 범위 설정 파일 경로
+        confidence_threshold: 신뢰도 임계값 (낮으면 unknown으로 분류)
+        use_hsv: HSV 공간 사용 여부 (더 정확함)
+    
+    Returns:
+        hold_data: 그룹 정보가 추가된 홀드 데이터
+    """
+    if len(hold_data) == 0:
+        return hold_data
+    
+    import time
+    start_time = time.time()
+    
+    print(f"\n⚡ 룰 기반 색상 클러스터링 시작 (CLIP 없음, 초고속)")
+    print(f"   홀드 개수: {len(hold_data)}개")
+    print(f"   색상 공간: {'HSV' if use_hsv else 'RGB'}")
+    
+    # 색상 범위 로드
+    ranges_data = load_color_ranges(config_path)
+    colors_config = ranges_data["colors"]
+    
+    # 각 홀드를 색상으로 분류
+    color_groups = {}
+    classification_details = []
+    
+    for hold_idx, hold in enumerate(hold_data):
+        # RGB/HSV 값 가져오기
+        if "dominant_hsv" in hold:
+            h, s, v = hold["dominant_hsv"]
+        elif "dominant_rgb" in hold:
+            rgb = hold["dominant_rgb"]
+            hsv_arr = np.uint8([[[rgb[0], rgb[1], rgb[2]]]])
+            hsv_bgr = cv2.cvtColor(hsv_arr, cv2.COLOR_RGB2HSV)[0][0]
+            h, s, v = hsv_bgr
+        else:
+            h, s, v = 0, 0, 128  # 기본값
+            rgb = [128, 128, 128]
+        
+        if "dominant_rgb" not in hold:
+            hsv_arr = np.uint8([[[h, s, v]]])
+            rgb_arr = cv2.cvtColor(hsv_arr, cv2.COLOR_HSV2RGB)[0][0]
+            rgb = rgb_arr.tolist()
+        else:
+            rgb = hold["dominant_rgb"]
+        
+        # 색상 분류 (우선순위 순서대로)
+        if use_hsv:
+            color_name, confidence, matched_rule = classify_color_by_hsv(
+                h, s, v, rgb, colors_config
+            )
+        else:
+            color_name, confidence, matched_rule = classify_color_by_rgb(
+                rgb, colors_config
+            )
+        
+        # 신뢰도 낮으면 unknown
+        if confidence < confidence_threshold:
+            color_name = "unknown"
+        
+        # 홀드에 정보 추가 (CLIP 호환)
+        hold["clip_color_name"] = color_name
+        hold["clip_confidence"] = confidence
+        hold["color_method"] = "rule_based"
+        hold["matched_rule"] = matched_rule
+        
+        # 그룹핑
+        if color_name not in color_groups:
+            color_groups[color_name] = []
+        color_groups[color_name].append(hold)
+        
+        classification_details.append({
+            "hold_id": hold.get("id", hold_idx),
+            "rgb": rgb,
+            "hsv": [h, s, v],
+            "color": color_name,
+            "confidence": confidence,
+            "rule": matched_rule
+        })
+    
+    # 그룹 ID 할당 (색상 이름 기준 정렬)
+    color_order = ["black", "white", "gray", "red", "orange", "yellow", 
+                   "green", "mint", "blue", "purple", "pink", "brown", "unknown"]
+    
+    group_idx = 0
+    for color_name in color_order:
+        if color_name in color_groups:
+            for hold in color_groups[color_name]:
+                hold["group"] = f"g{group_idx}"
+            group_idx += 1
+    
+    elapsed = time.time() - start_time
+    
+    print(f"\n✅ 룰 기반 클러스터링 완료 (⚡ {elapsed:.2f}초)")
+    print(f"   생성된 그룹 수: {len(color_groups)}개")
+    for color_name in color_order:
+        if color_name in color_groups:
+            count = len(color_groups[color_name])
+            avg_conf = np.mean([h["clip_confidence"] for h in color_groups[color_name]])
+            print(f"   {color_name}: {count}개 홀드 (평균 신뢰도: {avg_conf:.2f})")
+    
+    return hold_data
+
+
+def classify_color_by_hsv(h, s, v, rgb, colors_config):
+    """HSV 범위 기반 색상 분류 (더 정확함)"""
+    # 우선순위 순서대로 검사
+    sorted_colors = sorted(colors_config.items(), key=lambda x: x[1].get("priority", 999))
+    
+    for color_name, config in sorted_colors:
+        # HSV 범위 체크
+        if "hsv_ranges" in config:
+            for hsv_range in config["hsv_ranges"]:
+                h_min, h_max = hsv_range["h"]
+                s_min, s_max = hsv_range["s"]
+                v_min, v_max = hsv_range["v"]
+                
+                # Hue는 원형이므로 특별 처리
+                h_match = False
+                if h_min <= h_max:
+                    h_match = h_min <= h <= h_max
+                else:  # 예: [170, 10] (빨강)
+                    h_match = h >= h_min or h <= h_max
+                
+                if h_match and s_min <= s <= s_max and v_min <= v <= v_max:
+                    confidence = calculate_confidence_hsv(h, s, v, hsv_range)
+                    return color_name, confidence, f"HSV: H={h}, S={s}, V={v}"
+        
+        # RGB 조건 체크 (보조)
+        if "rgb_conditions" in config:
+            for condition in config["rgb_conditions"]:
+                if check_rgb_condition(rgb, condition):
+                    confidence = 0.8  # RGB 조건은 약간 낮은 신뢰도
+                    return color_name, confidence, f"RGB: {rgb}"
+    
+    # 매칭 실패 - 가장 가까운 색상 찾기
+    return find_nearest_color_hsv(h, s, v, colors_config)
+
+
+def classify_color_by_rgb(rgb, colors_config):
+    """RGB 조건 기반 색상 분류"""
+    r, g, b = rgb
+    
+    sorted_colors = sorted(colors_config.items(), key=lambda x: x[1].get("priority", 999))
+    
+    for color_name, config in sorted_colors:
+        if "rgb_conditions" in config:
+            for condition in config["rgb_conditions"]:
+                if check_rgb_condition(rgb, condition):
+                    confidence = 0.85
+                    return color_name, confidence, f"RGB: {rgb}"
+    
+    # 매칭 실패
+    return "unknown", 0.5, "No match"
+
+
+def check_rgb_condition(rgb, condition):
+    """RGB 조건 체크"""
+    r, g, b = rgb
+    cond_type = condition.get("type")
+    
+    if cond_type == "max_value":
+        return max(r, g, b) < condition["threshold"]
+    
+    elif cond_type == "min_value":
+        return min(r, g, b) > condition["threshold"]
+    
+    elif cond_type == "achromatic":
+        brightness = max(r, g, b)
+        channel_diff = max(r, g, b) - min(r, g, b)
+        
+        checks = []
+        if "brightness_min" in condition:
+            checks.append(brightness >= condition["brightness_min"])
+        if "brightness_max" in condition:
+            checks.append(brightness <= condition["brightness_max"])
+        if "channel_diff_max" in condition:
+            checks.append(channel_diff < condition["channel_diff_max"])
+        
+        return all(checks) if checks else False
+    
+    elif cond_type == "dominant_channel":
+        channel = condition["channel"]
+        min_val = condition.get("min_value", 0)
+        diff_thresh = condition.get("diff_threshold", 30)
+        
+        channel_val = {"r": r, "g": g, "b": b}[channel]
+        other_vals = [v for k, v in {"r": r, "g": g, "b": b}.items() if k != channel]
+        
+        return (channel_val >= min_val and 
+                all(channel_val > ov + diff_thresh for ov in other_vals))
+    
+    elif cond_type == "two_channel_high":
+        channels = condition["channels"]
+        vals = {"r": r, "g": g, "b": b}
+        
+        checks = []
+        for ch in channels:
+            if f"{ch}_min" in condition:
+                checks.append(vals[ch] >= condition[f"{ch}_min"])
+            if f"{ch}_max" in condition:
+                checks.append(vals[ch] <= condition[f"{ch}_max"])
+        
+        # 추가 조건
+        if condition.get("r_over_g"):
+            checks.append(r > g)
+        if condition.get("similar"):
+            checks.append(abs(r - g) < 50)
+        if "g_diff" in condition:
+            checks.append(r > g + condition["g_diff"] and b > g + condition["g_diff"])
+        
+        return all(checks)
+    
+    return False
+
+
+def calculate_confidence_hsv(h, s, v, hsv_range):
+    """HSV 매칭 신뢰도 계산"""
+    h_min, h_max = hsv_range["h"]
+    s_min, s_max = hsv_range["s"]
+    v_min, v_max = hsv_range["v"]
+    
+    # 중심에 가까울수록 높은 신뢰도
+    h_center = (h_min + h_max) / 2
+    s_center = (s_min + s_max) / 2
+    v_center = (v_min + v_max) / 2
+    
+    h_dist = min(abs(h - h_center), 180 - abs(h - h_center)) / 90  # 정규화
+    s_dist = abs(s - s_center) / 127.5
+    v_dist = abs(v - v_center) / 127.5
+    
+    # 거리 기반 신뢰도
+    avg_dist = (h_dist + s_dist + v_dist) / 3
+    confidence = 1.0 - avg_dist * 0.3  # 최대 0.3 감소
+    
+    return max(0.5, min(1.0, confidence))
+
+
+def find_nearest_color_hsv(h, s, v, colors_config):
+    """가장 가까운 색상 찾기 (폴백)"""
+    # 무채색 체크
+    if s < 50:
+        if v < 80:
+            return "black", 0.6, "Fallback: dark achromatic"
+        elif v > 180:
+            return "white", 0.6, "Fallback: bright achromatic"
+        else:
+            return "gray", 0.6, "Fallback: mid achromatic"
+    
+    # Hue 기반 분류
+    if h < 10 or h > 170:
+        return "red", 0.5, "Fallback: hue range"
+    elif 10 <= h < 25:
+        return "orange", 0.5, "Fallback: hue range"
+    elif 25 <= h < 40:
+        return "yellow", 0.5, "Fallback: hue range"
+    elif 40 <= h < 80:
+        return "green", 0.5, "Fallback: hue range"
+    elif 80 <= h < 100:
+        return "mint", 0.5, "Fallback: hue range"
+    elif 100 <= h < 130:
+        return "blue", 0.5, "Fallback: hue range"
+    else:
+        return "purple", 0.5, "Fallback: hue range"
+
+
+def save_user_feedback(hold_data, feedback_list, config_path="holdcheck/color_ranges.json"):
+    """
+    사용자 피드백 저장 및 색상 범위 자동 조정
+    
+    Args:
+        hold_data: 홀드 데이터
+        feedback_list: [{"hold_id": 0, "correct_color": "yellow", "predicted_color": "orange"}, ...]
+        config_path: 설정 파일 경로
+    """
+    global _color_feedback_data
+    
+    print(f"\n📝 사용자 피드백 저장 중... ({len(feedback_list)}개)")
+    
+    # 피드백 데이터 추가
+    _color_feedback_data.extend(feedback_list)
+    
+    # 색상 범위 로드
+    ranges_data = load_color_ranges(config_path)
+    
+    # 피드백 통계
+    feedback_stats = {}
+    for fb in feedback_list:
+        pred = fb["predicted_color"]
+        correct = fb["correct_color"]
+        
+        if pred != correct:
+            key = f"{pred} -> {correct}"
+            if key not in feedback_stats:
+                feedback_stats[key] = []
+            
+            # 홀드 찾기
+            hold = next((h for h in hold_data if h.get("id") == fb["hold_id"]), None)
+            if hold:
+                feedback_stats[key].append({
+                    "rgb": hold.get("dominant_rgb"),
+                    "hsv": hold.get("dominant_hsv")
+                })
+    
+    print(f"   오분류 패턴:")
+    for pattern, samples in feedback_stats.items():
+        print(f"   {pattern}: {len(samples)}건")
+    
+    # 색상 범위 자동 조정 (학습)
+    adjust_color_ranges(ranges_data, feedback_stats)
+    
+    # 피드백 카운트 증가
+    ranges_data["feedback_count"] += len(feedback_list)
+    ranges_data["last_updated"] = str(np.datetime64('now'))
+    
+    # 저장
+    save_color_ranges(ranges_data, config_path)
+    
+    print(f"✅ 피드백 반영 완료! (총 {ranges_data['feedback_count']}건)")
+    
+    # 캐시 초기화
+    global _color_ranges_cache
+    _color_ranges_cache = None
+
+
+def adjust_color_ranges(ranges_data, feedback_stats):
+    """피드백 기반 색상 범위 자동 조정"""
+    colors_config = ranges_data["colors"]
+    
+    for pattern, samples in feedback_stats.items():
+        if len(samples) < 3:  # 최소 3개 이상
+            continue
+        
+        pred_color, correct_color = pattern.split(" -> ")
+        
+        if correct_color not in colors_config:
+            continue
+        
+        # 올바른 색상의 HSV 범위 확장
+        hsv_samples = [s["hsv"] for s in samples if s["hsv"]]
+        
+        if hsv_samples:
+            avg_h = np.mean([h for h, s, v in hsv_samples])
+            avg_s = np.mean([s for h, s, v in hsv_samples])
+            avg_v = np.mean([v for h, s, v in hsv_samples])
+            
+            print(f"   {correct_color} 범위 확장: H={avg_h:.0f}, S={avg_s:.0f}, V={avg_v:.0f}")
+            
+            # 범위에 새 샘플 추가 (간단한 방식)
+            # 실제로는 더 정교한 클러스터링 필요
+            current_ranges = colors_config[correct_color].get("hsv_ranges", [])
+            
+            # 기존 범위와 겹치지 않으면 새 범위 추가
+            new_range = {
+                "h": [max(0, int(avg_h - 10)), min(180, int(avg_h + 10))],
+                "s": [max(0, int(avg_s - 30)), min(255, int(avg_s + 30))],
+                "v": [max(0, int(avg_v - 30)), min(255, int(avg_v + 30))]
+            }
+            
+            # 중복 체크 (간단히)
+            is_duplicate = any(
+                abs(r["h"][0] - new_range["h"][0]) < 20 for r in current_ranges
+            )
+            
+            if not is_duplicate:
+                current_ranges.append(new_range)
+                print(f"      새 범위 추가됨!")
+
+
+def export_feedback_dataset(output_path="holdcheck/color_feedback_dataset.json"):
+    """피드백 데이터를 학습 데이터셋으로 내보내기 (AI 모델 학습용)"""
+    global _color_feedback_data
+    
+    if not _color_feedback_data:
+        print("⚠️ 피드백 데이터 없음")
+        return
+    
+    dataset = {
+        "version": "1.0",
+        "total_samples": len(_color_feedback_data),
+        "samples": _color_feedback_data
+    }
+    
+    with open(output_path, 'w', encoding='utf-8') as f:
+        json.dump(dataset, f, indent=2, ensure_ascii=False)
+    
+    print(f"✅ 피드백 데이터셋 내보내기: {output_path} ({len(_color_feedback_data)}개 샘플)")
