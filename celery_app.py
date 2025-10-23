@@ -17,7 +17,7 @@ celery_app.conf.update(
     task_serializer='json',
     accept_content=['json'],
     result_serializer='json',
-    result_extended=True,  # 확장된 결과 메타데이터 활성화
+    result_extended=False,  # 확장된 메타데이터 비활성화 (직렬화 문제 방지)
     timezone='Asia/Seoul',
     enable_utc=True,
     task_track_started=True,
@@ -27,7 +27,6 @@ celery_app.conf.update(
     task_acks_late=True,  # 작업 완료 후 ACK
     worker_disable_rate_limits=False,
     result_expires=3600,  # 결과는 1시간 후 삭제
-    result_backend_transport_options={'master_name': 'mymaster'},  # Redis Sentinel 옵션 (선택)
 )
 
 if __name__ == '__main__':
