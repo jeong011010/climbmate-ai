@@ -34,6 +34,12 @@ def analyze_image_async(self, image_base64, wall_angle=None):
     Returns:
         dict: 전체 분석 결과
     """
+    print("=" * 80)
+    print("🚀 analyze_image_async 시작!")
+    print(f"   이미지 크기: {len(image_base64) if image_base64 else 0} bytes")
+    print(f"   Wall angle: {wall_angle}")
+    print("=" * 80)
+    
     try:
         # 1단계: 홀드 감지 (YOLO)
         self.update_state(
