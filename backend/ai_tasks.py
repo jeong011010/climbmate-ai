@@ -93,14 +93,11 @@ def analyze_image_async(self, image_base64, wall_angle=None):
             }
         )
         
-        from holdcheck.clustering import clip_ai_color_clustering
-        colored_holds = clip_ai_color_clustering(
+        from holdcheck.clustering import rule_based_color_clustering
+        colored_holds = rule_based_color_clustering(
             holds,
             None,
-            image,
-            masks,
-            eps=0.3,
-            use_dbscan=False
+            config_path="holdcheck/color_ranges.json"
         )
         
         # 3단계: 문제 생성 (색상별 그룹핑)
@@ -265,14 +262,11 @@ def analyze_colors_with_clip_async(self, image_base64, hold_data):
             cv2.circle(mask, (center_x, center_y), radius, 255, -1)
             masks.append(mask)
         
-        # CLIP 색상 분석
-        colored_holds = clustering.clip_ai_color_clustering(
+        # 규칙 기반 색상 분석
+        colored_holds = clustering.rule_based_color_clustering(
             hold_data,
             None,
-            image,
-            masks,
-            eps=0.3,
-            use_dbscan=False
+            config_path="holdcheck/color_ranges.json"
         )
         
         # 진행률 업데이트: 완료
@@ -395,14 +389,11 @@ def analyze_colors_with_clip_async(self, image_base64, hold_data):
             meta={'progress': 40, 'message': '🎨 색상 분류 중...', 'step': 'clustering'}
         )
         
-        # 색상 그룹핑
-        hold_data = clustering.clip_ai_color_clustering(
+        # 규칙 기반 색상 그룹핑
+        hold_data = clustering.rule_based_color_clustering(
             hold_data_raw,
             None,
-            image,
-            masks,
-            eps=0.3,
-            use_dbscan=False
+            config_path="holdcheck/color_ranges.json"
         )
         
         # 문제 그룹핑
