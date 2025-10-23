@@ -9,7 +9,8 @@ from clustering import (
     rule_based_color_clustering,
     save_user_feedback,
     load_color_ranges,
-    export_feedback_dataset
+    export_feedback_dataset,
+    draw_holds_on_image_with_highlights # <--- Add this import
 )
 from preprocess import preprocess
 
@@ -102,32 +103,24 @@ def show_feedback_ui():
         # 홀드별 수정 UI
         st.markdown("### 잘못 분류된 홀드를 수정하세요:")
         
-        # 이미지 표시 (홀드 ID 표시)
-        display_image = image.copy()
-        for hold in hold_data:
-            center = hold.get("center", [0, 0])
-            color_name = hold.get('clip_color_name', 'unknown')
-            confidence = hold.get('clip_confidence', 0)
-            
-            # 홀드 ID와 색상 표시
-            cv2.putText(
-                display_image, 
-                f"ID{hold['id']}:{color_name}", 
-                (center[0]-30, center[1]), 
-                cv2.FONT_HERSHEY_SIMPLEX, 
-                0.4, 
-                (255, 255, 0), 
-                1
-            )
-            
-            # 신뢰도 낮으면 노란색 테두리
-            if confidence < 0.7:
-                mask = masks[hold["id"]].astype(np.uint8) * 255
-                contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-                cv2.drawContours(display_image, contours, -1, (0, 255, 255), 2)
+        # 피드백 모드에서 문제가 있는 홀드들을 강조 표시
+        problems_dict = {}
+        for change in feedback_changes:
+            problems_dict[str(change['hold_id'])] = {
+                "predicted_color": change['predicted_color'],
+                "correct_color": change['correct_color']
+            }
         
-        st.image(cv2.cvtColor(display_image, cv2.COLOR_BGR2RGB), 
-                 caption="🟡 노란 테두리 = 신뢰도 낮음 (확인 필요)", 
+        # 강조 표시가 적용된 이미지 생성
+        highlighted_image = draw_holds_on_image_with_highlights(
+            image, hold_data, 
+            [[hold.get("bbox", [0,0,100,100])[0], hold.get("bbox", [0,0,100,100])[1], 
+              hold.get("bbox", [0,0,100,100])[2], hold.get("bbox", [0,0,100,100])[3]] for hold in hold_data],
+            problems_dict
+        )
+        
+        st.image(cv2.cvtColor(highlighted_image, cv2.COLOR_BGR2RGB), 
+                 caption="🔴 빨간 테두리 = 수정된 홀드, 🟡 노란 테두리 = 신뢰도 낮음", 
                  use_container_width=True)
         
         # 홀드별 수정

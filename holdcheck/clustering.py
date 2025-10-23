@@ -4968,7 +4968,7 @@ def get_default_color_ranges_data():
                 "name": "초록색",
                 "priority": 7,
                 "hsv_ranges": [
-                    {"h": [40, 80], "s": [100, 255], "v": [100, 255]}  # 초록 (60도 근처)
+                    {"h": [40, 75], "s": [100, 255], "v": [100, 255]}  # 초록 (60도 근처) - 민트와 겹침 방지
                 ],
                 "rgb_conditions": [
                     {"type": "dominant_channel", "channel": "g", "min_value": 100, "diff_threshold": 30}
@@ -4978,7 +4978,7 @@ def get_default_color_ranges_data():
                 "name": "민트색",
                 "priority": 8,
                 "hsv_ranges": [
-                    {"h": [80, 100], "s": [100, 255], "v": [150, 255]}  # 청록 (90도 근처)
+                    {"h": [75, 105], "s": [100, 255], "v": [150, 255]}  # 청록 (90도 근처) - 범위 확장
                 ],
                 "rgb_conditions": [
                     {"type": "two_channel_high", "channels": ["g", "b"], "g_min": 150, "b_min": 150, "r_max": 150}
@@ -4988,7 +4988,7 @@ def get_default_color_ranges_data():
                 "name": "파란색",
                 "priority": 9,
                 "hsv_ranges": [
-                    {"h": [100, 130], "s": [100, 255], "v": [100, 255]}  # 파랑 (120도 근처)
+                    {"h": [105, 130], "s": [100, 255], "v": [100, 255]}  # 파랑 (120도 근처) - 민트와 겹침 방지
                 ],
                 "rgb_conditions": [
                     {"type": "dominant_channel", "channel": "b", "min_value": 100, "diff_threshold": 30}
@@ -5018,7 +5018,7 @@ def get_default_color_ranges_data():
                 "name": "갈색",
                 "priority": 12,
                 "hsv_ranges": [
-                    {"h": [10, 30], "s": [100, 200], "v": [50, 150]}  # 어두운 주황
+                    {"h": [0, 10], "s": [80, 200], "v": [50, 150]}  # 어두운 주황 - 주황과 겹침 방지
                 ],
                 "rgb_conditions": [
                     {"type": "dominant_channel", "channel": "r", "min_value": 80, "max_value": 150, "dark": True}
@@ -5405,6 +5405,61 @@ def adjust_color_ranges(ranges_data, feedback_stats):
             if not is_duplicate:
                 current_ranges.append(new_range)
                 print(f"      새 범위 추가됨!")
+
+
+def draw_holds_on_image_with_highlights(image, hold_data, bboxes, problems):
+    """
+    이미지에 홀드를 그리고, 피드백이 있는 홀드는 강조하여 표시합니다.
+    
+    Args:
+        image (np.array): 원본 이미지 (BGR 형식).
+        hold_data (list): 각 홀드의 정보 (dict).
+        bboxes (list): 각 홀드의 바운딩 박스 (x1, y1, x2, y2).
+        problems (dict): hold_id를 키로 하고, 문제가 있는 홀드 정보를 값으로 하는 딕셔너리.
+                         예: {0: {"predicted_color": "yellow", "correct_color": "orange"}}
+    Returns:
+        np.array: 홀드와 강조 표시가 그려진 이미지.
+    """
+    display_image = image.copy()
+    
+    # 색상 매핑 (BGR 형식)
+    color_map = {
+        "black": (0, 0, 0), "white": (255, 255, 255), "gray": (128, 128, 128),
+        "red": (0, 0, 255), "orange": (0, 165, 255), "yellow": (0, 255, 255),
+        "green": (0, 255, 0), "mint": (204, 255, 0), "blue": (255, 0, 0),
+        "purple": (255, 0, 128), "pink": (204, 102, 255), "brown": (42, 42, 165),
+        "unknown": (192, 192, 192) # 회색
+    }
+    
+    for i, hold in enumerate(hold_data):
+        if i >= len(bboxes):
+            continue # 바운딩 박스가 없는 홀드는 건너뜀
+            
+        x1, y1, x2, y2 = map(int, bboxes[i])
+        
+        # 홀드 색상 가져오기 (없으면 unknown)
+        color_name = hold.get("clip_color_name", "unknown")
+        bbox_color = color_map.get(color_name, color_map["unknown"])
+        
+        # 문제가 있는 홀드인지 확인
+        is_problematic = str(i) in problems # problems keys are strings
+        
+        if is_problematic:
+            # 문제가 있는 홀드는 빨간색 두꺼운 테두리로 강조
+            cv2.rectangle(display_image, (x1, y1), (x2, y2), (0, 0, 255), 4) # Red, thick
+            # 텍스트도 빨간색으로
+            text_color = (0, 0, 255) 
+        else:
+            # 일반 홀드는 해당 색상 테두리
+            cv2.rectangle(display_image, (x1, y1), (x2, y2), bbox_color, 2)
+            text_color = bbox_color
+            
+        # 홀드 ID와 색상 이름 표시
+        text = f"ID:{i} {color_name}"
+        cv2.putText(display_image, text, (x1, y1 - 10), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, text_color, 2, cv2.LINE_AA)
+            
+    return display_image
 
 
 def export_feedback_dataset(output_path="holdcheck/color_feedback_dataset.json"):
