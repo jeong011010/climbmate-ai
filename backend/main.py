@@ -1097,6 +1097,105 @@ async def test_gpt4():
             "details": str(e)
         }
 
+# ============================================================================
+# 🎨 색상 피드백 API (룰 기반 학습용)
+# ============================================================================
+
+class ColorFeedbackRequest(BaseModel):
+    feedbacks: list  # [{"hold_id": 0, "predicted_color": "yellow", "correct_color": "orange"}]
+
+@app.post("/api/color-feedback")
+async def submit_color_feedback(request: ColorFeedbackRequest):
+    """
+    사용자 색상 피드백 저장 및 학습
+    
+    프론트엔드에서 사용자가 수정한 색상을 받아서:
+    1. 피드백 데이터 저장
+    2. 색상 범위 자동 조정
+    3. ML 모델 학습 데이터 축적
+    """
+    try:
+        from clustering import save_user_feedback
+        
+        feedbacks = request.feedbacks
+        
+        if not feedbacks or len(feedbacks) == 0:
+            raise HTTPException(status_code=400, detail="피드백이 비어있습니다")
+        
+        print(f"\n📝 색상 피드백 수신: {len(feedbacks)}개")
+        
+        # 피드백 저장 및 학습
+        # Note: hold_data는 실제로는 필요 없지만 호환성을 위해 빈 리스트 전달
+        save_user_feedback([], feedbacks)
+        
+        return {
+            "status": "success",
+            "message": f"{len(feedbacks)}개의 피드백이 저장되었습니다",
+            "feedback_count": len(feedbacks),
+            "next_steps": "다음 분석부터 개선된 색상 분류가 적용됩니다"
+        }
+    
+    except Exception as e:
+        print(f"❌ 피드백 저장 오류: {e}")
+        raise HTTPException(status_code=500, detail=f"피드백 저장 실패: {str(e)}")
+
+
+@app.get("/api/color-ranges")
+async def get_color_ranges():
+    """
+    현재 색상 범위 설정 조회
+    """
+    try:
+        from clustering import load_color_ranges
+        
+        ranges_data = load_color_ranges()
+        
+        return {
+            "status": "success",
+            "ranges": ranges_data,
+            "feedback_count": ranges_data.get("feedback_count", 0)
+        }
+    
+    except Exception as e:
+        print(f"❌ 색상 범위 조회 오류: {e}")
+        raise HTTPException(status_code=500, detail=f"색상 범위 조회 실패: {str(e)}")
+
+
+@app.get("/api/feedback-stats")
+async def get_feedback_stats():
+    """
+    피드백 통계 조회
+    """
+    try:
+        from clustering import load_color_ranges
+        
+        ranges_data = load_color_ranges()
+        feedback_count = ranges_data.get("feedback_count", 0)
+        last_updated = ranges_data.get("last_updated", "없음")
+        
+        # 색상별 범위 개수
+        colors = ranges_data.get("colors", {})
+        color_stats = {}
+        for color_name, config in colors.items():
+            hsv_ranges = config.get("hsv_ranges", [])
+            color_stats[color_name] = {
+                "name": config.get("name", color_name),
+                "range_count": len(hsv_ranges),
+                "priority": config.get("priority", 999)
+            }
+        
+        return {
+            "status": "success",
+            "total_feedbacks": feedback_count,
+            "last_updated": last_updated,
+            "color_stats": color_stats
+        }
+    
+    except Exception as e:
+        print(f"❌ 피드백 통계 조회 오류: {e}")
+        raise HTTPException(status_code=500, detail=f"통계 조회 실패: {str(e)}")
+
+
 if __name__ == "__main__":
     import uvicorn
     # 동시 요청 처리를 위한 워커 설정
