@@ -194,22 +194,11 @@ def analyze_image_async(self, image_base64, wall_angle=None):
     except Exception as e:
         import traceback
         error_details = traceback.format_exc()
-        # 로그 제거
+        print(f"❌ 분석 실패: {str(e)}")
+        print(error_details)
         
-        self.update_state(
-            state='FAILURE',
-            meta={
-                'error': str(e),
-                'message': f'분석 실패: {str(e)}',
-                'error_type': 'GENERAL_ERROR',
-                'traceback': error_details[:500]  # 트레이스백 일부만 저장
-            }
-        )
-        return {
-            'status': 'error',
-            'error': str(e),
-            'message': f'분석 중 오류가 발생했습니다: {str(e)}'
-        }
+        # Celery에게 제대로 된 예외를 던져야 함
+        raise Exception(f'분석 실패: {str(e)}')
 
 @celery_app.task(bind=True)
 def analyze_colors_with_clip_async(self, image_base64, hold_data):
