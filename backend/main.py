@@ -553,6 +553,24 @@ if DB_AVAILABLE:
             print(f"❌ 피드백 조회 오류: {e}")
             raise HTTPException(status_code=500, detail=str(e))
     
+    @app.post("/api/color-feedbacks/{feedback_id}/confirm")
+    async def confirm_feedback(feedback_id: int):
+        """🎨 홀드 색상 피드백 확인 (ML 학습 데이터로 확정)"""
+        try:
+            if not DB_AVAILABLE:
+                raise HTTPException(status_code=503, detail="Database not available")
+            
+            from database import confirm_color_feedback
+            confirm_color_feedback(feedback_id)
+            
+            return JSONResponse(
+                status_code=200,
+                content={"message": f"피드백 ID {feedback_id} 확인 완료"}
+            )
+        except Exception as e:
+            print(f"❌ 피드백 확인 오류: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
+    
     @app.delete("/api/color-feedbacks/{feedback_id}")
     async def delete_feedback(feedback_id: int):
         """🎨 홀드 색상 피드백 삭제"""

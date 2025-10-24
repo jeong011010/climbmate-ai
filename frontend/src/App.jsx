@@ -29,8 +29,7 @@ function App() {
   
   // 새로운 상태들
   const [analysisHistory, setAnalysisHistory] = useState([])
-  const [favorites, setFavorites] = useState([])
-  const [currentView, setCurrentView] = useState('analyze') // 'analyze', 'history', 'favorites', 'stats', 'feedbacks'
+  const [currentView, setCurrentView] = useState('analyze') // 'analyze', 'history', 'stats', 'feedbacks'
   const [compareMode, setCompareMode] = useState(false)
   const [selectedForCompare, setSelectedForCompare] = useState([])
   
@@ -65,6 +64,22 @@ function App() {
       alert('피드백 목록을 불러오는데 실패했습니다.')
     } finally {
       setFeedbacksLoading(false)
+    }
+  }
+
+  // 🎨 색상 피드백 확인 (ML 학습용으로 확정)
+  const confirmFeedback = async (feedbackId) => {
+    if (!confirm('이 피드백을 ML 학습 데이터로 확정하시겠습니까?')) {
+      return
+    }
+
+    try {
+      await axios.post(`${API_URL}/api/color-feedbacks/${feedbackId}/confirm`)
+      alert('피드백이 확인되었습니다! ML 학습에 사용됩니다.')
+      loadColorFeedbacks() // 목록 새로고침
+    } catch (error) {
+      console.error('피드백 확인 실패:', error)
+      alert('피드백 확인에 실패했습니다.')
     }
   }
 
@@ -145,16 +160,9 @@ function App() {
     setAnalysisHistory(history)
   }
 
-  // 즐겨찾기 로드
-  const loadFavorites = () => {
-    const favs = JSON.parse(localStorage.getItem('climbmate_favorites') || '[]')
-    setFavorites(favs)
-  }
-
   // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
     loadAnalysisHistory()
-    loadFavorites()
   }, [])
 
   // 분석 결과를 히스토리에 저장
@@ -201,20 +209,6 @@ function App() {
     }
   }
 
-  // 즐겨찾기 추가/제거
-  const toggleFavorite = (problemId) => {
-    const isFavorited = favorites.includes(problemId)
-    let newFavorites
-    
-    if (isFavorited) {
-      newFavorites = favorites.filter(id => id !== problemId)
-    } else {
-      newFavorites = [...favorites, problemId]
-    }
-    
-    setFavorites(newFavorites)
-    localStorage.setItem('climbmate_favorites', JSON.stringify(newFavorites))
-  }
 
   // GPT-4 결과를 훈련 데이터로 변환
   const convertGpt4ToTraining = async () => {
@@ -593,9 +587,13 @@ function App() {
               <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <p className="text-sm text-blue-800">
                   📊 총 <span className="font-bold text-lg">{colorFeedbacks.length}</span>개의 피드백
-                  {colorFeedbacks.length >= 30 && (
+                  <span className="mx-2">|</span>
+                  ✅ 확인됨: <span className="font-bold">{colorFeedbacks.filter(f => f.confirmed).length}</span>개
+                  <span className="mx-2">|</span>
+                  ⏳ 대기 중: <span className="font-bold">{colorFeedbacks.filter(f => !f.confirmed).length}</span>개
+                  {colorFeedbacks.filter(f => f.confirmed).length >= 30 && (
                     <span className="ml-2 text-green-600 font-semibold">
-                      ✅ ML 학습 가능! (30개 이상)
+                      🤖 ML 학습 가능! (30개 이상 확인됨)
                     </span>
                   )}
                 </p>
@@ -603,7 +601,18 @@ function App() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {colorFeedbacks.map((feedback) => (
-                  <div key={feedback.id} className="glass-card p-4 hover:shadow-xl transition-all">
+                  <div key={feedback.id} className={`p-4 rounded-xl shadow-lg hover:shadow-xl transition-all ${
+                    feedback.confirmed 
+                      ? 'bg-blue-50 border-2 border-blue-400' 
+                      : 'bg-white border-2 border-slate-200'
+                  }`}>
+                    {/* 확인 배지 */}
+                    {feedback.confirmed && (
+                      <div className="mb-2 px-2 py-1 bg-blue-500 text-white text-xs rounded-full inline-block">
+                        ✅ ML 학습용 확정
+                      </div>
+                    )}
+                    
                     {/* AI 예측 vs 사용자 정답 */}
                     <div className="flex justify-between items-center mb-3">
                       <div className="flex items-center gap-2">
@@ -640,12 +649,26 @@ function App() {
 
                     {/* 액션 버튼 */}
                     <div className="flex gap-2">
-                      <button
-                        onClick={() => deleteFeedback(feedback.id)}
-                        className="flex-1 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all text-sm"
-                      >
-                        🗑️ 삭제
-                      </button>
+                      {!feedback.confirmed ? (
+                        <>
+                          <button
+                            onClick={() => confirmFeedback(feedback.id)}
+                            className="flex-1 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all text-sm font-semibold"
+                          >
+                            ✅ 확인
+                          </button>
+                          <button
+                            onClick={() => deleteFeedback(feedback.id)}
+                            className="flex-1 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all text-sm"
+                          >
+                            🗑️ 삭제
+                          </button>
+                        </>
+                      ) : (
+                        <div className="flex-1 py-2 bg-blue-500 text-white rounded-lg text-center text-sm font-semibold">
+                          ✅ 확인됨 (ML 학습용)
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -704,51 +727,6 @@ function App() {
     </div>
   )
 
-  // 즐겨찾기 뷰 컴포넌트
-  const FavoritesView = () => (
-    <div className="w-full px-2 sm:px-4">
-      <div className="glass-card p-4 sm:p-6">
-        <h2 className="text-xl sm:text-2xl font-bold mb-4 text-slate-800">⭐ 즐겨찾기</h2>
-        {favorites.length === 0 ? (
-          <p className="text-slate-600 text-center py-8">즐겨찾기한 문제가 없습니다.</p>
-        ) : (
-          <div className="space-y-3">
-            {favorites.map((problemId) => {
-              const historyItem = analysisHistory.find(item => 
-                item.result.problems?.some(p => p.id === problemId)
-              )
-              if (!historyItem) return null
-              
-              const problem = historyItem.result.problems.find(p => p.id === problemId)
-              return (
-                <div key={problemId} className="glass-card p-4 flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <img 
-                      src={historyItem.image} 
-                      alt="즐겨찾기 문제" 
-                      className="w-16 h-16 object-cover rounded-lg"
-                    />
-                    <div>
-                      <div className="font-medium">{problem.color}</div>
-                      <div className="text-sm text-slate-600">
-                        {problem.difficulty} {problem.type}
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => toggleFavorite(problemId)}
-                    className="text-yellow-500 hover:text-yellow-600"
-                  >
-                    ⭐
-                  </button>
-                </div>
-              )
-            })}
-          </div>
-        )}
-      </div>
-    </div>
-  )
 
   // 문제 비교 뷰 컴포넌트
   const CompareView = () => {
@@ -1372,19 +1350,6 @@ function App() {
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            toggleFavorite(problem.id)
-                          }}
-                          className={`text-2xl transition-colors ${
-                            favorites.includes(problem.id) 
-                              ? 'text-yellow-500' 
-                              : 'text-gray-400 hover:text-yellow-500'
-                          }`}
-                        >
-                          {favorites.includes(problem.id) ? '⭐' : '☆'}
-                        </button>
                         
                         {compareMode && (
                           <button
@@ -1468,9 +1433,6 @@ function App() {
 
         {/* 히스토리 뷰 */}
         {currentView === 'history' && <HistoryView />}
-
-        {/* 즐겨찾기 뷰 */}
-        {currentView === 'favorites' && <FavoritesView />}
 
         {/* 통계 뷰 */}
         {currentView === 'stats' && <StatsView />}
@@ -1791,18 +1753,6 @@ function App() {
             >
               <span className="text-2xl mb-1">📚</span>
               <span className="text-xs font-medium">히스토리</span>
-            </button>
-            
-            <button
-              onClick={() => setCurrentView('favorites')}
-              className={`flex flex-col items-center justify-center py-3 transition-all ${
-                currentView === 'favorites'
-                  ? 'text-blue-600'
-                  : 'text-slate-600 hover:text-blue-500'
-              }`}
-            >
-              <span className="text-2xl mb-1">⭐</span>
-              <span className="text-xs font-medium">즐겨찾기</span>
             </button>
             
             <button

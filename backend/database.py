@@ -99,6 +99,7 @@ def init_db():
             
             -- 메타데이터
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            confirmed INTEGER DEFAULT 0,
             
             FOREIGN KEY (problem_id) REFERENCES climbing_problems(id)
         )
@@ -414,7 +415,7 @@ def get_all_color_feedbacks() -> List[Dict]:
             rgb_r, rgb_g, rgb_b,
             hsv_h, hsv_s, hsv_v,
             predicted_color, user_correct_color,
-            created_at
+            created_at, confirmed
         FROM hold_color_feedback
         ORDER BY created_at DESC
     """)
@@ -433,10 +434,28 @@ def get_all_color_feedbacks() -> List[Dict]:
             'hsv': [row[8], row[9], row[10]],
             'predicted_color': row[11],
             'user_correct_color': row[12],
-            'created_at': row[13]
+            'created_at': row[13],
+            'confirmed': row[14] == 1  # Boolean으로 변환
         })
     
     return feedbacks
+
+def confirm_color_feedback(feedback_id: int):
+    """🎨 색상 피드백 확인 (ML 학습 데이터로 확정)"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        UPDATE hold_color_feedback 
+        SET confirmed = 1 
+        WHERE id = ?
+    """, (feedback_id,))
+    
+    conn.commit()
+    conn.close()
+    
+    print(f"✅ 피드백 ID {feedback_id} 확인 완료 (ML 학습용)")
+    return True
 
 def delete_color_feedback(feedback_id: int):
     """🎨 색상 피드백 삭제"""
