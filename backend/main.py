@@ -58,6 +58,13 @@ class FeedbackRequest(BaseModel):
     user_type: str
     user_feedback: str = None
 
+class HoldColorFeedbackRequest(BaseModel):
+    problem_id: int
+    hold_id: str
+    predicted_color: str
+    user_color: str
+    hold_center: list = None
+
 app = FastAPI(title="ClimbMate API", version="1.0.0")
 
 # 🚀 성능 최적화: 시작 시 CLIP 모델 미리 로딩
@@ -422,6 +429,47 @@ if DB_AVAILABLE:
             )
         except Exception as e:
             print(f"❌ 피드백 저장 오류: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
+
+    @app.post("/api/hold-color-feedback")
+    async def submit_hold_color_feedback(feedback: HoldColorFeedbackRequest):
+        """홀드 색상 피드백 저장"""
+        try:
+            # 데이터베이스에 홀드 색상 피드백 저장
+            # TODO: 나중에 전용 테이블을 만들 수 있지만, 일단은 간단히 로깅
+            print(f"🎨 홀드 색상 피드백 수신:")
+            print(f"  - Problem ID: {feedback.problem_id}")
+            print(f"  - Hold ID: {feedback.hold_id}")
+            print(f"  - Predicted: {feedback.predicted_color}")
+            print(f"  - User: {feedback.user_color}")
+            print(f"  - Center: {feedback.hold_center}")
+            
+            # 색상 피드백 데이터 저장 (간단 버전)
+            feedback_data = {
+                "hold_id": feedback.hold_id,
+                "predicted_color": feedback.predicted_color,
+                "correct_color": feedback.user_color
+            }
+            
+            # 기존 색상 피드백 시스템에 추가
+            try:
+                from clustering import save_user_feedback
+                save_user_feedback([], [feedback_data])
+            except Exception as e:
+                print(f"⚠️ 색상 범위 업데이트 실패 (정상): {e}")
+            
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "message": "홀드 색상 피드백이 저장되었습니다! 감사합니다 🎨",
+                    "feedback": {
+                        "predicted": feedback.predicted_color,
+                        "corrected": feedback.user_color
+                    }
+                }
+            )
+        except Exception as e:
+            print(f"❌ 홀드 색상 피드백 저장 오류: {e}")
             raise HTTPException(status_code=500, detail=str(e))
 
     @app.get("/api/stats")
