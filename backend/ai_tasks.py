@@ -133,15 +133,43 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                 # 색상 RGB 추출 (첫 번째 홀드에서)
                 color_rgb = group_holds[0].get('dominant_rgb', [128, 128, 128])
                 
-                # 규칙 기반 분석 (group_holds를 직접 전달, group_id는 None)
+                # 각 홀드에 bbox, color, individual_color 추가
+                enriched_holds = []
+                for hold in group_holds:
+                    hold_id = hold['id']
+                    bbox = [0, 0, 0, 0]
+                    
+                    # 마스크에서 bbox 계산
+                    if hold_id < len(masks):
+                        mask = masks[hold_id]
+                        coords = np.argwhere(mask > 0.5)
+                        if len(coords) > 0:
+                            y_min, x_min = coords.min(axis=0)
+                            y_max, x_max = coords.max(axis=0)
+                            bbox = [int(x_min), int(y_min), int(x_max), int(y_max)]
+                    
+                    # 홀드 정보 추가
+                    enriched_hold = {
+                        'id': hold['id'],
+                        'center': hold['center'],
+                        'area': hold['area'],
+                        'bbox': bbox,
+                        'color': color_name,  # 그룹 색상 (문제 색상)
+                        'individual_color': hold.get('clip_color_name', 'unknown'),  # 홀드 자체의 실제 색상
+                        'rgb': hold.get('dominant_rgb', [128, 128, 128]),
+                        'hsv': hold.get('dominant_hsv', [0, 0, 128])
+                    }
+                    enriched_holds.append(enriched_hold)
+                
+                # 규칙 기반 분석 (원본 group_holds 사용)
                 analysis = analyze_problem(group_holds, None, wall_angle)
                 if analysis:
                     problems.append({
                         'id': f"ai_{color_name}",
                         'color_name': color_name,
                         'color_rgb': color_rgb,
-                        'holds': group_holds,
-                        'hold_count': len(group_holds),
+                        'holds': enriched_holds,  # bbox와 색상이 추가된 홀드 사용
+                        'hold_count': len(enriched_holds),
                         'analysis': analysis
                     })
         
