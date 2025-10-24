@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://climbmate.store'
 
@@ -13,6 +13,7 @@ function App() {
   const [currentAnalysisStep, setCurrentAnalysisStep] = useState('')
   const [result, setResult] = useState(null)
   const [selectedProblem, setSelectedProblem] = useState(null)
+  const [selectedHold, setSelectedHold] = useState(null) // 선택된 홀드
   const [wallAngle, setWallAngle] = useState(null)
   const [annotatedImage, setAnnotatedImage] = useState(null)
   const [showImageModal, setShowImageModal] = useState(false)
@@ -22,6 +23,8 @@ function App() {
   const [feedbackDifficulty, setFeedbackDifficulty] = useState('')
   const [feedbackType, setFeedbackType] = useState('')
   const [feedbackText, setFeedbackText] = useState('')
+  const [showHoldFeedbackModal, setShowHoldFeedbackModal] = useState(false)
+  const [holdColorFeedback, setHoldColorFeedback] = useState('')
   const [modelStats, setModelStats] = useState(null)
   
   // 새로운 상태들
@@ -30,6 +33,9 @@ function App() {
   const [currentView, setCurrentView] = useState('analyze') // 'analyze', 'history', 'favorites', 'stats'
   const [compareMode, setCompareMode] = useState(false)
   const [selectedForCompare, setSelectedForCompare] = useState([])
+  
+  // Ref
+  const imageRef = useRef(null)
 
   // 통계 로드
   const loadStats = async () => {
@@ -402,6 +408,39 @@ function App() {
     }
   }
 
+  // 홀드 색상 피드백 제출
+  const submitHoldColorFeedback = async () => {
+    if (!selectedHold || !selectedProblem || !selectedProblem.db_id) {
+      alert('홀드 또는 문제 정보를 찾을 수 없습니다.')
+      return
+    }
+
+    if (!holdColorFeedback) {
+      alert('색상을 선택해주세요.')
+      return
+    }
+
+    try {
+      await axios.post(`${API_URL}/api/hold-color-feedback`, {
+        problem_id: selectedProblem.db_id,
+        hold_id: selectedHold.id || `${selectedHold.center[0]}_${selectedHold.center[1]}`,
+        predicted_color: selectedHold.color,
+        user_color: holdColorFeedback,
+        hold_center: selectedHold.center
+      })
+
+      alert('홀드 색상 피드백이 제출되었습니다. 감사합니다!')
+      setShowHoldFeedbackModal(false)
+      setHoldColorFeedback('')
+      
+      // 통계 다시 로드
+      loadStats()
+    } catch (error) {
+      console.error('홀드 색상 피드백 제출 실패:', error)
+      alert('홀드 색상 피드백 제출에 실패했습니다.')
+    }
+  }
+
   const handleImageClick = (e) => {
     if (!result || !result.problems) return
     
@@ -435,8 +474,9 @@ function App() {
     const realX = x * scaleX
     const realY = y * scaleY
     
-    // 클릭 위치에서 가장 가까운 홀드 찾기
+    // 클릭 위치에서 가장 가까운 홀드와 문제 찾기
     let closestProblem = null
+    let closestHold = null
     let minDistance = Infinity
     
     result.problems?.forEach(problem => {
@@ -450,12 +490,16 @@ function App() {
         if (distance < minDistance && distance < 150) { // 150px 반경 내
           minDistance = distance
           closestProblem = problem
+          closestHold = hold
         }
       })
     })
     
     if (closestProblem) {
       setSelectedProblem(closestProblem)
+      setSelectedHold(closestHold)
+    } else {
+      setSelectedHold(null)
     }
   }
 
@@ -732,22 +776,93 @@ function App() {
       {/* 메인 컨텐츠 영역 */}
       <div className="w-full pt-24 pb-20 px-2 sm:px-4">
         {preview && (
-           <div className="relative mb-4 w-full">
-             <img 
-               src={annotatedImage || preview} 
-               alt="Climbing Wall" 
-               className={`w-full max-h-[500px] object-contain rounded-2xl mx-auto shadow-2xl border border-white/20 block ${
-                 result ? 'cursor-pointer hover:opacity-90 transition-opacity' : ''
-               }`}
-               onClick={result ? handleImageClick : undefined}
-               onTouchEnd={result ? handleImageClick : undefined}
-               onDoubleClick={result ? () => setShowImageModal(true) : undefined}
-             />
-             {result && selectedProblem && (
-               <div className="absolute top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-full text-base font-bold shadow-lg animate-pulse-slow">
-                 {colorEmoji[selectedProblem.color_name] || '⭕'} {(selectedProblem.color_name || 'UNKNOWN').toUpperCase()} 선택됨
-               </div>
-             )}
+           <div className="relative mb-4 w-full max-w-[900px] mx-auto">
+             <div className="relative inline-block w-full">
+               <img 
+                 ref={imageRef}
+                 src={annotatedImage || preview} 
+                 alt="Climbing Wall" 
+                 className={`w-full max-h-[500px] object-contain rounded-2xl mx-auto shadow-2xl border border-white/20 block ${
+                   result ? 'cursor-pointer hover:opacity-90 transition-opacity' : ''
+                 }`}
+                 onClick={result ? handleImageClick : undefined}
+                 onTouchEnd={result ? handleImageClick : undefined}
+                 onDoubleClick={result ? () => setShowImageModal(true) : undefined}
+               />
+               
+               {/* SVG 오버레이 - 선택된 문제의 홀드들 강조 */}
+               {result && selectedProblem && imageRef.current && (
+                 <svg
+                   className="absolute top-0 left-0 w-full h-full pointer-events-none"
+                   viewBox={`0 0 ${imageRef.current.naturalWidth} ${imageRef.current.naturalHeight}`}
+                   preserveAspectRatio="xMidYMid meet"
+                   style={{
+                     maxHeight: '500px',
+                     objectFit: 'contain'
+                   }}
+                 >
+                   {selectedProblem.holds?.map((hold, idx) => {
+                     if (!hold.bbox || hold.bbox.length !== 4) return null
+                     const [x1, y1, x2, y2] = hold.bbox
+                     const isSelectedHold = selectedHold && 
+                       selectedHold.center[0] === hold.center[0] && 
+                       selectedHold.center[1] === hold.center[1]
+                     
+                     return (
+                       <g key={idx}>
+                         {/* 홀드 바운딩 박스 */}
+                         <rect
+                           x={x1}
+                           y={y1}
+                           width={x2 - x1}
+                           height={y2 - y1}
+                           fill="none"
+                           stroke={isSelectedHold ? "#FFD700" : "#00FF00"}
+                           strokeWidth={isSelectedHold ? "8" : "4"}
+                           strokeDasharray={isSelectedHold ? "10,5" : "none"}
+                           opacity={isSelectedHold ? "0.9" : "0.6"}
+                         >
+                           {isSelectedHold && (
+                             <animate
+                               attributeName="stroke-width"
+                               values="8;12;8"
+                               dur="1s"
+                               repeatCount="indefinite"
+                             />
+                           )}
+                         </rect>
+                         
+                         {/* 홀드 중심점 */}
+                         {hold.center && (
+                           <circle
+                             cx={hold.center[0]}
+                             cy={hold.center[1]}
+                             r={isSelectedHold ? "12" : "8"}
+                             fill={isSelectedHold ? "#FFD700" : "#00FF00"}
+                             opacity={isSelectedHold ? "1" : "0.7"}
+                           >
+                             {isSelectedHold && (
+                               <animate
+                                 attributeName="r"
+                                 values="12;16;12"
+                                 dur="1s"
+                                 repeatCount="indefinite"
+                               />
+                             )}
+                           </circle>
+                         )}
+                       </g>
+                     )
+                   })}
+                 </svg>
+               )}
+               
+               {result && selectedProblem && (
+                 <div className="absolute top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-full text-base font-bold shadow-lg animate-pulse-slow z-10">
+                   {colorEmoji[selectedProblem.color_name] || '⭕'} {(selectedProblem.color_name || 'UNKNOWN').toUpperCase()} 선택됨
+                 </div>
+               )}
+             </div>
            </div>
          )}
 
@@ -862,6 +977,57 @@ function App() {
                 <div className="text-xs text-slate-600 font-semibold">분석 가능</div>
               </div>
              </div>
+
+             {/* 선택된 홀드 상세 */}
+             {selectedHold && selectedProblem && (
+               <div className="glass-card p-5 mx-auto mb-4 w-full shadow-lg border-2 border-yellow-400">
+                 <div className="flex items-center justify-between mb-3">
+                   <h3 className="text-xl text-slate-800 font-bold flex items-center gap-2">
+                     <span className="text-3xl">🎯</span>
+                     선택된 홀드
+                   </h3>
+                   <button
+                     onClick={() => {
+                       setSelectedHold(null)
+                     }}
+                     className="px-3 py-1 text-slate-600 hover:text-slate-800 text-sm"
+                   >
+                     ✕
+                   </button>
+                 </div>
+                 
+                 <div className="grid grid-cols-2 gap-4 mb-4">
+                   <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md">
+                     <h4 className="text-xs mb-2 text-slate-600 font-semibold text-center">홀드 색상</h4>
+                     <div className="flex items-center justify-center gap-2">
+                       <span className="text-3xl">{colorEmoji[selectedHold.color] || '⭕'}</span>
+                       <span className="text-lg font-bold text-slate-800">{(selectedHold.color || 'UNKNOWN').toUpperCase()}</span>
+                     </div>
+                   </div>
+                   
+                   <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md">
+                     <h4 className="text-xs mb-2 text-slate-600 font-semibold text-center">위치</h4>
+                     <div className="text-sm text-slate-700 text-center">
+                       <div>X: {selectedHold.center ? Math.round(selectedHold.center[0]) : 'N/A'}</div>
+                       <div>Y: {selectedHold.center ? Math.round(selectedHold.center[1]) : 'N/A'}</div>
+                     </div>
+                   </div>
+                 </div>
+                 
+                 <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-3 rounded-xl border border-yellow-200">
+                   <h4 className="text-sm mb-2 text-slate-800 font-bold text-center">💬 색상 피드백</h4>
+                   <p className="text-xs text-slate-600 mb-3 text-center">
+                     AI가 예측한 색상이 맞나요? 피드백을 주시면 더 정확해집니다!
+                   </p>
+                   <button
+                     onClick={() => setShowHoldFeedbackModal(true)}
+                     className="w-full px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl text-sm font-semibold shadow-md hover:shadow-lg transition-all"
+                   >
+                     🎨 색상 피드백 제출
+                   </button>
+                 </div>
+               </div>
+             )}
 
              {/* 선택된 문제 상세 */}
              {selectedProblem && selectedProblem.difficulty && (
@@ -1235,6 +1401,74 @@ function App() {
                    )}
                  </div>
                )}
+             </div>
+           </div>
+         )}
+
+         {/* 홀드 색상 피드백 모달 */}
+         {showHoldFeedbackModal && selectedHold && (
+           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000] p-4" onClick={() => setShowHoldFeedbackModal(false)}>
+             <div className="glass-card p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+               <h3 className="text-2xl font-extrabold gradient-text mb-4 text-center">
+                 🎨 홀드 색상 피드백
+               </h3>
+               <p className="text-sm text-slate-600 mb-6 text-center">
+                 AI가 예측한 색상이 맞나요?<br/>
+                 정확한 색상을 알려주시면 AI가 더 똑똑해집니다! 🙏
+               </p>
+
+               {/* 현재 예측된 색상 */}
+               <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border-2 border-blue-200">
+                 <div className="text-center">
+                   <p className="text-sm text-slate-600 mb-2">AI 예측 색상</p>
+                   <div className="flex items-center justify-center gap-3">
+                     <span className="text-5xl">{colorEmoji[selectedHold.color] || '⭕'}</span>
+                     <span className="text-2xl font-bold gradient-text">{(selectedHold.color || 'UNKNOWN').toUpperCase()}</span>
+                   </div>
+                 </div>
+               </div>
+
+               {/* 실제 색상 선택 */}
+               <div className="mb-6">
+                 <label className="block text-sm font-bold text-slate-700 mb-3 text-center">
+                   🎯 실제 홀드 색상
+                 </label>
+                 <div className="grid grid-cols-3 gap-3">
+                   {Object.keys(colorEmoji).map(color => (
+                     <button
+                       key={color}
+                       onClick={() => setHoldColorFeedback(color)}
+                       className={`p-4 rounded-xl text-center transition-all ${
+                         holdColorFeedback === color
+                           ? 'bg-gradient-to-r from-primary-500 to-purple-600 text-white shadow-lg scale-105'
+                           : 'bg-white/80 text-slate-600 hover:bg-white hover:scale-105'
+                       }`}
+                     >
+                       <div className="text-3xl mb-1">{colorEmoji[color]}</div>
+                       <div className="text-xs font-semibold">{color.toUpperCase()}</div>
+                     </button>
+                   ))}
+                 </div>
+               </div>
+
+               {/* 버튼 */}
+               <div className="flex gap-3">
+                 <button
+                   onClick={() => {
+                     setShowHoldFeedbackModal(false)
+                     setHoldColorFeedback('')
+                   }}
+                   className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-all"
+                 >
+                   취소
+                 </button>
+                 <button
+                   onClick={submitHoldColorFeedback}
+                   className="flex-1 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+                 >
+                   💾 저장
+                 </button>
+               </div>
              </div>
            </div>
          )}
