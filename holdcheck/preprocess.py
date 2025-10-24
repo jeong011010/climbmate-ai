@@ -815,9 +815,28 @@ def get_hybrid_dominant_color(pixels_hsv):
     
     # 2단계: 유형별 전처리 전략
     if is_achromatic:
-        # 무채색 (흰색, 검정색, 회색) → 명도 정규화 하지 않음
-        print("   → 무채색: 기존 방식 사용")
-        return get_dominant_color(pixels_hsv)
+        # 🔥 무채색 (흰색, 검정색, 회색) → 중앙값 기반 색상 추출
+        print("   → 무채색: 중앙값 기반 색상 추출")
+        
+        # 중앙값 사용 (평균보다 outlier에 강함)
+        median_h = np.median(pixels_array[:, 0])
+        median_s = np.median(pixels_array[:, 1])
+        median_v = np.median(pixels_array[:, 2])
+        
+        print(f"   중앙값: H={median_h:.1f}, S={median_s:.1f}, V={median_v:.1f}")
+        
+        # 검정색/흰색 강화 판단
+        if median_v < 60:
+            # 검정색: V를 더 낮게, S를 0으로
+            print("   → 검정색 감지! V 강화")
+            return [0, 0, min(50, int(median_v))]
+        elif median_v > 200 and median_s < 40:
+            # 흰색: V를 255로, S를 0으로
+            print("   → 흰색 감지! V 강화")
+            return [0, 0, 255]
+        else:
+            # 회색: 중앙값 사용
+            return [int(median_h), int(median_s), int(median_v)]
     
     elif is_dark or is_bright:
         # 어두운/밝은 유채색 → 명도 정규화 적용
@@ -1117,6 +1136,18 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
                           brightness_filter=False, min_brightness=0, max_brightness=100,
                           saturation_filter=False, min_saturation=0):
     """🚀 확장된 색상 통계 추출 - 다중 색상 공간 + 고급 특징 + 명도 정규화 옵션"""
+    
+    # 🔥 마스크 경계 제거 (배경 픽셀 혼입 방지)
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+    eroded_mask = cv2.erode(mask.astype(np.uint8), kernel, iterations=1)
+    
+    # 마스크가 너무 작아지면 원본 사용
+    if np.sum(eroded_mask > 0) < 50:
+        eroded_mask = mask
+        print("   ⚠️ 마스크가 너무 작아 erosion 스킵")
+    else:
+        print(f"   ✂️ 마스크 경계 제거: {np.sum(mask > 0)} → {np.sum(eroded_mask > 0)} 픽셀")
+    
     # 다중 색상 공간 변환
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -1124,11 +1155,33 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
     yuv_image = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
     xyz_image = cv2.cvtColor(image, cv2.COLOR_BGR2XYZ)
 
-    pixels_hsv = hsv_image[mask > 0.5]
-    pixels_rgb = rgb_image[mask > 0.5]
-    pixels_lab = lab_image[mask > 0.5]
-    pixels_yuv = yuv_image[mask > 0.5]
-    pixels_xyz = xyz_image[mask > 0.5]
+    pixels_hsv = hsv_image[eroded_mask > 0.5]
+    pixels_rgb = rgb_image[eroded_mask > 0.5]
+    pixels_lab = lab_image[eroded_mask > 0.5]
+    pixels_yuv = yuv_image[eroded_mask > 0.5]
+    pixels_xyz = xyz_image[eroded_mask > 0.5]
+    
+    # 🔥 밝기 outlier 제거 (초크 반사광 + 어두운 그림자 제거)
+    if len(pixels_hsv) > 100:  # 충분한 픽셀이 있을 때만
+        v_values = pixels_hsv[:, 2]
+        v_median = np.median(v_values)
+        v_std = np.std(v_values)
+        
+        # 중앙값 ± 2σ 범위의 픽셀만 사용
+        v_min = max(0, v_median - 2 * v_std)
+        v_max = min(255, v_median + 2 * v_std)
+        
+        outlier_mask = (v_values >= v_min) & (v_values <= v_max)
+        
+        if np.sum(outlier_mask) > 50:  # 필터링 후에도 충분한 픽셀이 남아있으면
+            pixels_hsv = pixels_hsv[outlier_mask]
+            pixels_rgb = pixels_rgb[outlier_mask]
+            pixels_lab = pixels_lab[outlier_mask]
+            pixels_yuv = pixels_yuv[outlier_mask]
+            pixels_xyz = pixels_xyz[outlier_mask]
+            print(f"   🎯 밝기 outlier 제거: V 범위 [{v_min:.0f}, {v_max:.0f}], 남은 픽셀 {len(pixels_hsv)}개")
+        else:
+            print(f"   ⚠️ outlier 제거 후 픽셀 부족, 원본 사용")
     
     # 🎨 색상 품질 필터링 적용
     if len(pixels_hsv) > 0:
@@ -1180,11 +1233,10 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
             rgb_arr = cv2.cvtColor(hsv_arr, cv2.COLOR_HSV2RGB)[0][0]
             dominant_rgb = [int(rgb_arr[0]), int(rgb_arr[1]), int(rgb_arr[2])]
             
-            # RGB(0,0,0) 검증
-            if dominant_rgb == [0, 0, 0]:
-                print(f"⚠️ HSV={dominant_hsv} → RGB(0,0,0) 변환됨! pixels_hsv 길이: {len(pixels_hsv)}")
-                print(f"   원본 HSV 샘플: {pixels_hsv[:3].tolist() if len(pixels_hsv) >= 3 else pixels_hsv.tolist()}")
-                dominant_rgb = [128, 128, 128]  # 회색으로 대체
+            # 🔥 검정색은 유지! (기존 로직 제거)
+            # RGB(0,0,0)이 검정색 홀드의 정확한 색상일 수 있음
+            print(f"   ✅ HSV={dominant_hsv} → RGB={dominant_rgb}")
+            
         except Exception as e:
             print(f"⚠️ HSV→RGB 변환 오류: {e}, HSV={dominant_hsv}")
             dominant_rgb = [128, 128, 128]  # 회색으로 대체
@@ -1493,13 +1545,14 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
             )
             
             # 🚨 RGB(0,0,0) 검증 및 로그
-            if stats.get("dominant_rgb") == [0, 0, 0]:
-                print(f"🚨 경고! 홀드 {i}: RGB(0,0,0) 감지!")
-                print(f"   - 마스크 픽셀 수: {np.sum(mask_clean > 0)}")
-                print(f"   - dominant_hsv: {stats.get('dominant_hsv')}")
-                print(f"   - 건너뜀 또는 기본값 설정 필요")
+            # 🔥 검정색 RGB(0,0,0)은 유효한 색상! (검정 홀드)
+            if stats.get("dominant_rgb") == [0, 0, 0] and stats.get("dominant_hsv", [0, 0, 0])[2] > 60:
+                # HSV의 V값이 60 이상인데 RGB가 (0,0,0)이면 변환 오류
+                print(f"⚠️ 경고! 홀드 {i}: 변환 오류 감지 (HSV V={stats.get('dominant_hsv', [0, 0, 0])[2]} but RGB=0,0,0)")
                 stats["dominant_rgb"] = [128, 128, 128]  # 회색으로 대체
                 stats["dominant_hsv"] = [0, 0, 128]  # 회색 HSV
+            elif stats.get("dominant_rgb") == [0, 0, 0]:
+                print(f"⚫ 홀드 {i}: 검정색 감지! RGB(0,0,0) 유지")
 
             # contour 단순화 (JSON 크기 최적화)
             epsilon = 0.005 * cv2.arcLength(largest_contour, True)
