@@ -939,14 +939,14 @@ function App() {
       {/* 메인 컨텐츠 영역 */}
       <div className="w-full pt-24 pb-20 px-2 sm:px-4">
         {preview && (
-           <div className="relative mb-4 w-full max-w-[900px] mx-auto">
+           <div className="relative mb-4 w-full lg:max-w-[50%] lg:float-left lg:mr-6">
              <div className="relative w-full flex justify-center">
                <div className="relative" style={{ display: 'inline-block' }}>
                  <img 
                    ref={imageRef}
                    src={annotatedImage || preview} 
                    alt="Climbing Wall" 
-                   className={`max-h-[500px] object-contain rounded-2xl shadow-2xl border border-white/20 ${
+                   className={`max-h-[400px] lg:max-h-[600px] object-contain rounded-2xl shadow-2xl border border-white/20 ${
                      result ? 'cursor-pointer hover:opacity-90 transition-opacity' : ''
                    }`}
                    onClick={result ? handleImageClick : undefined}
@@ -1062,6 +1062,9 @@ function App() {
            </div>
          )}
 
+        {/* Float 클리어 (PC 레이아웃용) */}
+        <div className="clear-both"></div>
+
         {/* 메인 컨텐츠 */}
         {currentView === 'analyze' && (
           <>
@@ -1157,7 +1160,7 @@ function App() {
 
         {/* 결과 */}
         {result && (
-          <div className="w-full">
+          <div className="w-full lg:w-[48%] lg:float-right">
             {/* 통계 */}
             <div className="flex flex-row gap-4 mx-auto mb-6 w-full justify-center items-center">
               <div className="glass-card p-6 rounded-2xl text-center shadow-lg transition-all duration-300 flex-1 min-w-[80px] max-w-[120px] hover:translate-y-[-5px] hover:shadow-xl">
@@ -1483,7 +1486,7 @@ function App() {
 
          {/* 이미지 확대 모달 */}
          {showImageModal && (
-           <div className="fixed top-0 left-0 w-full h-full bg-black/90 flex items-center justify-center z-[1000] p-4" onClick={() => setShowImageModal(false)}>
+           <div className="fixed top-0 left-0 w-full h-full bg-black/90 flex items-center justify-center z-[1000] p-2 sm:p-4" onClick={() => setShowImageModal(false)}>
              <img 
                src={annotatedImage || preview} 
                alt="Climbing Wall - 확대보기" 
@@ -1491,7 +1494,7 @@ function App() {
                onClick={(e) => e.stopPropagation()}
              />
              <button 
-               className="absolute top-4 right-4 bg-white/90 border-none rounded-full w-10 h-10 text-2xl cursor-pointer flex items-center justify-center text-slate-800 transition-all duration-300 hover:bg-white hover:scale-110"
+               className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white/90 border-none rounded-full w-8 h-8 sm:w-10 sm:h-10 text-xl sm:text-2xl cursor-pointer flex items-center justify-center text-slate-800 transition-all duration-300 hover:bg-white hover:scale-110"
                onClick={() => setShowImageModal(false)}
              >
                ×
@@ -1501,8 +1504,8 @@ function App() {
 
          {/* 피드백 모달 */}
          {showFeedbackModal && selectedProblem && (
-           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000] p-4" onClick={() => setShowFeedbackModal(false)}>
-             <div className="glass-card p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000] p-2 sm:p-4" onClick={() => setShowFeedbackModal(false)}>
+             <div className="glass-card p-4 sm:p-6 max-w-md w-full max-h-[95vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                <h3 className="text-2xl font-extrabold gradient-text mb-4 text-center">
                  📝 피드백 제공하기
                </h3>
@@ -1619,8 +1622,8 @@ function App() {
 
          {/* 홀드 색상 피드백 모달 */}
          {showHoldFeedbackModal && selectedHold && (
-           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000] p-4" onClick={() => setShowHoldFeedbackModal(false)}>
-             <div className="glass-card p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000] p-2 sm:p-4" onClick={() => setShowHoldFeedbackModal(false)}>
+             <div className="glass-card p-4 sm:p-6 max-w-md w-full max-h-[95vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                <h3 className="text-2xl font-extrabold gradient-text mb-4 text-center">
                  🎨 홀드 색상 피드백
                </h3>
