@@ -322,30 +322,42 @@ def extract_color_features(color_data: Dict) -> np.ndarray:
     # 통계 특징 추가 (color_stats에서)
     color_stats = color_data.get('color_stats', {})
     
-    # HSV 통계
-    hsv_stats = color_stats.get('hsv_stats', {})
-    features.extend([
-        hsv_stats.get('mean', [0, 0, 0])[0],  # H 평균
-        hsv_stats.get('mean', [0, 0, 0])[1],  # S 평균
-        hsv_stats.get('mean', [0, 0, 0])[2],  # V 평균
-        hsv_stats.get('std', [0, 0, 0])[1],   # S 표준편차
-        hsv_stats.get('std', [0, 0, 0])[2],   # V 표준편차
-    ])
+    # HSV 통계 (리스트 형식)
+    hsv_stats = color_stats.get('hsv_stats', [])
+    if isinstance(hsv_stats, list) and len(hsv_stats) >= 12:
+        # [mean_h, mean_s, mean_v, std_h, std_s, std_v, min_h, min_s, min_v, max_h, max_s, max_v]
+        features.extend([
+            hsv_stats[0] if hsv_stats[0] else 0,  # H 평균
+            hsv_stats[1] if hsv_stats[1] else 0,  # S 평균
+            hsv_stats[2] if hsv_stats[2] else 0,  # V 평균
+            hsv_stats[4] if len(hsv_stats) > 4 else 0,  # S 표준편차
+            hsv_stats[5] if len(hsv_stats) > 5 else 0,  # V 표준편차
+        ])
+    else:
+        features.extend([0, 0, 0, 0, 0])
     
-    # RGB 통계
-    rgb_stats = color_stats.get('rgb_stats', {})
-    features.extend([
-        rgb_stats.get('std', [0, 0, 0])[0],   # R 표준편차
-        rgb_stats.get('std', [0, 0, 0])[1],   # G 표준편차
-        rgb_stats.get('std', [0, 0, 0])[2],   # B 표준편차
-    ])
+    # RGB 통계 (리스트 형식)
+    rgb_stats = color_stats.get('rgb_stats', [])
+    if isinstance(rgb_stats, list) and len(rgb_stats) >= 9:
+        # [mean_r, mean_g, mean_b, std_r, std_g, std_b, min_r, min_g, min_b, max_r, max_g, max_b]
+        features.extend([
+            rgb_stats[3] if len(rgb_stats) > 3 else 0,  # R 표준편차
+            rgb_stats[4] if len(rgb_stats) > 4 else 0,  # G 표준편차
+            rgb_stats[5] if len(rgb_stats) > 5 else 0,  # B 표준편차
+        ])
+    else:
+        features.extend([0, 0, 0])
     
-    # LAB 통계
-    lab_stats = color_stats.get('lab_stats', {})
-    features.extend([
-        lab_stats.get('mean', [0, 0, 0])[1],  # a 평균 (빨강-녹색)
-        lab_stats.get('mean', [0, 0, 0])[2],  # b 평균 (파랑-노랑)
-    ])
+    # LAB 통계 (리스트 형식)
+    lab_stats = color_stats.get('lab_stats', [])
+    if isinstance(lab_stats, list) and len(lab_stats) >= 6:
+        # [mean_l, mean_a, mean_b, std_l, std_a, std_b, min_l, min_a, min_b, max_l, max_a, max_b]
+        features.extend([
+            lab_stats[1] if len(lab_stats) > 1 else 0,  # a 평균 (빨강-녹색)
+            lab_stats[2] if len(lab_stats) > 2 else 0,  # b 평균 (파랑-노랑)
+        ])
+    else:
+        features.extend([0, 0])
     
     # 추가 특징
     features.extend([
