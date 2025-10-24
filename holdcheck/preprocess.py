@@ -1152,7 +1152,7 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
     else:
         print(f"   ✂️ 마스크 경계 제거: {np.sum(mask > 0)} → {np.sum(eroded_mask > 0)} 픽셀")
     
-    # 🔥 상대적 명도 보정: 주변 배경을 고려한 홀드 밝기 조정
+    # 🔥 지각적 색상 보정: 전체 이미지 밝기 분포를 고려한 상대적 색상 판단
     hold_region = image[eroded_mask > 0.5]
     
     if len(hold_region) > 50:
@@ -1160,50 +1160,66 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
         lab_region = cv2.cvtColor(image, cv2.COLOR_BGR2Lab)
         l_channel = lab_region[:, :, 0].copy()
         
-        # 1️⃣ 홀드 영역의 평균 명도
+        # 1️⃣ 전체 이미지의 명도 히스토그램 분석
+        global_l_values = l_channel.flatten()
+        global_l_mean = np.mean(global_l_values)
+        global_l_median = np.median(global_l_values)
+        global_l_p25 = np.percentile(global_l_values, 25)  # 하위 25%
+        global_l_p75 = np.percentile(global_l_values, 75)  # 상위 25%
+        
+        # 2️⃣ 홀드 영역의 평균 명도
         hold_l_values = l_channel[eroded_mask > 0.5]
         hold_l_mean = np.mean(hold_l_values)
+        hold_l_median = np.median(hold_l_values)
         hold_l_std = np.std(hold_l_values)
         
-        # 2️⃣ 홀드 주변 배경의 평균 명도 (dilate로 주변 영역 추출)
-        kernel_bg = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (15, 15))
-        dilated_mask = cv2.dilate(eroded_mask.astype(np.uint8), kernel_bg, iterations=1)
-        background_mask = (dilated_mask > 0) & (eroded_mask == 0)  # 주변 영역만
+        # 3️⃣ 홀드의 상대적 밝기 백분위 계산
+        hold_percentile = np.percentile(global_l_values, (hold_l_median / 255.0) * 100)
+        hold_rank = np.sum(global_l_values < hold_l_median) / len(global_l_values) * 100
         
-        if np.sum(background_mask) > 20:
-            bg_l_values = l_channel[background_mask]
-            bg_l_mean = np.mean(bg_l_values)
-        else:
-            # 주변 영역이 없으면 전체 이미지 평균 사용
-            bg_l_mean = np.mean(l_channel)
+        print(f"   🌍 전체 이미지: 평균={global_l_mean:.1f}, 중앙={global_l_median:.1f}, 25%={global_l_p25:.1f}, 75%={global_l_p75:.1f}")
+        print(f"   🎯 홀드: 평균={hold_l_mean:.1f}, 중앙={hold_l_median:.1f}, 백분위={hold_rank:.1f}%")
         
-        # 3️⃣ 상대적 밝기 계산
-        relative_brightness = hold_l_mean - bg_l_mean
-        
-        print(f"   💡 명도 분석: 홀드={hold_l_mean:.1f}, 배경={bg_l_mean:.1f}, 차이={relative_brightness:.1f}")
-        
-        # 4️⃣ 적응형 명도 보정
+        # 4️⃣ 지각적 색상 보정: 백분위 기반 매핑
         l_channel_corrected = l_channel.copy()
         
-        # 주변이 어두운데 홀드가 밝으면 → 더 밝게 (흰색 홀드)
-        # 주변이 밝은데 홀드가 어두우면 → 더 어둡게 (검정 홀드)
-        if bg_l_mean < 100:
-            # 배경이 어두움 → 홀드를 더 밝게
-            brightness_boost = (100 - bg_l_mean) * 0.5
-            target_mean = min(255, hold_l_mean + brightness_boost)
-            print(f"   🌟 어두운 배경 감지: 홀드 밝기 +{brightness_boost:.1f} (→ {target_mean:.1f})")
-        elif bg_l_mean > 180:
-            # 배경이 밝음 → 홀드를 상대적으로 어둡게
-            brightness_reduce = (bg_l_mean - 180) * 0.3
-            target_mean = max(0, hold_l_mean - brightness_reduce)
-            print(f"   🌙 밝은 배경 감지: 홀드 밝기 -{brightness_reduce:.1f} (→ {target_mean:.1f})")
+        # 전체 이미지의 밝기 분포를 고려한 적응형 보정
+        if hold_rank > 75:
+            # 상위 25% 밝기 → 흰색 계열
+            if global_l_mean > 150:
+                # 전체적으로 밝은 이미지 → 매우 밝게
+                target_mean = 220
+                print(f"   ⚪ 지각적 판단: 흰색 홀드 (상위 {hold_rank:.0f}%, 밝은 이미지)")
+            else:
+                # 보통 이미지 → 밝게
+                target_mean = 200
+                print(f"   ⚪ 지각적 판단: 밝은 회색/흰색 (상위 {hold_rank:.0f}%)")
+        elif hold_rank < 25:
+            # 하위 25% 밝기 → 검정 계열
+            if global_l_mean < 100:
+                # 전체적으로 어두운 이미지 → 매우 어둡게
+                target_mean = 40
+                print(f"   ⚫ 지각적 판단: 검정 홀드 (하위 {hold_rank:.0f}%, 어두운 이미지)")
+            else:
+                # 보통 이미지 → 어둡게
+                target_mean = 60
+                print(f"   ⚫ 지각적 판단: 어두운 회색/검정 (하위 {hold_rank:.0f}%)")
+        elif hold_rank > 60:
+            # 상위 40% → 밝은 편
+            target_mean = 170
+            print(f"   ◻️ 지각적 판단: 밝은 회색 (상위 {hold_rank:.0f}%)")
+        elif hold_rank < 40:
+            # 하위 40% → 어두운 편
+            target_mean = 90
+            print(f"   ◼️ 지각적 판단: 어두운 회색 (하위 {hold_rank:.0f}%)")
         else:
-            # 중간 범위 → 표준 정규화
+            # 중간 40~60% → 중간 회색
             target_mean = 128
+            print(f"   ⬜ 지각적 판단: 중간 회색 ({hold_rank:.0f}%)")
         
         # 5️⃣ 명도 정규화 + 표준편차 축소
         mask_indices = eroded_mask > 0.5
-        target_std = 35  # 표준편차 목표값
+        target_std = 30  # 표준편차 목표값 (더 타이트하게)
         
         l_channel_corrected[mask_indices] = np.clip(
             ((hold_l_values - hold_l_mean) / (hold_l_std + 1e-6)) * target_std + target_mean,
@@ -1215,7 +1231,7 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
         lab_corrected[:, :, 0] = l_channel_corrected
         image_normalized = cv2.cvtColor(lab_corrected, cv2.COLOR_Lab2BGR)
         
-        print(f"   ✅ 명도 보정 완료: {hold_l_mean:.1f} → {target_mean:.1f}, 표준편차 {hold_l_std:.1f} → {target_std}")
+        print(f"   ✅ 지각적 보정 완료: {hold_l_mean:.1f} → {target_mean:.1f}, 표준편차 {hold_l_std:.1f} → {target_std}")
     else:
         image_normalized = image
     
