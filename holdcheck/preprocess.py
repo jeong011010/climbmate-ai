@@ -93,44 +93,53 @@ def extract_color_with_clip_ai(image, mask):
     hold_image = image[y_min:y_max+1, x_min:x_max+1]
     hold_pil = Image.fromarray(cv2.cvtColor(hold_image, cv2.COLOR_BGR2RGB))
     
-    # 색상 프롬프트 정의 (검정색 우선, 주황색 강화)
+    # 🎨 색상 프롬프트 정의 (세분화 + 순서 최적화)
     color_prompts = [
-        "a black climbing hold", "a very dark black climbing hold", "a dark black climbing hold",  # 검정색 최우선
-        "a bright orange climbing hold",
-        "a dark orange climbing hold",
-        "an orange climbing hold",
-        "a bright yellow climbing hold",
-        "a yellow climbing hold",
-        "a light yellow climbing hold",
-        "a dark yellow climbing hold",
-        "a red climbing hold", 
-        "a dark red climbing hold",
-        "a blue climbing hold",
-        "a light blue climbing hold",
-        "a dark blue climbing hold",
-        "a green climbing hold",
-        "a light green climbing hold",
-        "a dark green climbing hold",
-        "a purple climbing hold",
-        "a pink climbing hold",
-        "a white climbing hold",
-        "a gray climbing hold",
-        "a brown climbing hold"
+        # 검정/흰색/회색 (무채색 우선)
+        "a black climbing hold", "a very dark black climbing hold",
+        "a white climbing hold", "a bright white climbing hold",
+        "a gray climbing hold", "a light gray climbing hold", "a dark gray climbing hold",
+        
+        # 주황색 (노란색과 명확히 구분)
+        "a bright orange climbing hold", "an orange climbing hold", "a dark orange climbing hold",
+        
+        # 노란색 (주황색과 구분)
+        "a bright yellow climbing hold", "a yellow climbing hold", "a light yellow climbing hold",
+        
+        # 빨간색
+        "a red climbing hold", "a bright red climbing hold", "a dark red climbing hold",
+        
+        # 초록색 계열 (연두/초록/민트 분리)
+        "a lime green climbing hold", "a light lime climbing hold",  # 연두색
+        "a green climbing hold", "a dark green climbing hold",  # 초록색
+        "a mint green climbing hold", "a turquoise climbing hold",  # 민트/청록
+        
+        # 파란색
+        "a blue climbing hold", "a bright blue climbing hold", "a dark blue climbing hold",
+        
+        # 보라/핑크
+        "a purple climbing hold", "a violet climbing hold",
+        "a pink climbing hold", "a magenta climbing hold",
+        
+        # 갈색
+        "a brown climbing hold", "a tan climbing hold"
     ]
     
-    # 색상 매핑 (검정색 우선)
+    # 색상 매핑 (CLIP 프롬프트 → 표준 색상 이름)
     color_map = {
-        "black": ["black", "very dark black", "dark black"],  # 검정색 최우선
+        "black": ["black", "very dark black"],
+        "white": ["white", "bright white"],
+        "gray": ["gray", "light gray", "dark gray"],
         "orange": ["orange", "bright orange", "dark orange"],
-        "yellow": ["yellow", "light yellow", "dark yellow", "bright yellow"],
-        "red": ["red", "dark red"],
-        "blue": ["blue", "light blue", "dark blue"],
-        "green": ["green", "light green", "dark green"],
-        "purple": ["purple"],
-        "pink": ["pink"],
-        "white": ["white"],
-        "gray": ["gray"],
-        "brown": ["brown"]
+        "yellow": ["yellow", "bright yellow", "light yellow"],
+        "red": ["red", "bright red", "dark red"],
+        "lime": ["lime green", "light lime"],  # 🔥 연두색 추가
+        "green": ["green", "dark green"],
+        "mint": ["mint green", "turquoise"],  # 🔥 민트 추가
+        "blue": ["blue", "bright blue", "dark blue"],
+        "purple": ["purple", "violet"],
+        "pink": ["pink", "magenta"],
+        "brown": ["brown", "tan"]
     }
     
     # 텍스트 특징 추출
@@ -295,37 +304,53 @@ def extract_colors_with_clip_ai_batch(hold_images, masks):
     print("   🔄 CLIP 모델 로딩 중... (한 번만!)")
     model, preprocess, device = get_clip_model()
     
-    # 색상 프롬프트 정의 (다양한 표현 유지)
+    # 🎨 색상 프롬프트 정의 (세분화 + 순서 최적화 - 배치용)
     color_prompts = [
-        "a black climbing hold", "a very dark black climbing hold", "a dark black climbing hold",
-        "a white climbing hold", "a bright white climbing hold", "a pure white climbing hold",
+        # 검정/흰색/회색 (무채색 우선)
+        "a black climbing hold", "a very dark black climbing hold",
+        "a white climbing hold", "a bright white climbing hold",
         "a gray climbing hold", "a light gray climbing hold", "a dark gray climbing hold",
-        "an orange climbing hold", "a bright orange climbing hold", "a dark orange climbing hold",
-        "a yellow climbing hold", "a bright yellow climbing hold", "a lemon yellow climbing hold", "a golden yellow climbing hold",
+        
+        # 주황색 (노란색과 명확히 구분)
+        "a bright orange climbing hold", "an orange climbing hold", "a dark orange climbing hold",
+        
+        # 노란색 (주황색과 구분)
+        "a bright yellow climbing hold", "a yellow climbing hold", "a light yellow climbing hold",
+        
+        # 빨간색
         "a red climbing hold", "a bright red climbing hold", "a dark red climbing hold",
-        "a pink climbing hold", "a hot pink climbing hold",
-        "a blue climbing hold", "a light blue climbing hold", "a sky blue climbing hold",
-        "a green climbing hold", "a bright green climbing hold", "a forest green climbing hold",
-        "a mint climbing hold", "a mint green climbing hold", "a turquoise mint climbing hold",
-        "a lime climbing hold", "a lime green climbing hold", "a neon lime climbing hold",
-        "a purple climbing hold", "a bright purple climbing hold", "a violet climbing hold",
-        "a brown climbing hold", "a dark brown climbing hold"
+        
+        # 초록색 계열 (연두/초록/민트 분리)
+        "a lime green climbing hold", "a light lime climbing hold",  # 연두색
+        "a green climbing hold", "a dark green climbing hold",  # 초록색
+        "a mint green climbing hold", "a turquoise climbing hold",  # 민트/청록
+        
+        # 파란색
+        "a blue climbing hold", "a bright blue climbing hold", "a dark blue climbing hold",
+        
+        # 보라/핑크
+        "a purple climbing hold", "a violet climbing hold",
+        "a pink climbing hold", "a magenta climbing hold",
+        
+        # 갈색
+        "a brown climbing hold", "a tan climbing hold"
     ]
     
+    # 색상 매핑 (CLIP 프롬프트 → 표준 색상 이름)
     color_map = {
-        "black": ["black", "very dark black", "dark black"],
-        "white": ["white", "bright white", "pure white"],
+        "black": ["black", "very dark black"],
+        "white": ["white", "bright white"],
         "gray": ["gray", "light gray", "dark gray"],
         "orange": ["orange", "bright orange", "dark orange"],
-        "yellow": ["yellow", "bright yellow", "lemon", "golden"],
+        "yellow": ["yellow", "bright yellow", "light yellow"],
         "red": ["red", "bright red", "dark red"],
-        "pink": ["pink", "hot pink"],
-        "blue": ["blue", "light blue", "sky blue"],
-        "green": ["green", "bright green", "forest"],
-        "mint": ["mint", "mint green", "turquoise mint"],
-        "lime": ["lime", "lime green", "neon lime"],
-        "purple": ["purple", "bright purple", "violet"],
-        "brown": ["brown", "dark brown"]
+        "lime": ["lime green", "light lime"],  # 🔥 연두색
+        "green": ["green", "dark green"],
+        "mint": ["mint green", "turquoise"],  # 🔥 민트
+        "blue": ["blue", "bright blue", "dark blue"],
+        "purple": ["purple", "violet"],
+        "pink": ["pink", "magenta"],
+        "brown": ["brown", "tan"]
     }
     
     # 텍스트 특징 추출 (한 번만)
@@ -1183,39 +1208,20 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
         # 4️⃣ 지각적 색상 보정: 백분위 기반 매핑
         l_channel_corrected = l_channel.copy()
         
-        # 전체 이미지의 밝기 분포를 고려한 적응형 보정
-        if hold_rank > 75:
-            # 상위 25% 밝기 → 흰색 계열
-            if global_l_mean > 150:
-                # 전체적으로 밝은 이미지 → 매우 밝게
-                target_mean = 220
-                print(f"   ⚪ 지각적 판단: 흰색 홀드 (상위 {hold_rank:.0f}%, 밝은 이미지)")
-            else:
-                # 보통 이미지 → 밝게
-                target_mean = 200
-                print(f"   ⚪ 지각적 판단: 밝은 회색/흰색 (상위 {hold_rank:.0f}%)")
-        elif hold_rank < 25:
-            # 하위 25% 밝기 → 검정 계열
-            if global_l_mean < 100:
-                # 전체적으로 어두운 이미지 → 매우 어둡게
-                target_mean = 40
-                print(f"   ⚫ 지각적 판단: 검정 홀드 (하위 {hold_rank:.0f}%, 어두운 이미지)")
-            else:
-                # 보통 이미지 → 어둡게
-                target_mean = 60
-                print(f"   ⚫ 지각적 판단: 어두운 회색/검정 (하위 {hold_rank:.0f}%)")
-        elif hold_rank > 60:
-            # 상위 40% → 밝은 편
-            target_mean = 170
-            print(f"   ◻️ 지각적 판단: 밝은 회색 (상위 {hold_rank:.0f}%)")
-        elif hold_rank < 40:
-            # 하위 40% → 어두운 편
-            target_mean = 90
-            print(f"   ◼️ 지각적 판단: 어두운 회색 (하위 {hold_rank:.0f}%)")
+        # 🔥 CLIP AI 사용 시 명도 보정 최소화 (원본 색상 보존)
+        # 극단적인 경우만 약하게 보정
+        if hold_rank > 90:
+            # 상위 10% 밝기 → 약간만 밝게
+            target_mean = min(200, hold_l_mean + 20)
+            print(f"   ⚪ 지각적 판단: 매우 밝음 (상위 {hold_rank:.0f}%) → 약한 보정")
+        elif hold_rank < 10:
+            # 하위 10% 밝기 → 약간만 어둡게
+            target_mean = max(60, hold_l_mean - 20)
+            print(f"   ⚫ 지각적 판단: 매우 어두움 (하위 {hold_rank:.0f}%) → 약한 보정")
         else:
-            # 중간 40~60% → 중간 회색
-            target_mean = 128
-            print(f"   ⬜ 지각적 판단: 중간 회색 ({hold_rank:.0f}%)")
+            # 나머지는 원본 유지
+            target_mean = hold_l_mean
+            print(f"   ✨ 원본 명도 유지: {hold_l_mean:.1f} (백분위 {hold_rank:.0f}%)")
         
         # 5️⃣ 명도 정규화 + 표준편차 축소
         mask_indices = eroded_mask > 0.5
