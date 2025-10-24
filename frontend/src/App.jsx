@@ -828,34 +828,34 @@ function App() {
                        preserveAspectRatio="xMidYMid meet"
                      >
                        {selectedProblem.holds?.map((hold, idx) => {
-                         if (!hold.bbox || hold.bbox.length !== 4) {
-                           console.log('Hold missing bbox:', hold)
+                         if (!hold.contour || hold.contour.length === 0) {
+                           console.log('Hold missing contour:', hold)
                            return null
                          }
-                         const [x1, y1, x2, y2] = hold.bbox
+                         
                          const isSelectedHold = selectedHold && 
                            selectedHold.center && hold.center &&
                            selectedHold.center[0] === hold.center[0] && 
                            selectedHold.center[1] === hold.center[1]
                          
+                         // contour를 SVG polygon path로 변환
+                         const points = hold.contour.map(pt => `${pt[0]},${pt[1]}`).join(' ')
+                         
                          console.log(`Hold ${idx}:`, {
-                           bbox: [x1, y1, x2, y2],
+                           contour: hold.contour.length + ' points',
                            center: hold.center,
                            isSelected: isSelectedHold
                          })
                          
                          return (
                            <g key={idx}>
-                             {/* 홀드 바운딩 박스 */}
-                             <rect
-                               x={x1}
-                               y={y1}
-                               width={x2 - x1}
-                               height={y2 - y1}
+                             {/* 세그먼테이션 윤곽선 */}
+                             <polygon
+                               points={points}
                                fill="none"
                                stroke={isSelectedHold ? "#FFD700" : "#00FF00"}
-                               strokeWidth={isSelectedHold ? "6" : "3"}
-                               strokeDasharray={isSelectedHold ? "8,4" : "none"}
+                               strokeWidth={isSelectedHold ? "4" : "2"}
+                               strokeDasharray={isSelectedHold ? "6,3" : "none"}
                                opacity="0.8"
                              >
                                {isSelectedHold && (
@@ -866,21 +866,21 @@ function App() {
                                    repeatCount="indefinite"
                                  />
                                )}
-                             </rect>
+                             </polygon>
                              
                              {/* 홀드 중심점 */}
                              {hold.center && (
                                <circle
                                  cx={hold.center[0]}
                                  cy={hold.center[1]}
-                                 r={isSelectedHold ? "10" : "6"}
+                                 r={isSelectedHold ? "8" : "5"}
                                  fill={isSelectedHold ? "#FFD700" : "#00FF00"}
                                  opacity="0.9"
                                >
                                  {isSelectedHold && (
                                    <animate
                                      attributeName="r"
-                                     values="10;14;10"
+                                     values="8;12;8"
                                      dur="1s"
                                      repeatCount="indefinite"
                                    />
@@ -1047,11 +1047,24 @@ function App() {
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md">
                     <h4 className="text-xs mb-2 text-slate-600 font-semibold text-center">💎 홀드 실제 색상</h4>
-                    <div className="flex flex-col items-center justify-center gap-1">
-                      <span className="text-3xl">{colorEmoji[selectedHold.individual_color] || '⭕'}</span>
-                      <span className="text-sm font-bold text-slate-800">{(selectedHold.individual_color || 'UNKNOWN').toUpperCase()}</span>
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      {/* 실제 RGB 색상 원형 표시 */}
+                      <div 
+                        className="w-16 h-16 rounded-full shadow-lg border-4 border-white"
+                        style={{
+                          backgroundColor: selectedHold.rgb ? 
+                            `rgb(${selectedHold.rgb[0]}, ${selectedHold.rgb[1]}, ${selectedHold.rgb[2]})` : 
+                            '#808080'
+                        }}
+                      />
+                      <div className="text-xs font-mono text-slate-600 text-center">
+                        {selectedHold.rgb ? 
+                          `RGB(${selectedHold.rgb[0]}, ${selectedHold.rgb[1]}, ${selectedHold.rgb[2]})` : 
+                          'N/A'}
+                      </div>
+                      <span className="text-xs font-bold text-slate-800">{(selectedHold.individual_color || 'UNKNOWN').toUpperCase()}</span>
                     </div>
-                    <p className="text-xs text-slate-500 text-center mt-2">AI 감지 색상</p>
+                    <p className="text-xs text-slate-500 text-center mt-1">AI 감지 색상</p>
                   </div>
                   
                   <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md">
@@ -1060,6 +1073,11 @@ function App() {
                       <div className="font-mono">X: {selectedHold.center ? Math.round(selectedHold.center[0]) : 'N/A'}</div>
                       <div className="font-mono">Y: {selectedHold.center ? Math.round(selectedHold.center[1]) : 'N/A'}</div>
                     </div>
+                    {selectedHold.hsv && (
+                      <div className="text-xs font-mono text-slate-600 text-center mt-2">
+                        HSV({selectedHold.hsv[0]}, {selectedHold.hsv[1]}, {selectedHold.hsv[2]})
+                      </div>
+                    )}
                   </div>
                 </div>
                  
@@ -1478,15 +1496,28 @@ function App() {
                    </div>
                  </div>
                  
-                 <div className="p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl border-2 border-blue-200">
-                   <div className="text-center">
-                     <p className="text-xs text-slate-600 mb-2">AI가 감지한 홀드 실제 색상</p>
-                     <div className="flex items-center justify-center gap-2">
-                       <span className="text-4xl">{colorEmoji[selectedHold.individual_color] || '⭕'}</span>
-                       <span className="text-xl font-bold gradient-text">{(selectedHold.individual_color || 'UNKNOWN').toUpperCase()}</span>
-                     </div>
-                   </div>
-                 </div>
+                <div className="p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl border-2 border-blue-200">
+                  <div className="text-center">
+                    <p className="text-xs text-slate-600 mb-3">AI가 감지한 홀드 실제 색상</p>
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      {/* 실제 RGB 색상 원형 표시 */}
+                      <div 
+                        className="w-20 h-20 rounded-full shadow-lg border-4 border-white"
+                        style={{
+                          backgroundColor: selectedHold.rgb ? 
+                            `rgb(${selectedHold.rgb[0]}, ${selectedHold.rgb[1]}, ${selectedHold.rgb[2]})` : 
+                            '#808080'
+                        }}
+                      />
+                      <div className="text-xs font-mono text-slate-600">
+                        {selectedHold.rgb ? 
+                          `RGB(${selectedHold.rgb[0]}, ${selectedHold.rgb[1]}, ${selectedHold.rgb[2]})` : 
+                          'N/A'}
+                      </div>
+                      <span className="text-sm font-bold gradient-text">{(selectedHold.individual_color || 'UNKNOWN').toUpperCase()}</span>
+                    </div>
+                  </div>
+                </div>
                </div>
 
                {/* 실제 색상 선택 */}
