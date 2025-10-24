@@ -30,9 +30,13 @@ function App() {
   // 새로운 상태들
   const [analysisHistory, setAnalysisHistory] = useState([])
   const [favorites, setFavorites] = useState([])
-  const [currentView, setCurrentView] = useState('analyze') // 'analyze', 'history', 'favorites', 'stats'
+  const [currentView, setCurrentView] = useState('analyze') // 'analyze', 'history', 'favorites', 'stats', 'feedbacks'
   const [compareMode, setCompareMode] = useState(false)
   const [selectedForCompare, setSelectedForCompare] = useState([])
+  
+  // 피드백 관리 상태
+  const [colorFeedbacks, setColorFeedbacks] = useState([])
+  const [feedbacksLoading, setFeedbacksLoading] = useState(false)
   
   // Ref
   const imageRef = useRef(null)
@@ -46,6 +50,37 @@ function App() {
     } catch {
       // API가 없으면 무시 (선택적 기능)
       console.log('통계 API 사용 불가 (정상)')
+    }
+  }
+
+  // 🎨 색상 피드백 목록 로드
+  const loadColorFeedbacks = async () => {
+    setFeedbacksLoading(true)
+    try {
+      const response = await axios.get(`${API_URL}/api/color-feedbacks`)
+      setColorFeedbacks(response.data.feedbacks || [])
+      console.log(`✅ 피드백 ${response.data.count}개 로드 완료`)
+    } catch (error) {
+      console.error('피드백 로드 실패:', error)
+      alert('피드백 목록을 불러오는데 실패했습니다.')
+    } finally {
+      setFeedbacksLoading(false)
+    }
+  }
+
+  // 🎨 색상 피드백 삭제
+  const deleteFeedback = async (feedbackId) => {
+    if (!confirm('이 피드백을 삭제하시겠습니까?')) {
+      return
+    }
+
+    try {
+      await axios.delete(`${API_URL}/api/color-feedbacks/${feedbackId}`)
+      alert('피드백이 삭제되었습니다.')
+      loadColorFeedbacks() // 목록 새로고침
+    } catch (error) {
+      console.error('피드백 삭제 실패:', error)
+      alert('피드백 삭제에 실패했습니다.')
     }
   }
 
@@ -529,6 +564,102 @@ function App() {
     red: '🔴', orange: '🟠', yellow: '🟡',
     green: '🟢', blue: '🔵', purple: '🟣',
     pink: '🩷', brown: '🟤', mint: '💚', lime: '🍃'
+  }
+
+  // 🎨 피드백 관리 뷰 컴포넌트
+  const FeedbacksView = () => {
+    // 피드백 로드 (처음 진입 시)
+    useEffect(() => {
+      loadColorFeedbacks()
+    }, [])
+
+    return (
+      <div className="w-full px-2 sm:px-4">
+        <div className="glass-card p-4 sm:p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-800">🎨 색상 피드백 관리</h2>
+            <button
+              onClick={loadColorFeedbacks}
+              className="px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all"
+            >
+              🔄 새로고침
+            </button>
+          </div>
+
+          {feedbacksLoading ? (
+            <p className="text-slate-600 text-center py-8">피드백 로딩 중...</p>
+          ) : colorFeedbacks.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-slate-600 mb-4">아직 피드백이 없습니다.</p>
+              <p className="text-slate-500 text-sm">홀드를 클릭하고 색상 피드백을 제출해보세요!</p>
+            </div>
+          ) : (
+            <>
+              <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-sm text-blue-800">
+                  📊 총 <span className="font-bold text-lg">{colorFeedbacks.length}</span>개의 피드백
+                  {colorFeedbacks.length >= 30 && (
+                    <span className="ml-2 text-green-600 font-semibold">
+                      ✅ ML 학습 가능! (30개 이상)
+                    </span>
+                  )}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {colorFeedbacks.map((feedback) => (
+                  <div key={feedback.id} className="glass-card p-4 hover:shadow-xl transition-all">
+                    {/* AI 예측 vs 사용자 정답 */}
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-8 h-8 rounded-full border-2 border-slate-300"
+                          style={{
+                            backgroundColor: `rgb(${feedback.rgb[0]}, ${feedback.rgb[1]}, ${feedback.rgb[2]})`
+                          }}
+                        />
+                        <span className="text-xs font-mono text-slate-600">
+                          RGB({feedback.rgb[0]},{feedback.rgb[1]},{feedback.rgb[2]})
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* AI 예측 */}
+                    <div className="mb-2 p-2 bg-red-50 rounded-lg border border-red-200">
+                      <p className="text-xs text-red-600 mb-1">AI 예측 ❌</p>
+                      <p className="font-bold text-red-800">{(feedback.predicted_color || 'unknown').toUpperCase()}</p>
+                    </div>
+
+                    {/* 사용자 정답 */}
+                    <div className="mb-3 p-2 bg-green-50 rounded-lg border border-green-200">
+                      <p className="text-xs text-green-600 mb-1">사용자 정답 ✅</p>
+                      <p className="font-bold text-green-800">{(feedback.user_correct_color || 'unknown').toUpperCase()}</p>
+                    </div>
+
+                    {/* 상세 정보 */}
+                    <div className="text-xs text-slate-500 mb-3 space-y-1">
+                      <p>📍 위치: ({Math.round(feedback.center[0])}, {Math.round(feedback.center[1])})</p>
+                      <p>🎨 HSV: ({Math.round(feedback.hsv[0])}, {Math.round(feedback.hsv[1])}, {Math.round(feedback.hsv[2])})</p>
+                      <p>🕐 {new Date(feedback.created_at).toLocaleString('ko-KR')}</p>
+                    </div>
+
+                    {/* 액션 버튼 */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => deleteFeedback(feedback.id)}
+                        className="flex-1 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all text-sm"
+                      >
+                        🗑️ 삭제
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    )
   }
 
   // 히스토리 뷰 컴포넌트
@@ -1348,6 +1479,9 @@ function App() {
 
         {/* 통계 뷰 */}
         {currentView === 'stats' && <StatsView />}
+        
+        {/* 피드백 관리 뷰 */}
+        {currentView === 'feedbacks' && <FeedbacksView />}
 
         {/* 비교 뷰 */}
         {compareMode && <CompareView />}
@@ -1686,6 +1820,19 @@ function App() {
             >
               <span className="text-2xl mb-1">📊</span>
               <span className="text-xs font-medium">통계</span>
+            </button>
+            
+            {/* 피드백 탭 */}
+            <button
+              onClick={() => setCurrentView('feedbacks')}
+              className={`flex flex-col items-center justify-center py-3 transition-all ${
+                currentView === 'feedbacks'
+                  ? 'text-blue-600'
+                  : 'text-slate-600 hover:text-blue-500'
+              }`}
+            >
+              <span className="text-2xl mb-1">🎨</span>
+              <span className="text-xs font-medium">피드백</span>
             </button>
           </div>
         </div>

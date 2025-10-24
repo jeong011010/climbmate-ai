@@ -402,6 +402,55 @@ def get_color_training_data(min_samples: int = 10) -> List[Dict]:
     print(f"✅ 색상 학습 데이터 {len(training_data)}건 로드")
     return training_data
 
+def get_all_color_feedbacks() -> List[Dict]:
+    """🎨 모든 홀드 색상 피드백 가져오기 (관리용)"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT 
+            id, problem_id, hold_id,
+            center_x, center_y,
+            rgb_r, rgb_g, rgb_b,
+            hsv_h, hsv_s, hsv_v,
+            predicted_color, user_correct_color,
+            created_at
+        FROM hold_color_feedback
+        ORDER BY created_at DESC
+    """)
+    
+    rows = cursor.fetchall()
+    conn.close()
+    
+    feedbacks = []
+    for row in rows:
+        feedbacks.append({
+            'id': row[0],
+            'problem_id': row[1],
+            'hold_id': row[2],
+            'center': [row[3], row[4]],
+            'rgb': [row[5], row[6], row[7]],
+            'hsv': [row[8], row[9], row[10]],
+            'predicted_color': row[11],
+            'user_correct_color': row[12],
+            'created_at': row[13]
+        })
+    
+    return feedbacks
+
+def delete_color_feedback(feedback_id: int):
+    """🎨 색상 피드백 삭제"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute("DELETE FROM hold_color_feedback WHERE id = ?", (feedback_id,))
+    
+    conn.commit()
+    conn.close()
+    
+    print(f"✅ 피드백 ID {feedback_id} 삭제 완료")
+    return True
+
 def calculate_statistics(holds_data: List[Dict]) -> Dict:
     """홀드 데이터로부터 통계 계산"""
     if not holds_data:
