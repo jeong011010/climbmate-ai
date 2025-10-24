@@ -458,6 +458,8 @@ function App() {
       setSelectedProblem(closestProblem)
     }
   }
+
+  const colorEmoji = {
     black: '⚫', white: '⚪', gray: '🔘',
     red: '🔴', orange: '🟠', yellow: '🟡',
     green: '🟢', blue: '🔵', purple: '🟣',
