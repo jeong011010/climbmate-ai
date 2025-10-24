@@ -2,6 +2,7 @@ from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
+from typing import Optional, Dict, List, Any
 import asyncio
 import json
 import cv2
@@ -63,8 +64,8 @@ class HoldColorFeedbackRequest(BaseModel):
     hold_id: str
     predicted_color: str
     user_color: str
-    hold_center: list = None
-    hold_features: dict = None  # 홀드의 전체 색상 특징 데이터
+    hold_center: Optional[List[float]] = None
+    hold_features: Optional[Dict[str, Any]] = None  # 홀드의 전체 색상 특징 데이터
 
 app = FastAPI(title="ClimbMate API", version="1.0.0")
 
