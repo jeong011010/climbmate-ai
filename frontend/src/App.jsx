@@ -405,11 +405,23 @@ function App() {
   const handleImageClick = (e) => {
     if (!result || !result.problems) return
     
+    e.preventDefault() // 기본 동작 방지
+    
     const rect = e.target.getBoundingClientRect()
     
     // 터치 이벤트와 마우스 이벤트 모두 지원
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY
+    // onTouchEnd에서는 e.touches가 비어있으므로 e.changedTouches 사용
+    let clientX, clientY
+    if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX
+      clientY = e.touches[0].clientY
+    } else if (e.changedTouches && e.changedTouches.length > 0) {
+      clientX = e.changedTouches[0].clientX
+      clientY = e.changedTouches[0].clientY
+    } else {
+      clientX = e.clientX
+      clientY = e.clientY
+    }
     
     const x = clientX - rect.left
     const y = clientY - rect.top
@@ -423,8 +435,6 @@ function App() {
     const realX = x * scaleX
     const realY = y * scaleY
     
-    console.log('🖱️ 클릭 위치:', { x: realX, y: realY })
-    
     // 클릭 위치에서 가장 가까운 홀드 찾기
     let closestProblem = null
     let minDistance = Infinity
@@ -437,8 +447,6 @@ function App() {
         const holdY = hold.center[1]
         const distance = Math.sqrt(Math.pow(realX - holdX, 2) + Math.pow(realY - holdY, 2))
         
-        console.log(`홀드 ${hold.id} (${problem.color_name}):`, { x: holdX, y: holdY, distance })
-        
         if (distance < minDistance && distance < 150) { // 150px 반경 내
           minDistance = distance
           closestProblem = problem
@@ -447,14 +455,9 @@ function App() {
     })
     
     if (closestProblem) {
-      console.log('✅ 선택된 문제:', closestProblem.color_name)
       setSelectedProblem(closestProblem)
-    } else {
-      console.log('❌ 가까운 홀드 없음')
     }
   }
-
-  const colorEmoji = {
     black: '⚫', white: '⚪', gray: '🔘',
     red: '🔴', orange: '🟠', yellow: '🟡',
     green: '🟢', blue: '🔵', purple: '🟣',
