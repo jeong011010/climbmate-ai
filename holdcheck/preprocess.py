@@ -1152,12 +1152,49 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
     else:
         print(f"   ✂️ 마스크 경계 제거: {np.sum(mask > 0)} → {np.sum(eroded_mask > 0)} 픽셀")
     
-    # 다중 색상 공간 변환
-    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    lab_image = cv2.cvtColor(image, cv2.COLOR_BGR2Lab)
-    yuv_image = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
-    xyz_image = cv2.cvtColor(image, cv2.COLOR_BGR2XYZ)
+    # 🔥 명암 정규화: 홀드 영역만 추출해서 조명 영향 제거
+    hold_region = image[eroded_mask > 0.5]
+    
+    if len(hold_region) > 50:
+        # LAB 색공간에서 명도 정규화
+        lab_region = cv2.cvtColor(image, cv2.COLOR_BGR2Lab)
+        l_channel = lab_region[:, :, 0].copy()
+        
+        # 홀드 영역의 명도만 정규화
+        hold_l_values = l_channel[eroded_mask > 0.5]
+        l_mean = np.mean(hold_l_values)
+        l_std = np.std(hold_l_values)
+        
+        if l_std > 5:  # 명도 편차가 있으면 정규화
+            # 명도를 평균 128로 정규화 (0~255 범위에서 중간값)
+            target_mean = 128
+            l_channel_normalized = l_channel.copy()
+            
+            # 홀드 영역만 정규화
+            mask_indices = eroded_mask > 0.5
+            l_channel_normalized[mask_indices] = np.clip(
+                ((hold_l_values - l_mean) / (l_std + 1e-6)) * 40 + target_mean,
+                0, 255
+            ).astype(np.uint8)
+            
+            # 정규화된 L 채널로 이미지 재구성
+            lab_normalized = lab_region.copy()
+            lab_normalized[:, :, 0] = l_channel_normalized
+            image_normalized = cv2.cvtColor(lab_normalized, cv2.COLOR_Lab2BGR)
+            
+            print(f"   💡 명도 정규화: 평균 {l_mean:.1f} → {target_mean}, 표준편차 {l_std:.1f} → 40")
+        else:
+            image_normalized = image
+            print(f"   💡 명도 편차 작음 ({l_std:.1f}), 정규화 스킵")
+    else:
+        image_normalized = image
+    
+    # 다중 색상 공간 변환 (정규화된 이미지 사용)
+    hsv_image = cv2.cvtColor(image_normalized, cv2.COLOR_BGR2HSV)
+    rgb_image = cv2.cvtColor(image_normalized, cv2.COLOR_BGR2RGB)
+    lab_image = cv2.cvtColor(image_normalized, cv2.COLOR_BGR2Lab)
+    yuv_image = cv2.cvtColor(image_normalized, cv2.COLOR_BGR2YUV)
+    xyz_image = cv2.cvtColor(image_normalized, cv2.COLOR_BGR2XYZ)
 
     pixels_hsv = hsv_image[eroded_mask > 0.5]
     pixels_rgb = rgb_image[eroded_mask > 0.5]
