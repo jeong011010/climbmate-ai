@@ -1152,40 +1152,70 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
     else:
         print(f"   ✂️ 마스크 경계 제거: {np.sum(mask > 0)} → {np.sum(eroded_mask > 0)} 픽셀")
     
-    # 🔥 명암 정규화: 홀드 영역만 추출해서 조명 영향 제거
+    # 🔥 상대적 명도 보정: 주변 배경을 고려한 홀드 밝기 조정
     hold_region = image[eroded_mask > 0.5]
     
     if len(hold_region) > 50:
-        # LAB 색공간에서 명도 정규화
+        # LAB 색공간에서 명도 분석
         lab_region = cv2.cvtColor(image, cv2.COLOR_BGR2Lab)
         l_channel = lab_region[:, :, 0].copy()
         
-        # 홀드 영역의 명도만 정규화
+        # 1️⃣ 홀드 영역의 평균 명도
         hold_l_values = l_channel[eroded_mask > 0.5]
-        l_mean = np.mean(hold_l_values)
-        l_std = np.std(hold_l_values)
+        hold_l_mean = np.mean(hold_l_values)
+        hold_l_std = np.std(hold_l_values)
         
-        if l_std > 5:  # 명도 편차가 있으면 정규화
-            # 명도를 평균 128로 정규화 (0~255 범위에서 중간값)
-            target_mean = 128
-            l_channel_normalized = l_channel.copy()
-            
-            # 홀드 영역만 정규화
-            mask_indices = eroded_mask > 0.5
-            l_channel_normalized[mask_indices] = np.clip(
-                ((hold_l_values - l_mean) / (l_std + 1e-6)) * 40 + target_mean,
-                0, 255
-            ).astype(np.uint8)
-            
-            # 정규화된 L 채널로 이미지 재구성
-            lab_normalized = lab_region.copy()
-            lab_normalized[:, :, 0] = l_channel_normalized
-            image_normalized = cv2.cvtColor(lab_normalized, cv2.COLOR_Lab2BGR)
-            
-            print(f"   💡 명도 정규화: 평균 {l_mean:.1f} → {target_mean}, 표준편차 {l_std:.1f} → 40")
+        # 2️⃣ 홀드 주변 배경의 평균 명도 (dilate로 주변 영역 추출)
+        kernel_bg = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (15, 15))
+        dilated_mask = cv2.dilate(eroded_mask.astype(np.uint8), kernel_bg, iterations=1)
+        background_mask = (dilated_mask > 0) & (eroded_mask == 0)  # 주변 영역만
+        
+        if np.sum(background_mask) > 20:
+            bg_l_values = l_channel[background_mask]
+            bg_l_mean = np.mean(bg_l_values)
         else:
-            image_normalized = image
-            print(f"   💡 명도 편차 작음 ({l_std:.1f}), 정규화 스킵")
+            # 주변 영역이 없으면 전체 이미지 평균 사용
+            bg_l_mean = np.mean(l_channel)
+        
+        # 3️⃣ 상대적 밝기 계산
+        relative_brightness = hold_l_mean - bg_l_mean
+        
+        print(f"   💡 명도 분석: 홀드={hold_l_mean:.1f}, 배경={bg_l_mean:.1f}, 차이={relative_brightness:.1f}")
+        
+        # 4️⃣ 적응형 명도 보정
+        l_channel_corrected = l_channel.copy()
+        
+        # 주변이 어두운데 홀드가 밝으면 → 더 밝게 (흰색 홀드)
+        # 주변이 밝은데 홀드가 어두우면 → 더 어둡게 (검정 홀드)
+        if bg_l_mean < 100:
+            # 배경이 어두움 → 홀드를 더 밝게
+            brightness_boost = (100 - bg_l_mean) * 0.5
+            target_mean = min(255, hold_l_mean + brightness_boost)
+            print(f"   🌟 어두운 배경 감지: 홀드 밝기 +{brightness_boost:.1f} (→ {target_mean:.1f})")
+        elif bg_l_mean > 180:
+            # 배경이 밝음 → 홀드를 상대적으로 어둡게
+            brightness_reduce = (bg_l_mean - 180) * 0.3
+            target_mean = max(0, hold_l_mean - brightness_reduce)
+            print(f"   🌙 밝은 배경 감지: 홀드 밝기 -{brightness_reduce:.1f} (→ {target_mean:.1f})")
+        else:
+            # 중간 범위 → 표준 정규화
+            target_mean = 128
+        
+        # 5️⃣ 명도 정규화 + 표준편차 축소
+        mask_indices = eroded_mask > 0.5
+        target_std = 35  # 표준편차 목표값
+        
+        l_channel_corrected[mask_indices] = np.clip(
+            ((hold_l_values - hold_l_mean) / (hold_l_std + 1e-6)) * target_std + target_mean,
+            0, 255
+        ).astype(np.uint8)
+        
+        # 6️⃣ 정규화된 L 채널로 이미지 재구성
+        lab_corrected = lab_region.copy()
+        lab_corrected[:, :, 0] = l_channel_corrected
+        image_normalized = cv2.cvtColor(lab_corrected, cv2.COLOR_Lab2BGR)
+        
+        print(f"   ✅ 명도 보정 완료: {hold_l_mean:.1f} → {target_mean:.1f}, 표준편차 {hold_l_std:.1f} → {target_std}")
     else:
         image_normalized = image
     
