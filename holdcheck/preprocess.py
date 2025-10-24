@@ -832,17 +832,22 @@ def get_hybrid_dominant_color(pixels_hsv):
     
     print(f"🎨 HSV 중앙값: H={median_h:.1f}, S={median_s:.1f}, V={median_v:.1f}")
     
-    # 🔥 1단계: 무채색 판단 (채도가 낮으면 흰색/검정/회색)
-    if median_s < 30:  # 채도가 낮음
-        if median_v < 60:
-            print(f"   → ⚫ 검정 (S={median_s:.1f}, V={median_v:.1f})")
-            return [0, 0, int(min(50, median_v))]
-        elif median_v > 200:
-            print(f"   → ⚪ 흰색 (S={median_s:.1f}, V={median_v:.1f})")
+    # 🔥 1단계: 명도 우선 판단 (검정/흰색은 채도 무관)
+    if median_v < 80:
+        # 매우 어두움 → 검정 (채도 무관!)
+        print(f"   → ⚫ 검정 (V={median_v:.1f} < 80, S={median_s:.1f})")
+        return [0, 0, int(min(60, median_v))]
+    elif median_v > 200:
+        # 매우 밝음 → 흰색 (채도가 낮으면)
+        if median_s < 50:
+            print(f"   → ⚪ 흰색 (V={median_v:.1f} > 200, S={median_s:.1f} < 50)")
             return [0, 0, 255]
-        else:
-            print(f"   → ⬜ 회색 (S={median_s:.1f}, V={median_v:.1f})")
-            return [0, 0, int(median_v)]
+    
+    # 🔥 2단계: 채도 기반 무채색 판단 (중간 명도)
+    if median_s < 30:
+        # 채도가 매우 낮음 → 회색
+        print(f"   → ⬜ 회색 (S={median_s:.1f} < 30, V={median_v:.1f})")
+        return [0, 0, int(median_v)]
     
     # 🔥 2단계: 유채색 판단 (OpenCV H는 0-180 범위)
     h = median_h
