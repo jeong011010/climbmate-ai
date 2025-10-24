@@ -1177,10 +1177,15 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
     else:
         print(f"   ✂️ 마스크 경계 제거: {np.sum(mask > 0)} → {np.sum(eroded_mask > 0)} 픽셀")
     
-    # 🔥 지각적 색상 보정: 전체 이미지 밝기 분포를 고려한 상대적 색상 판단
-    hold_region = image[eroded_mask > 0.5]
+    # 🔥 명도 보정: 규칙 기반도 원본 이미지 사용 (CLIP과 동일)
+    # 색상 왜곡 방지를 위해 명도 보정 비활성화
+    image_normalized = image  # 원본 이미지 사용
     
-    if len(hold_region) > 50:
+    # 🚫 명도 보정 비활성화됨 (원본 색상 보존)
+    print("   ✨ 원본 이미지 사용 (명도 보정 없음)")
+    
+    if False:  # 명도 보정 코드 비활성화 (참고용으로 보존)
+        hold_region = image[eroded_mask > 0.5]
         # LAB 색공간에서 명도 분석
         lab_region = cv2.cvtColor(image, cv2.COLOR_BGR2Lab)
         l_channel = lab_region[:, :, 0].copy()
@@ -1254,44 +1259,9 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
     pixels_yuv = yuv_image[eroded_mask > 0.5]
     pixels_xyz = xyz_image[eroded_mask > 0.5]
     
-    # 🔥 STEP 1: 초크 자국 강력 제거 (V > 200인 매우 밝은 픽셀)
-    if len(pixels_hsv) > 100:
-        v_values = pixels_hsv[:, 2]
-        
-        # 초크 임계값: V > 200 제거
-        chalk_threshold = 200
-        non_chalk_mask = v_values < chalk_threshold
-        
-        chalk_removed = np.sum(~non_chalk_mask)
-        if chalk_removed > 0 and np.sum(non_chalk_mask) > 50:
-            pixels_hsv = pixels_hsv[non_chalk_mask]
-            pixels_rgb = pixels_rgb[non_chalk_mask]
-            pixels_lab = pixels_lab[non_chalk_mask]
-            pixels_yuv = pixels_yuv[non_chalk_mask]
-            pixels_xyz = pixels_xyz[non_chalk_mask]
-            print(f"   🧹 초크 제거: {chalk_removed}개 픽셀 (V>{chalk_threshold}), 남은 픽셀 {len(pixels_hsv)}개")
-    
-    # 🔥 STEP 2: 밝기 outlier 제거 (반사광 + 그림자)
-    if len(pixels_hsv) > 100:
-        v_values = pixels_hsv[:, 2]
-        v_median = np.median(v_values)
-        v_std = np.std(v_values)
-        
-        # 중앙값 ± 1.5σ 범위의 픽셀만 사용 (더 엄격하게)
-        v_min = max(0, v_median - 1.5 * v_std)
-        v_max = min(255, v_median + 1.5 * v_std)
-        
-        outlier_mask = (v_values >= v_min) & (v_values <= v_max)
-        
-        if np.sum(outlier_mask) > 50:
-            pixels_hsv = pixels_hsv[outlier_mask]
-            pixels_rgb = pixels_rgb[outlier_mask]
-            pixels_lab = pixels_lab[outlier_mask]
-            pixels_yuv = pixels_yuv[outlier_mask]
-            pixels_xyz = pixels_xyz[outlier_mask]
-            print(f"   🎯 밝기 outlier 제거: V 범위 [{v_min:.0f}, {v_max:.0f}], 남은 픽셀 {len(pixels_hsv)}개")
-        else:
-            print(f"   ⚠️ outlier 제거 후 픽셀 부족, 이전 단계 사용")
+    # 🚫 초크 제거 및 outlier 제거 비활성화 (원본 색상 보존)
+    # CLIP AI와 동일하게 원본 픽셀 사용
+    print(f"   ✨ 원본 픽셀 사용: {len(pixels_hsv)}개 (필터링 없음)")
     
     # 🎨 색상 품질 필터링 적용
     if len(pixels_hsv) > 0:
