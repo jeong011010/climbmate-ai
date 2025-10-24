@@ -415,7 +415,7 @@ function App() {
 
   // 홀드 색상 피드백 제출
   const submitHoldColorFeedback = async () => {
-    if (!selectedHold || !selectedProblem || !selectedProblem.db_id) {
+    if (!selectedHold || !selectedProblem) {
       alert('홀드 또는 문제 정보를 찾을 수 없습니다.')
       return
     }
@@ -438,8 +438,11 @@ function App() {
         circularity: selectedHold.circularity || 0
       }
 
+      // problem_id: db_id가 있으면 사용, 없으면 0 (피드백만 저장)
+      const problemId = selectedProblem.db_id || 0
+
       await axios.post(`${API_URL}/api/hold-color-feedback`, {
-        problem_id: selectedProblem.db_id,
+        problem_id: problemId,
         hold_id: selectedHold.id || `${selectedHold.center[0]}_${selectedHold.center[1]}`,
         predicted_color: selectedHold.individual_color || selectedHold.color,
         user_color: holdColorFeedback,

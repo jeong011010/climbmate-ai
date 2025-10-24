@@ -806,8 +806,8 @@ def get_hybrid_dominant_color(pixels_hsv):
     avg_v = np.mean(pixels_array[:, 2])
     
     # 색상 유형 판단
-    is_achromatic = avg_s < 30  # 채도가 낮으면 무채색 (흰색, 검정색, 회색)
-    is_dark = avg_v < 80        # 어두운 색
+    is_achromatic = avg_s < 50  # 채도가 낮으면 무채색 (흰색, 검정색, 회색) - 더 완화
+    is_dark = avg_v < 120       # 어두운 색 - 더 완화
     is_bright = avg_v > 180     # 밝은 색
     
     print(f"🔍 색상 분석: H={avg_h:.1f}, S={avg_s:.1f}, V={avg_v:.1f}")
@@ -825,17 +825,21 @@ def get_hybrid_dominant_color(pixels_hsv):
         
         print(f"   중앙값: H={median_h:.1f}, S={median_s:.1f}, V={median_v:.1f}")
         
-        # 검정색/흰색 강화 판단
-        if median_v < 60:
-            # 검정색: V를 더 낮게, S를 0으로
-            print("   → 검정색 감지! V 강화")
-            return [0, 0, min(50, int(median_v))]
+        # 검정색/흰색/회색 강화 판단
+        if median_v < 80:
+            # 검정색: V < 80 → 검정색으로 강화
+            print(f"   → 검정색 감지! (V={median_v:.1f}) V 강화")
+            return [0, 0, min(60, int(median_v))]
         elif median_v > 200 and median_s < 40:
-            # 흰색: V를 255로, S를 0으로
-            print("   → 흰색 감지! V 강화")
+            # 흰색: V > 200 & S < 40 → 흰색으로 강화
+            print(f"   → 흰색 감지! (V={median_v:.1f}) V 강화")
             return [0, 0, 255]
+        elif median_v >= 80 and median_v <= 200:
+            # 회색: V가 중간 범위 → 채도 0으로 강화
+            print(f"   → 회색 감지! (V={median_v:.1f}) 채도 0으로 강화")
+            return [0, 0, int(median_v)]
         else:
-            # 회색: 중앙값 사용
+            # 기타: 중앙값 사용
             return [int(median_h), int(median_s), int(median_v)]
     
     elif is_dark or is_bright:
@@ -1161,19 +1165,36 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
     pixels_yuv = yuv_image[eroded_mask > 0.5]
     pixels_xyz = xyz_image[eroded_mask > 0.5]
     
-    # 🔥 밝기 outlier 제거 (초크 반사광 + 어두운 그림자 제거)
-    if len(pixels_hsv) > 100:  # 충분한 픽셀이 있을 때만
+    # 🔥 STEP 1: 초크 자국 강력 제거 (V > 200인 매우 밝은 픽셀)
+    if len(pixels_hsv) > 100:
+        v_values = pixels_hsv[:, 2]
+        
+        # 초크 임계값: V > 200 제거
+        chalk_threshold = 200
+        non_chalk_mask = v_values < chalk_threshold
+        
+        chalk_removed = np.sum(~non_chalk_mask)
+        if chalk_removed > 0 and np.sum(non_chalk_mask) > 50:
+            pixels_hsv = pixels_hsv[non_chalk_mask]
+            pixels_rgb = pixels_rgb[non_chalk_mask]
+            pixels_lab = pixels_lab[non_chalk_mask]
+            pixels_yuv = pixels_yuv[non_chalk_mask]
+            pixels_xyz = pixels_xyz[non_chalk_mask]
+            print(f"   🧹 초크 제거: {chalk_removed}개 픽셀 (V>{chalk_threshold}), 남은 픽셀 {len(pixels_hsv)}개")
+    
+    # 🔥 STEP 2: 밝기 outlier 제거 (반사광 + 그림자)
+    if len(pixels_hsv) > 100:
         v_values = pixels_hsv[:, 2]
         v_median = np.median(v_values)
         v_std = np.std(v_values)
         
-        # 중앙값 ± 2σ 범위의 픽셀만 사용
-        v_min = max(0, v_median - 2 * v_std)
-        v_max = min(255, v_median + 2 * v_std)
+        # 중앙값 ± 1.5σ 범위의 픽셀만 사용 (더 엄격하게)
+        v_min = max(0, v_median - 1.5 * v_std)
+        v_max = min(255, v_median + 1.5 * v_std)
         
         outlier_mask = (v_values >= v_min) & (v_values <= v_max)
         
-        if np.sum(outlier_mask) > 50:  # 필터링 후에도 충분한 픽셀이 남아있으면
+        if np.sum(outlier_mask) > 50:
             pixels_hsv = pixels_hsv[outlier_mask]
             pixels_rgb = pixels_rgb[outlier_mask]
             pixels_lab = pixels_lab[outlier_mask]
@@ -1181,7 +1202,7 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
             pixels_xyz = pixels_xyz[outlier_mask]
             print(f"   🎯 밝기 outlier 제거: V 범위 [{v_min:.0f}, {v_max:.0f}], 남은 픽셀 {len(pixels_hsv)}개")
         else:
-            print(f"   ⚠️ outlier 제거 후 픽셀 부족, 원본 사용")
+            print(f"   ⚠️ outlier 제거 후 픽셀 부족, 이전 단계 사용")
     
     # 🎨 색상 품질 필터링 적용
     if len(pixels_hsv) > 0:
