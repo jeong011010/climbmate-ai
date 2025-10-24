@@ -186,11 +186,27 @@ async def analyze_image(
                     'analysis': None
                 }
             
+            # 해당 홀드의 마스크에서 bbox 계산
+            hold_id = hold['id']
+            bbox = [0, 0, 0, 0]
+            if hold_id < len(masks):
+                mask = masks[hold_id]
+                # 마스크에서 0이 아닌 픽셀의 위치 찾기
+                coords = np.argwhere(mask > 0.5)
+                if len(coords) > 0:
+                    y_min, x_min = coords.min(axis=0)
+                    y_max, x_max = coords.max(axis=0)
+                    bbox = [int(x_min), int(y_min), int(x_max), int(y_max)]
+            
             problems[group]['holds'].append({
                 'id': hold['id'],
                 'center': hold['center'],
                 'area': hold['area'],
-                'rgb': hold.get('dominant_rgb', [128, 128, 128])
+                'bbox': bbox,
+                'color': clip_color,  # 그룹 색상 (문제 색상)
+                'individual_color': hold.get('clip_color_name', 'unknown'),  # 홀드 자체의 실제 색상
+                'rgb': hold.get('dominant_rgb', [128, 128, 128]),
+                'hsv': hold.get('dominant_hsv', [0, 0, 128])
             })
         
         # 이미지를 Base64로 인코딩 (GPT-4 및 DB 저장용)

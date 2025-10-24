@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://climbmate.store'
 
@@ -36,6 +36,7 @@ function App() {
   
   // Ref
   const imageRef = useRef(null)
+  const [imageLoaded, setImageLoaded] = useState(false)
 
   // 통계 로드
   const loadStats = async () => {
@@ -215,8 +216,10 @@ function App() {
       reader.readAsDataURL(file)
       setResult(null)
       setSelectedProblem(null)
+      setSelectedHold(null)
       setAnnotatedImage(null)
       setShowControlPanel(true)
+      setImageLoaded(false)
     }
   }
 
@@ -269,8 +272,10 @@ function App() {
           setPreview(URL.createObjectURL(blob))
           setResult(null)
           setSelectedProblem(null)
+          setSelectedHold(null)
           setAnnotatedImage(null)
           setShowControlPanel(true)
+          setImageLoaded(false)
           
           stream.getTracks().forEach(track => track.stop())
           document.body.removeChild(modal)
@@ -424,7 +429,7 @@ function App() {
       await axios.post(`${API_URL}/api/hold-color-feedback`, {
         problem_id: selectedProblem.db_id,
         hold_id: selectedHold.id || `${selectedHold.center[0]}_${selectedHold.center[1]}`,
-        predicted_color: selectedHold.color,
+        predicted_color: selectedHold.individual_color || selectedHold.color,
         user_color: holdColorFeedback,
         hold_center: selectedHold.center
       })
@@ -788,10 +793,11 @@ function App() {
                  onClick={result ? handleImageClick : undefined}
                  onTouchEnd={result ? handleImageClick : undefined}
                  onDoubleClick={result ? () => setShowImageModal(true) : undefined}
+                 onLoad={() => setImageLoaded(true)}
                />
                
                {/* SVG 오버레이 - 선택된 문제의 홀드들 강조 */}
-               {result && selectedProblem && imageRef.current && (
+               {result && selectedProblem && imageRef.current && imageLoaded && (
                  <svg
                    className="absolute top-0 left-0 w-full h-full pointer-events-none"
                    viewBox={`0 0 ${imageRef.current.naturalWidth} ${imageRef.current.naturalHeight}`}
@@ -996,23 +1002,34 @@ function App() {
                    </button>
                  </div>
                  
-                 <div className="grid grid-cols-2 gap-4 mb-4">
-                   <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md">
-                     <h4 className="text-xs mb-2 text-slate-600 font-semibold text-center">홀드 색상</h4>
-                     <div className="flex items-center justify-center gap-2">
-                       <span className="text-3xl">{colorEmoji[selectedHold.color] || '⭕'}</span>
-                       <span className="text-lg font-bold text-slate-800">{(selectedHold.color || 'UNKNOWN').toUpperCase()}</span>
-                     </div>
-                   </div>
-                   
-                   <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md">
-                     <h4 className="text-xs mb-2 text-slate-600 font-semibold text-center">위치</h4>
-                     <div className="text-sm text-slate-700 text-center">
-                       <div>X: {selectedHold.center ? Math.round(selectedHold.center[0]) : 'N/A'}</div>
-                       <div>Y: {selectedHold.center ? Math.round(selectedHold.center[1]) : 'N/A'}</div>
-                     </div>
-                   </div>
-                 </div>
+                {/* 문제 색상 */}
+                <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-xl shadow-md mb-4 border-2 border-purple-200">
+                  <h4 className="text-xs mb-2 text-slate-600 font-semibold text-center">🎨 문제 그룹 색상</h4>
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="text-4xl">{colorEmoji[selectedHold.color] || '⭕'}</span>
+                    <span className="text-xl font-bold gradient-text">{(selectedHold.color || 'UNKNOWN').toUpperCase()}</span>
+                  </div>
+                  <p className="text-xs text-slate-500 text-center mt-2">이 홀드가 속한 문제의 색상</p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md">
+                    <h4 className="text-xs mb-2 text-slate-600 font-semibold text-center">💎 홀드 실제 색상</h4>
+                    <div className="flex flex-col items-center justify-center gap-1">
+                      <span className="text-3xl">{colorEmoji[selectedHold.individual_color] || '⭕'}</span>
+                      <span className="text-sm font-bold text-slate-800">{(selectedHold.individual_color || 'UNKNOWN').toUpperCase()}</span>
+                    </div>
+                    <p className="text-xs text-slate-500 text-center mt-2">AI 감지 색상</p>
+                  </div>
+                  
+                  <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md">
+                    <h4 className="text-xs mb-2 text-slate-600 font-semibold text-center">📍 위치</h4>
+                    <div className="text-sm text-slate-700 text-center space-y-1">
+                      <div className="font-mono">X: {selectedHold.center ? Math.round(selectedHold.center[0]) : 'N/A'}</div>
+                      <div className="font-mono">Y: {selectedHold.center ? Math.round(selectedHold.center[1]) : 'N/A'}</div>
+                    </div>
+                  </div>
+                </div>
                  
                  <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-3 rounded-xl border border-yellow-200">
                    <h4 className="text-sm mb-2 text-slate-800 font-bold text-center">💬 색상 피드백</h4>
@@ -1418,12 +1435,24 @@ function App() {
                </p>
 
                {/* 현재 예측된 색상 */}
-               <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border-2 border-blue-200">
-                 <div className="text-center">
-                   <p className="text-sm text-slate-600 mb-2">AI 예측 색상</p>
-                   <div className="flex items-center justify-center gap-3">
-                     <span className="text-5xl">{colorEmoji[selectedHold.color] || '⭕'}</span>
-                     <span className="text-2xl font-bold gradient-text">{(selectedHold.color || 'UNKNOWN').toUpperCase()}</span>
+               <div className="mb-6 space-y-3">
+                 <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border-2 border-purple-200">
+                   <div className="text-center">
+                     <p className="text-xs text-slate-600 mb-2">문제 그룹 색상</p>
+                     <div className="flex items-center justify-center gap-2">
+                       <span className="text-4xl">{colorEmoji[selectedHold.color] || '⭕'}</span>
+                       <span className="text-xl font-bold gradient-text">{(selectedHold.color || 'UNKNOWN').toUpperCase()}</span>
+                     </div>
+                   </div>
+                 </div>
+                 
+                 <div className="p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl border-2 border-blue-200">
+                   <div className="text-center">
+                     <p className="text-xs text-slate-600 mb-2">AI가 감지한 홀드 실제 색상</p>
+                     <div className="flex items-center justify-center gap-2">
+                       <span className="text-4xl">{colorEmoji[selectedHold.individual_color] || '⭕'}</span>
+                       <span className="text-xl font-bold gradient-text">{(selectedHold.individual_color || 'UNKNOWN').toUpperCase()}</span>
+                     </div>
                    </div>
                  </div>
                </div>
