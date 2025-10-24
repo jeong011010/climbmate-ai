@@ -371,11 +371,16 @@ def train_color_model(training_data: List[Dict]) -> Tuple[float, float]:
     
     for data in training_data:
         try:
+            # 디버깅: 데이터 구조 확인
+            if not isinstance(data, dict):
+                print(f"   ⚠️ 데이터 타입 오류: {type(data)}, 데이터: {data}")
+                continue
+            
             features = extract_color_features(data)
             X.append(features)
             y.append(data['correct_color'])
         except Exception as e:
-            print(f"   ⚠️ 특징 추출 실패: {e}")
+            print(f"   ⚠️ 특징 추출 실패: {e}, 데이터: {data}")
             continue
     
     if len(X) < 10:
