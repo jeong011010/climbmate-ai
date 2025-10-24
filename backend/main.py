@@ -203,7 +203,7 @@ async def analyze_image(
                 'center': hold['center'],
                 'area': hold['area'],
                 'bbox': bbox,
-                'color': clip_color,  # 그룹 색상 (문제 색상)
+                'color': problems[group]['color_name'],  # 그룹 색상 (문제 색상)
                 'individual_color': hold.get('clip_color_name', 'unknown'),  # 홀드 자체의 실제 색상
                 'rgb': hold.get('dominant_rgb', [128, 128, 128]),
                 'hsv': hold.get('dominant_hsv', [0, 0, 128])

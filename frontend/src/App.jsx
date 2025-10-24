@@ -782,92 +782,124 @@ function App() {
       <div className="w-full pt-24 pb-20 px-2 sm:px-4">
         {preview && (
            <div className="relative mb-4 w-full max-w-[900px] mx-auto">
-             <div className="relative inline-block w-full">
-               <img 
-                 ref={imageRef}
-                 src={annotatedImage || preview} 
-                 alt="Climbing Wall" 
-                 className={`w-full max-h-[500px] object-contain rounded-2xl mx-auto shadow-2xl border border-white/20 block ${
-                   result ? 'cursor-pointer hover:opacity-90 transition-opacity' : ''
-                 }`}
-                 onClick={result ? handleImageClick : undefined}
-                 onTouchEnd={result ? handleImageClick : undefined}
-                 onDoubleClick={result ? () => setShowImageModal(true) : undefined}
-                 onLoad={() => setImageLoaded(true)}
-               />
-               
-               {/* SVG 오버레이 - 선택된 문제의 홀드들 강조 */}
-               {result && selectedProblem && imageRef.current && imageLoaded && (
-                 <svg
-                   className="absolute top-0 left-0 w-full h-full pointer-events-none"
-                   viewBox={`0 0 ${imageRef.current.naturalWidth} ${imageRef.current.naturalHeight}`}
-                   preserveAspectRatio="xMidYMid meet"
-                   style={{
-                     maxHeight: '500px',
-                     objectFit: 'contain'
+             <div className="relative w-full flex justify-center">
+               <div className="relative" style={{ display: 'inline-block' }}>
+                 <img 
+                   ref={imageRef}
+                   src={annotatedImage || preview} 
+                   alt="Climbing Wall" 
+                   className={`max-h-[500px] object-contain rounded-2xl shadow-2xl border border-white/20 ${
+                     result ? 'cursor-pointer hover:opacity-90 transition-opacity' : ''
+                   }`}
+                   onClick={result ? handleImageClick : undefined}
+                   onTouchEnd={result ? handleImageClick : undefined}
+                   onDoubleClick={result ? () => setShowImageModal(true) : undefined}
+                   onLoad={() => {
+                     setImageLoaded(true)
+                     console.log('Image loaded:', imageRef.current?.naturalWidth, 'x', imageRef.current?.naturalHeight)
                    }}
-                 >
-                   {selectedProblem.holds?.map((hold, idx) => {
-                     if (!hold.bbox || hold.bbox.length !== 4) return null
-                     const [x1, y1, x2, y2] = hold.bbox
-                     const isSelectedHold = selectedHold && 
-                       selectedHold.center[0] === hold.center[0] && 
-                       selectedHold.center[1] === hold.center[1]
-                     
-                     return (
-                       <g key={idx}>
-                         {/* 홀드 바운딩 박스 */}
-                         <rect
-                           x={x1}
-                           y={y1}
-                           width={x2 - x1}
-                           height={y2 - y1}
-                           fill="none"
-                           stroke={isSelectedHold ? "#FFD700" : "#00FF00"}
-                           strokeWidth={isSelectedHold ? "8" : "4"}
-                           strokeDasharray={isSelectedHold ? "10,5" : "none"}
-                           opacity={isSelectedHold ? "0.9" : "0.6"}
-                         >
-                           {isSelectedHold && (
-                             <animate
-                               attributeName="stroke-width"
-                               values="8;12;8"
-                               dur="1s"
-                               repeatCount="indefinite"
-                             />
-                           )}
-                         </rect>
+                 />
+                 
+                 {/* SVG 오버레이 - 선택된 문제의 홀드들 강조 */}
+                 {result && selectedProblem && imageRef.current && imageLoaded && (() => {
+                   const img = imageRef.current
+                   const rect = img.getBoundingClientRect()
+                   const scaleX = rect.width / img.naturalWidth
+                   const scaleY = rect.height / img.naturalHeight
+                   
+                   console.log('SVG Rendering:', {
+                     naturalWidth: img.naturalWidth,
+                     naturalHeight: img.naturalHeight,
+                     displayWidth: rect.width,
+                     displayHeight: rect.height,
+                     scaleX,
+                     scaleY,
+                     holdsCount: selectedProblem.holds?.length
+                   })
+                   
+                   return (
+                     <svg
+                       className="absolute top-0 left-0 pointer-events-none"
+                       style={{
+                         width: rect.width + 'px',
+                         height: rect.height + 'px'
+                       }}
+                       viewBox={`0 0 ${img.naturalWidth} ${img.naturalHeight}`}
+                       preserveAspectRatio="xMidYMid meet"
+                     >
+                       {selectedProblem.holds?.map((hold, idx) => {
+                         if (!hold.bbox || hold.bbox.length !== 4) {
+                           console.log('Hold missing bbox:', hold)
+                           return null
+                         }
+                         const [x1, y1, x2, y2] = hold.bbox
+                         const isSelectedHold = selectedHold && 
+                           selectedHold.center && hold.center &&
+                           selectedHold.center[0] === hold.center[0] && 
+                           selectedHold.center[1] === hold.center[1]
                          
-                         {/* 홀드 중심점 */}
-                         {hold.center && (
-                           <circle
-                             cx={hold.center[0]}
-                             cy={hold.center[1]}
-                             r={isSelectedHold ? "12" : "8"}
-                             fill={isSelectedHold ? "#FFD700" : "#00FF00"}
-                             opacity={isSelectedHold ? "1" : "0.7"}
-                           >
-                             {isSelectedHold && (
-                               <animate
-                                 attributeName="r"
-                                 values="12;16;12"
-                                 dur="1s"
-                                 repeatCount="indefinite"
-                               />
+                         console.log(`Hold ${idx}:`, {
+                           bbox: [x1, y1, x2, y2],
+                           center: hold.center,
+                           isSelected: isSelectedHold
+                         })
+                         
+                         return (
+                           <g key={idx}>
+                             {/* 홀드 바운딩 박스 */}
+                             <rect
+                               x={x1}
+                               y={y1}
+                               width={x2 - x1}
+                               height={y2 - y1}
+                               fill="none"
+                               stroke={isSelectedHold ? "#FFD700" : "#00FF00"}
+                               strokeWidth={isSelectedHold ? "6" : "3"}
+                               strokeDasharray={isSelectedHold ? "8,4" : "none"}
+                               opacity="0.8"
+                             >
+                               {isSelectedHold && (
+                                 <animate
+                                   attributeName="opacity"
+                                   values="0.8;1;0.8"
+                                   dur="1s"
+                                   repeatCount="indefinite"
+                                 />
+                               )}
+                             </rect>
+                             
+                             {/* 홀드 중심점 */}
+                             {hold.center && (
+                               <circle
+                                 cx={hold.center[0]}
+                                 cy={hold.center[1]}
+                                 r={isSelectedHold ? "10" : "6"}
+                                 fill={isSelectedHold ? "#FFD700" : "#00FF00"}
+                                 opacity="0.9"
+                               >
+                                 {isSelectedHold && (
+                                   <animate
+                                     attributeName="r"
+                                     values="10;14;10"
+                                     dur="1s"
+                                     repeatCount="indefinite"
+                                   />
+                                 )}
+                               </circle>
                              )}
-                           </circle>
-                         )}
-                       </g>
-                     )
-                   })}
-                 </svg>
-               )}
-               
-               {result && selectedProblem && (
-                 <div className="absolute top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-full text-base font-bold shadow-lg animate-pulse-slow z-10">
-                   {colorEmoji[selectedProblem.color_name] || '⭕'} {(selectedProblem.color_name || 'UNKNOWN').toUpperCase()} 선택됨
-                 </div>
-               )}
+                           </g>
+                         )
+                       })}
+                     </svg>
+                   )
+                 })()}
+                 
+                 {result && selectedProblem && (
+                   <div className="absolute top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-full text-base font-bold shadow-lg animate-pulse-slow z-10">
+                     {colorEmoji[selectedProblem.color_name] || '⭕'} {(selectedProblem.color_name || 'UNKNOWN').toUpperCase()} 선택됨
+                   </div>
+                 )}
+               </div>
              </div>
            </div>
          )}
