@@ -381,7 +381,7 @@ def save_hold_color_feedback(
     return feedback_id
 
 def get_color_training_data(min_samples: int = 10) -> List[Dict]:
-    """🎨 색상 학습 데이터 가져오기"""
+    """🎨 색상 학습 데이터 가져오기 (확인된 피드백만)"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
@@ -393,6 +393,7 @@ def get_color_training_data(min_samples: int = 10) -> List[Dict]:
             color_stats,
             user_correct_color
         FROM hold_color_feedback
+        WHERE confirmed = 1
         ORDER BY created_at DESC
     """)
     

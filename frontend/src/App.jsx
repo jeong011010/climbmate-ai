@@ -99,6 +99,32 @@ function App() {
     }
   }
 
+  // 🤖 ML 학습 실행
+  const trainColorModel = async () => {
+    const confirmedCount = colorFeedbacks.filter(f => f.confirmed).length
+    
+    if (confirmedCount < 30) {
+      alert(`⚠️ 확인된 피드백이 부족합니다.\n\n현재: ${confirmedCount}개\n필요: 30개 이상`)
+      return
+    }
+
+    if (!confirm(`🎓 ML 색상 분류 모델을 학습하시겠습니까?\n\n확인된 피드백: ${confirmedCount}개`)) {
+      return
+    }
+
+    try {
+      setFeedbacksLoading(true)
+      const response = await axios.post(`${API_URL}/api/train-color-model`)
+      alert(`✅ ML 학습 완료!\n\n정확도: ${(response.data.test_accuracy * 100).toFixed(1)}%\nCross-validation: ${(response.data.cv_accuracy * 100).toFixed(1)}%`)
+      loadColorFeedbacks() // 목록 새로고침
+    } catch (error) {
+      console.error('ML 학습 실패:', error)
+      alert(`❌ ML 학습 실패: ${error.response?.data?.detail || error.message}`)
+    } finally {
+      setFeedbacksLoading(false)
+    }
+  }
+
   // GPT-4 상태 확인 (디버깅용)
   const checkGpt4Status = async () => {
     try {
@@ -585,18 +611,30 @@ function App() {
           ) : (
             <>
               <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm text-blue-800">
-                  📊 총 <span className="font-bold text-lg">{colorFeedbacks.length}</span>개의 피드백
-                  <span className="mx-2">|</span>
-                  ✅ 확인됨: <span className="font-bold">{colorFeedbacks.filter(f => f.confirmed).length}</span>개
-                  <span className="mx-2">|</span>
-                  ⏳ 대기 중: <span className="font-bold">{colorFeedbacks.filter(f => !f.confirmed).length}</span>개
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  <p className="text-sm text-blue-800">
+                    📊 총 <span className="font-bold text-lg">{colorFeedbacks.length}</span>개의 피드백
+                    <span className="mx-2">|</span>
+                    ✅ 확인됨: <span className="font-bold">{colorFeedbacks.filter(f => f.confirmed).length}</span>개
+                    <span className="mx-2">|</span>
+                    ⏳ 대기 중: <span className="font-bold">{colorFeedbacks.filter(f => !f.confirmed).length}</span>개
+                    {colorFeedbacks.filter(f => f.confirmed).length >= 30 && (
+                      <span className="ml-2 text-green-600 font-semibold">
+                        🤖 ML 학습 가능!
+                      </span>
+                    )}
+                  </p>
+                  
                   {colorFeedbacks.filter(f => f.confirmed).length >= 30 && (
-                    <span className="ml-2 text-green-600 font-semibold">
-                      🤖 ML 학습 가능! (30개 이상 확인됨)
-                    </span>
+                    <button
+                      onClick={trainColorModel}
+                      disabled={feedbacksLoading}
+                      className="px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:shadow-lg transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {feedbacksLoading ? '⏳ 학습 중...' : '🤖 ML 학습 시작'}
+                    </button>
                   )}
-                </p>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1014,11 +1052,11 @@ function App() {
                    )
                  })()}
                  
-                 {result && selectedProblem && (
-                   <div className="absolute top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-full text-base font-bold shadow-lg animate-pulse-slow z-10">
-                     {colorEmoji[selectedProblem.color_name] || '⭕'} {(selectedProblem.color_name || 'UNKNOWN').toUpperCase()} 선택됨
-                   </div>
-                 )}
+                {result && selectedProblem && (
+                  <div className="absolute top-2 right-2 px-4 py-2 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-lg text-sm font-bold shadow-lg z-10">
+                    {colorEmoji[selectedProblem.color_name] || '⭕'} {(selectedProblem.color_name || 'UNKNOWN').toUpperCase()}
+                  </div>
+                )}
                </div>
              </div>
            </div>

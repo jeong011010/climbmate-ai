@@ -590,6 +590,41 @@ if DB_AVAILABLE:
             raise HTTPException(status_code=500, detail=str(e))
 
 if ML_AVAILABLE and DB_AVAILABLE:
+    @app.post("/api/train-color-model")
+    async def train_color_model():
+        """🤖 ML 색상 분류 모델 학습"""
+        try:
+            from database import get_color_training_data
+            from ml_trainer import train_color_model
+            
+            # 확인된 피드백만 가져오기
+            training_data = get_color_training_data()
+            
+            if len(training_data) < 30:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"훈련 데이터 부족: {len(training_data)}개 (최소 30개 필요)"
+                )
+            
+            # 모델 학습
+            test_accuracy, cv_accuracy = train_color_model(training_data)
+            
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "message": "ML 색상 분류 모델 학습 완료",
+                    "test_accuracy": test_accuracy,
+                    "cv_accuracy": cv_accuracy,
+                    "training_samples": len(training_data)
+                }
+            )
+        except HTTPException:
+            raise
+        except Exception as e:
+            print(f"❌ ML 학습 오류: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
+
+if ML_AVAILABLE and DB_AVAILABLE:
     @app.post("/api/train")
     async def train_models():
         """자체 ML 모델 학습"""
