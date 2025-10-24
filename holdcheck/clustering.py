@@ -5120,7 +5120,7 @@ def rule_based_color_clustering(hold_data, vectors, config_path="holdcheck/color
     
     # 그룹 ID 할당 (색상 이름 기준 정렬)
     color_order = ["black", "white", "gray", "red", "orange", "yellow", 
-                   "green", "mint", "blue", "purple", "pink", "brown", "unknown"]
+                   "lime", "green", "mint", "blue", "purple", "pink", "brown", "unknown"]
     
     group_idx = 0
     for color_name in color_order:
@@ -5146,7 +5146,7 @@ def classify_color_simple_hsv(h, s, v):
     """🎨 상식적인 HSV 기반 색상 분류 (명도 우선 판단)"""
     
     # 🔥 1단계: 명도 우선 판단 (검정/흰색은 채도 무관)
-    if v < 80:
+    if v < 90:
         # 매우 어두움 → 검정 (채도 무관!)
         return "black", 0.95
     elif v > 200 and s < 50:

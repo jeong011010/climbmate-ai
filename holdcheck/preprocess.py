@@ -833,10 +833,10 @@ def get_hybrid_dominant_color(pixels_hsv):
     print(f"🎨 HSV 중앙값: H={median_h:.1f}, S={median_s:.1f}, V={median_v:.1f}")
     
     # 🔥 1단계: 명도 우선 판단 (검정/흰색은 채도 무관)
-    if median_v < 80:
+    if median_v < 90:
         # 매우 어두움 → 검정 (채도 무관!)
-        print(f"   → ⚫ 검정 (V={median_v:.1f} < 80, S={median_s:.1f})")
-        return [0, 0, int(min(60, median_v))]
+        print(f"   → ⚫ 검정 (V={median_v:.1f} < 90, S={median_s:.1f})")
+        return [0, 0, int(min(70, median_v))]
     elif median_v > 200:
         # 매우 밝음 → 흰색 (채도가 낮으면)
         if median_s < 50:
@@ -1171,16 +1171,23 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
                           saturation_filter=False, min_saturation=0):
     """🚀 확장된 색상 통계 추출 - 다중 색상 공간 + 고급 특징 + 명도 정규화 옵션"""
     
-    # 🔥 마스크 경계 제거 (배경 픽셀 혼입 방지)
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
-    eroded_mask = cv2.erode(mask.astype(np.uint8), kernel, iterations=1)
+    # 🔥 마스크 경계 제거 강화 (배경 픽셀 + 반사광 혼입 방지)
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))  # 더 큰 커널
+    eroded_mask = cv2.erode(mask.astype(np.uint8), kernel, iterations=2)  # 2번 반복
     
-    # 마스크가 너무 작아지면 원본 사용
+    # 마스크가 너무 작아지면 약하게 적용
     if np.sum(eroded_mask > 0) < 50:
-        eroded_mask = mask
-        print("   ⚠️ 마스크가 너무 작아 erosion 스킵")
+        # 더 작은 커널로 재시도
+        kernel_small = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+        eroded_mask = cv2.erode(mask.astype(np.uint8), kernel_small, iterations=1)
+        
+        if np.sum(eroded_mask > 0) < 30:
+            eroded_mask = mask
+            print("   ⚠️ 마스크가 너무 작아 erosion 스킵")
+        else:
+            print(f"   ✂️ 마스크 경계 제거 (약함): {np.sum(mask > 0)} → {np.sum(eroded_mask > 0)} 픽셀")
     else:
-        print(f"   ✂️ 마스크 경계 제거: {np.sum(mask > 0)} → {np.sum(eroded_mask > 0)} 픽셀")
+        print(f"   ✂️ 마스크 경계 제거 (강함): {np.sum(mask > 0)} → {np.sum(eroded_mask > 0)} 픽셀")
     
     # 🔥 명도 보정: 규칙 기반도 원본 이미지 사용 (CLIP과 동일)
     # 색상 왜곡 방지를 위해 명도 보정 비활성화
