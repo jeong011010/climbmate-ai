@@ -568,11 +568,6 @@ function App() {
 
   // 🎨 피드백 관리 뷰 컴포넌트
   const FeedbacksView = () => {
-    // 피드백 로드 (처음 진입 시)
-    useEffect(() => {
-      loadColorFeedbacks()
-    }, [])
-
     return (
       <div className="w-full px-2 sm:px-4">
         <div className="glass-card p-4 sm:p-6">
@@ -1824,7 +1819,10 @@ function App() {
             
             {/* 피드백 탭 */}
             <button
-              onClick={() => setCurrentView('feedbacks')}
+              onClick={() => {
+                setCurrentView('feedbacks')
+                loadColorFeedbacks()  // 탭 전환 시 피드백 로드
+              }}
               className={`flex flex-col items-center justify-center py-3 transition-all ${
                 currentView === 'feedbacks'
                   ? 'text-blue-600'
