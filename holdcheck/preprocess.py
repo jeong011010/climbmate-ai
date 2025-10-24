@@ -1407,6 +1407,11 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
                 else:
                     cx, cy = 0, 0
                 
+                # contour 단순화 (JSON 크기 최적화)
+                epsilon = 0.005 * cv2.arcLength(largest_contour, True)
+                approx = cv2.approxPolyDP(largest_contour, epsilon, True)
+                contour_points = [[int(pt[0][0]), int(pt[0][1])] for pt in approx]
+                
                 stats = {
                     "dominant_rgb": rgb,
                     "dominant_hsv": hsv,
@@ -1420,6 +1425,7 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
                     "center": [int(cx), int(cy)],
                     "area": area,
                     "circularity": circularity,
+                    "contour": contour_points,  # 세그먼테이션 윤곽선
                     **stats,
                     "size": int(np.sum(mask_clean > 0))
                 })

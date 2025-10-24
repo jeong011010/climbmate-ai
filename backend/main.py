@@ -186,39 +186,24 @@ async def analyze_image(
                     'analysis': None
                 }
             
-            # 해당 홀드의 마스크에서 bbox와 contour 계산
+            # bbox 계산 (contour는 preprocess.py에서 이미 추출됨)
             hold_id = hold['id']
             bbox = [0, 0, 0, 0]
-            contour_points = []
             
             if hold_id < len(masks):
                 mask = masks[hold_id]
-                mask_uint8 = (mask * 255).astype(np.uint8)
-                
-                # bbox 계산
                 coords = np.argwhere(mask > 0.5)
                 if len(coords) > 0:
                     y_min, x_min = coords.min(axis=0)
                     y_max, x_max = coords.max(axis=0)
                     bbox = [int(x_min), int(y_min), int(x_max), int(y_max)]
-                
-                # contour 추출 (세그먼테이션 윤곽선)
-                contours, _ = cv2.findContours(mask_uint8, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-                if contours:
-                    # 가장 큰 contour 선택
-                    largest_contour = max(contours, key=cv2.contourArea)
-                    # 윤곽선 단순화 (포인트 수 줄이기)
-                    epsilon = 0.005 * cv2.arcLength(largest_contour, True)
-                    approx = cv2.approxPolyDP(largest_contour, epsilon, True)
-                    # [[x, y], [x, y], ...] 형태로 변환
-                    contour_points = [[int(pt[0][0]), int(pt[0][1])] for pt in approx]
             
             problems[group]['holds'].append({
                 'id': hold['id'],
                 'center': hold['center'],
                 'area': hold['area'],
                 'bbox': bbox,
-                'contour': contour_points,  # 세그먼테이션 윤곽선
+                'contour': hold.get('contour', []),  # preprocess.py에서 이미 계산됨
                 'color': problems[group]['color_name'],  # 그룹 색상 (문제 색상)
                 'individual_color': hold.get('clip_color_name', 'unknown'),  # 홀드 자체의 실제 색상
                 'rgb': hold.get('dominant_rgb', [128, 128, 128]),
