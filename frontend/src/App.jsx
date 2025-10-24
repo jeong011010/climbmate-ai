@@ -443,7 +443,7 @@ function App() {
 
       await axios.post(`${API_URL}/api/hold-color-feedback`, {
         problem_id: problemId,
-        hold_id: selectedHold.id || `${selectedHold.center[0]}_${selectedHold.center[1]}`,
+        hold_id: String(selectedHold.id || `${selectedHold.center[0]}_${selectedHold.center[1]}`),  // 🔥 문자열 변환
         predicted_color: selectedHold.individual_color || selectedHold.color,
         user_color: holdColorFeedback,
         hold_center: selectedHold.center,
