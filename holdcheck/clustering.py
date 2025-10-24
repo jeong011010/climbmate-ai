@@ -5142,9 +5142,52 @@ def rule_based_color_clustering(hold_data, vectors, config_path="holdcheck/color
     return hold_data
 
 
+def classify_color_simple_hsv(h, s, v):
+    """🎨 상식적인 HSV 기반 색상 분류 (간단하고 정확)"""
+    
+    # 1단계: 무채색 판단 (채도가 낮으면)
+    if s < 30:
+        if v < 60:
+            return "black", 0.95
+        elif v > 200:
+            return "white", 0.95
+        else:
+            return "gray", 0.90
+    
+    # 2단계: 유채색 판단 (OpenCV H는 0-180)
+    if (h >= 0 and h < 8) or (h >= 170):
+        return "red", 0.90
+    elif h >= 8 and h < 18:
+        return "orange", 0.90
+    elif h >= 18 and h < 30:
+        return "yellow", 0.90
+    elif h >= 30 and h < 45:
+        return "lime", 0.90  # 연두
+    elif h >= 45 and h < 80:
+        return "green", 0.90
+    elif h >= 80 and h < 95:
+        return "mint", 0.85  # 민트/청록
+    elif h >= 95 and h < 130:
+        return "blue", 0.90
+    elif h >= 130 and h < 150:
+        return "purple", 0.90
+    elif h >= 150 and h < 170:
+        return "pink", 0.90
+    else:
+        # 갈색 판단 (낮은 채도 + 낮은 명도)
+        if s < 60 and v < 120:
+            return "brown", 0.80
+        return "unknown", 0.50
+
 def classify_color_by_hsv(h, s, v, rgb, colors_config):
-    """HSV 범위 기반 색상 분류 (더 정확함)"""
-    # 우선순위 순서대로 검사
+    """HSV 범위 기반 색상 분류 (상식적 분류 우선 사용)"""
+    
+    # 🔥 먼저 상식적인 HSV 분류 시도
+    color_name, confidence = classify_color_simple_hsv(h, s, v)
+    if confidence > 0.80:  # 신뢰도가 높으면 바로 반환
+        return color_name, confidence, f"Simple HSV: H={h}, S={s}, V={v}"
+    
+    # 기존 config 기반 분류 (백업)
     sorted_colors = sorted(colors_config.items(), key=lambda x: x[1].get("priority", 999))
     
     for color_name, config in sorted_colors:

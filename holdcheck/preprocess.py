@@ -819,80 +819,80 @@ def normalize_brightness_invariant_color(pixels_hsv):
     return normalized_pixels
 
 def get_hybrid_dominant_color(pixels_hsv):
-    """🎯 하이브리드 색상 추출: 색상 유형별 다른 전처리 전략"""
+    """🎨 상식적인 HSV 기반 색상 분류"""
     if len(pixels_hsv) == 0:
         return [0, 0, 0]
     
     pixels_array = np.array(pixels_hsv)
     
-    # 1단계: 색상 유형 분류
-    avg_h = np.mean(pixels_array[:, 0])
-    avg_s = np.mean(pixels_array[:, 1]) 
-    avg_v = np.mean(pixels_array[:, 2])
+    # 중앙값 사용 (평균보다 outlier에 강함)
+    median_h = np.median(pixels_array[:, 0])
+    median_s = np.median(pixels_array[:, 1])
+    median_v = np.median(pixels_array[:, 2])
     
-    # 색상 유형 판단
-    is_achromatic = avg_s < 50  # 채도가 낮으면 무채색 (흰색, 검정색, 회색) - 더 완화
-    is_dark = avg_v < 120       # 어두운 색 - 더 완화
-    is_bright = avg_v > 180     # 밝은 색
+    print(f"🎨 HSV 중앙값: H={median_h:.1f}, S={median_s:.1f}, V={median_v:.1f}")
     
-    print(f"🔍 색상 분석: H={avg_h:.1f}, S={avg_s:.1f}, V={avg_v:.1f}")
-    print(f"   무채색: {is_achromatic}, 어두움: {is_dark}, 밝음: {is_bright}")
-    
-    # 2단계: 유형별 전처리 전략
-    if is_achromatic:
-        # 🔥 무채색 (흰색, 검정색, 회색) → 중앙값 기반 색상 추출
-        print("   → 무채색: 중앙값 기반 색상 추출")
-        
-        # 중앙값 사용 (평균보다 outlier에 강함)
-        median_h = np.median(pixels_array[:, 0])
-        median_s = np.median(pixels_array[:, 1])
-        median_v = np.median(pixels_array[:, 2])
-        
-        print(f"   중앙값: H={median_h:.1f}, S={median_s:.1f}, V={median_v:.1f}")
-        
-        # 검정색/흰색/회색 강화 판단
-        if median_v < 80:
-            # 검정색: V < 80 → 검정색으로 강화
-            print(f"   → 검정색 감지! (V={median_v:.1f}) V 강화")
-            return [0, 0, min(60, int(median_v))]
-        elif median_v > 200 and median_s < 40:
-            # 흰색: V > 200 & S < 40 → 흰색으로 강화
-            print(f"   → 흰색 감지! (V={median_v:.1f}) V 강화")
+    # 🔥 1단계: 무채색 판단 (채도가 낮으면 흰색/검정/회색)
+    if median_s < 30:  # 채도가 낮음
+        if median_v < 60:
+            print(f"   → ⚫ 검정 (S={median_s:.1f}, V={median_v:.1f})")
+            return [0, 0, int(min(50, median_v))]
+        elif median_v > 200:
+            print(f"   → ⚪ 흰색 (S={median_s:.1f}, V={median_v:.1f})")
             return [0, 0, 255]
-        elif median_v >= 80 and median_v <= 200:
-            # 회색: V가 중간 범위 → 채도 0으로 강화
-            print(f"   → 회색 감지! (V={median_v:.1f}) 채도 0으로 강화")
-            return [0, 0, int(median_v)]
         else:
-            # 기타: 중앙값 사용
-            return [int(median_h), int(median_s), int(median_v)]
+            print(f"   → ⬜ 회색 (S={median_s:.1f}, V={median_v:.1f})")
+            return [0, 0, int(median_v)]
     
-    elif is_dark or is_bright:
-        # 어두운/밝은 유채색 → 명도 정규화 적용
-        print("   → 어두운/밝은 유채색: 명도 정규화 적용")
-        normalized_pixels = normalize_brightness_invariant_color(pixels_hsv)
-        
-        # K-means로 대표색 추출
-        from sklearn.cluster import KMeans
-        if len(normalized_pixels) < 3:
-            return [int(np.mean(normalized_pixels[:, 0])), 
-                    int(np.mean(normalized_pixels[:, 1])), 
-                    int(np.mean(normalized_pixels[:, 2]))]
-        
-        k = min(3, len(normalized_pixels) // 15 + 1)
-        kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
-        labels = kmeans.fit_predict(normalized_pixels)
-        
-        cluster_sizes = [np.sum(labels == i) for i in range(k)]
-        largest_cluster_idx = np.argmax(cluster_sizes)
-        
-        dominant_hsv = kmeans.cluster_centers_[largest_cluster_idx]
-        return [int(dominant_hsv[0]), int(dominant_hsv[1]), int(dominant_hsv[2])]
+    # 🔥 2단계: 유채색 판단 (OpenCV H는 0-180 범위)
+    h = median_h
+    s = median_s
+    v = median_v
     
-    else:
-        # 중간 명도의 유채색 → 기존 방식 사용
-        print("   → 중간 명도 유채색: 기존 방식 사용")
-        return get_dominant_color(pixels_hsv)
+    # H 범위별 색상 분류
+    if (h >= 0 and h < 8) or (h >= 170):  # 빨강 (0-8, 170-180)
+        print(f"   → 🔴 빨강 (H={h:.1f})")
+        return [int(h), int(s), int(v)]
+    
+    elif h >= 8 and h < 18:  # 주황 (8-18)
+        print(f"   → 🟠 주황 (H={h:.1f})")
+        return [int(h), int(s), int(v)]
+    
+    elif h >= 18 and h < 30:  # 노랑 (18-30)
+        print(f"   → 🟡 노랑 (H={h:.1f})")
+        return [int(h), int(s), int(v)]
+    
+    elif h >= 30 and h < 45:  # 연두 (30-45)
+        print(f"   → 🟢 연두 (H={h:.1f})")
+        return [int(h), int(s), int(v)]
+    
+    elif h >= 45 and h < 80:  # 초록 (45-80)
+        print(f"   → 🟢 초록 (H={h:.1f})")
+        return [int(h), int(s), int(v)]
+    
+    elif h >= 80 and h < 95:  # 민트/청록 (80-95)
+        print(f"   → 🫧 민트 (H={h:.1f})")
+        return [int(h), int(s), int(v)]
+    
+    elif h >= 95 and h < 130:  # 파랑 (95-130)
+        print(f"   → 🔵 파랑 (H={h:.1f})")
+        return [int(h), int(s), int(v)]
+    
+    elif h >= 130 and h < 150:  # 보라 (130-150)
+        print(f"   → 🟣 보라 (H={h:.1f})")
+        return [int(h), int(s), int(v)]
+    
+    elif h >= 150 and h < 170:  # 핑크/자홍 (150-170)
+        print(f"   → 🩷 핑크 (H={h:.1f})")
+        return [int(h), int(s), int(v)]
+    
+    else:  # 기타 (갈색 등)
+        # 채도와 명도로 추가 판단
+        if s < 60 and v < 120:
+            print(f"   → 🟤 갈색 (H={h:.1f}, S={s:.1f}, V={v:.1f})")
+        else:
+            print(f"   → ❓ 기타 (H={h:.1f})")
+        return [int(h), int(s), int(v)]
 
 def get_brightness_invariant_dominant_color(pixels_hsv):
     """🌞 명도 무관 색상 추출: 어둡고 밝은 같은 색을 동일하게 인식 (기존 함수)"""
