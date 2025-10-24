@@ -64,6 +64,7 @@ class HoldColorFeedbackRequest(BaseModel):
     predicted_color: str
     user_color: str
     hold_center: list = None
+    hold_features: dict = None  # 홀드의 전체 색상 특징 데이터
 
 app = FastAPI(title="ClimbMate API", version="1.0.0")
 
@@ -207,7 +208,12 @@ async def analyze_image(
                 'color': problems[group]['color_name'],  # 그룹 색상 (문제 색상)
                 'individual_color': hold.get('clip_color_name', 'unknown'),  # 홀드 자체의 실제 색상
                 'rgb': hold.get('dominant_rgb', [128, 128, 128]),
-                'hsv': hold.get('dominant_hsv', [0, 0, 128])
+                'hsv': hold.get('dominant_hsv', [0, 0, 128]),
+                # 🎨 ML 학습용 전체 색상 특징
+                'dominant_lab': hold.get('dominant_lab', [0, 0, 0]),
+                'hsv_stats': hold.get('hsv_stats', {}),
+                'rgb_stats': hold.get('rgb_stats', {}),
+                'lab_stats': hold.get('lab_stats', {})
             })
         
         # 이미지를 Base64로 인코딩 (GPT-4 및 DB 저장용)
@@ -450,35 +456,48 @@ if DB_AVAILABLE:
 
     @app.post("/api/hold-color-feedback")
     async def submit_hold_color_feedback(feedback: HoldColorFeedbackRequest):
-        """홀드 색상 피드백 저장"""
+        """🎨 홀드 색상 피드백 저장 (ML 학습용)"""
         try:
-            # 데이터베이스에 홀드 색상 피드백 저장
-            # TODO: 나중에 전용 테이블을 만들 수 있지만, 일단은 간단히 로깅
             print(f"🎨 홀드 색상 피드백 수신:")
             print(f"  - Problem ID: {feedback.problem_id}")
             print(f"  - Hold ID: {feedback.hold_id}")
             print(f"  - Predicted: {feedback.predicted_color}")
-            print(f"  - User: {feedback.user_color}")
+            print(f"  - User Correct: {feedback.user_color}")
             print(f"  - Center: {feedback.hold_center}")
+            print(f"  - Features: {len(feedback.hold_features) if feedback.hold_features else 0} keys")
             
-            # 색상 피드백 데이터 저장 (간단 버전)
-            feedback_data = {
-                "hold_id": feedback.hold_id,
-                "predicted_color": feedback.predicted_color,
-                "correct_color": feedback.user_color
-            }
-            
-            # 기존 색상 피드백 시스템에 추가
-            try:
-                from clustering import save_user_feedback
-                save_user_feedback([], [feedback_data])
-            except Exception as e:
-                print(f"⚠️ 색상 범위 업데이트 실패 (정상): {e}")
+            # 🔥 데이터베이스에 홀드 색상 피드백 저장 (ML 학습용)
+            if DB_AVAILABLE and feedback.hold_features:
+                from database import save_hold_color_feedback
+                
+                feedback_id = save_hold_color_feedback(
+                    problem_id=feedback.problem_id,
+                    hold_id=int(feedback.hold_id),
+                    hold_center=feedback.hold_center or [0, 0],
+                    hold_features=feedback.hold_features,
+                    predicted_color=feedback.predicted_color,
+                    user_correct_color=feedback.user_color
+                )
+                
+                print(f"✅ 홀드 색상 피드백 ID {feedback_id} 저장 완료!")
+                
+                # 🤖 ML 재학습 트리거 (비동기)
+                try:
+                    from database import get_color_training_data
+                    training_data = get_color_training_data()
+                    
+                    if len(training_data) >= 30:  # 30개 이상 피드백이 모이면
+                        print(f"🤖 색상 학습 데이터 {len(training_data)}개 확보! ML 재학습 준비 완료")
+                        # TODO: 실제 재학습은 별도 스케줄러에서 수행
+                except Exception as e:
+                    print(f"⚠️ ML 재학습 체크 실패: {e}")
+            else:
+                print("⚠️ DB 또는 hold_features 없음 - 로깅만 수행")
             
             return JSONResponse(
                 status_code=200,
                 content={
-                    "message": "홀드 색상 피드백이 저장되었습니다! 감사합니다 🎨",
+                    "message": "홀드 색상 피드백이 저장되었습니다! ML 학습에 활용됩니다 🎨🤖",
                     "feedback": {
                         "predicted": feedback.predicted_color,
                         "corrected": feedback.user_color

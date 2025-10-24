@@ -68,6 +68,42 @@ def init_db():
         )
     """)
     
+    # 🎨 홀드 색상 피드백 테이블 (ML 학습용)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS hold_color_feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            problem_id INTEGER,
+            hold_id INTEGER,
+            
+            -- 홀드 위치
+            center_x REAL,
+            center_y REAL,
+            
+            -- 색상 특징 (다양한 색상 공간)
+            rgb_r INTEGER,
+            rgb_g INTEGER,
+            rgb_b INTEGER,
+            hsv_h REAL,
+            hsv_s REAL,
+            hsv_v REAL,
+            lab_l REAL,
+            lab_a REAL,
+            lab_b REAL,
+            
+            -- 통계 특징 (JSON으로 저장)
+            color_stats TEXT,
+            
+            -- AI 예측 vs 사용자 피드백
+            predicted_color TEXT,
+            user_correct_color TEXT,
+            
+            -- 메타데이터
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            
+            FOREIGN KEY (problem_id) REFERENCES climbing_problems(id)
+        )
+    """)
+    
     # 인덱스 생성
     cursor.execute("""
         CREATE INDEX IF NOT EXISTS idx_verified 
@@ -77,6 +113,11 @@ def init_db():
     cursor.execute("""
         CREATE INDEX IF NOT EXISTS idx_created_at 
         ON climbing_problems(created_at)
+    """)
+    
+    cursor.execute("""
+        CREATE INDEX IF NOT EXISTS idx_hold_feedback_color
+        ON hold_color_feedback(user_correct_color)
     """)
     
     conn.commit()
@@ -283,6 +324,83 @@ def get_model_stats() -> Dict:
         'gpt4_type_accuracy': round(type_accuracy * 100, 1),
         'ready_for_training': verified >= 50
     }
+
+def save_hold_color_feedback(
+    problem_id: int,
+    hold_id: int,
+    hold_center: List[float],
+    hold_features: Dict,
+    predicted_color: str,
+    user_correct_color: str
+):
+    """🎨 홀드 색상 피드백 저장 (ML 학습용)"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    # RGB, HSV, LAB 추출
+    rgb = hold_features.get('dominant_rgb', [128, 128, 128])
+    hsv = hold_features.get('dominant_hsv', [0, 0, 128])
+    lab = hold_features.get('dominant_lab', [0, 0, 0])
+    
+    cursor.execute("""
+        INSERT INTO hold_color_feedback (
+            problem_id, hold_id, center_x, center_y,
+            rgb_r, rgb_g, rgb_b,
+            hsv_h, hsv_s, hsv_v,
+            lab_l, lab_a, lab_b,
+            color_stats,
+            predicted_color, user_correct_color
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        problem_id, hold_id,
+        hold_center[0], hold_center[1],
+        rgb[0], rgb[1], rgb[2],
+        hsv[0], hsv[1], hsv[2],
+        lab[0], lab[1], lab[2],
+        json.dumps(hold_features),  # 전체 특징 저장
+        predicted_color,
+        user_correct_color
+    ))
+    
+    feedback_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    
+    print(f"✅ 홀드 색상 피드백 ID {feedback_id} 저장 완료")
+    return feedback_id
+
+def get_color_training_data(min_samples: int = 10) -> List[Dict]:
+    """🎨 색상 학습 데이터 가져오기"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT 
+            rgb_r, rgb_g, rgb_b,
+            hsv_h, hsv_s, hsv_v,
+            lab_l, lab_a, lab_b,
+            color_stats,
+            user_correct_color
+        FROM hold_color_feedback
+        ORDER BY created_at DESC
+    """)
+    
+    rows = cursor.fetchall()
+    conn.close()
+    
+    training_data = []
+    for row in rows:
+        color_stats = json.loads(row[9]) if row[9] else {}
+        training_data.append({
+            'rgb': [row[0], row[1], row[2]],
+            'hsv': [row[3], row[4], row[5]],
+            'lab': [row[6], row[7], row[8]],
+            'color_stats': color_stats,
+            'correct_color': row[10]
+        })
+    
+    print(f"✅ 색상 학습 데이터 {len(training_data)}건 로드")
+    return training_data
 
 def calculate_statistics(holds_data: List[Dict]) -> Dict:
     """홀드 데이터로부터 통계 계산"""

@@ -158,7 +158,12 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                         'color': color_name,  # 그룹 색상 (문제 색상)
                         'individual_color': hold.get('clip_color_name', 'unknown'),  # 홀드 자체의 실제 색상
                         'rgb': hold.get('dominant_rgb', [128, 128, 128]),
-                        'hsv': hold.get('dominant_hsv', [0, 0, 128])
+                        'hsv': hold.get('dominant_hsv', [0, 0, 128]),
+                        # 🎨 ML 학습용 전체 색상 특징
+                        'dominant_lab': hold.get('dominant_lab', [0, 0, 0]),
+                        'hsv_stats': hold.get('hsv_stats', {}),
+                        'rgb_stats': hold.get('rgb_stats', {}),
+                        'lab_stats': hold.get('lab_stats', {})
                     }
                     enriched_holds.append(enriched_hold)
                 

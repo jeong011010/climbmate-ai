@@ -19,6 +19,10 @@ TYPE_MODEL_PATH = os.path.join(MODEL_DIR, 'type_model.pkl')
 DIFFICULTY_ENCODER_PATH = os.path.join(MODEL_DIR, 'difficulty_encoder.pkl')
 TYPE_ENCODER_PATH = os.path.join(MODEL_DIR, 'type_encoder.pkl')
 
+# 🎨 색상 분류 모델 경로
+COLOR_MODEL_PATH = os.path.join(MODEL_DIR, 'color_model.pkl')
+COLOR_ENCODER_PATH = os.path.join(MODEL_DIR, 'color_encoder.pkl')
+
 def extract_features(holds_data: List[Dict], stats: Dict = None) -> np.ndarray:
     """홀드 데이터로부터 특징 벡터 추출"""
     
@@ -295,6 +299,178 @@ def get_model_availability() -> Dict:
     """모델 사용 가능 여부 확인"""
     return {
         'difficulty_model': os.path.exists(DIFFICULTY_MODEL_PATH),
-        'type_model': os.path.exists(TYPE_MODEL_PATH)
+        'type_model': os.path.exists(TYPE_MODEL_PATH),
+        'color_model': os.path.exists(COLOR_MODEL_PATH)
     }
+
+# 🎨 ===== 색상 분류 모델 ===== 🎨
+
+def extract_color_features(color_data: Dict) -> np.ndarray:
+    """🎨 홀드 색상 데이터로부터 특징 벡터 추출"""
+    
+    rgb = color_data.get('rgb', [128, 128, 128])
+    hsv = color_data.get('hsv', [0, 0, 128])
+    lab = color_data.get('lab', [0, 0, 0])
+    
+    # 기본 색상 특징 (9개)
+    features = [
+        rgb[0], rgb[1], rgb[2],  # RGB
+        hsv[0], hsv[1], hsv[2],  # HSV
+        lab[0], lab[1], lab[2],  # LAB
+    ]
+    
+    # 통계 특징 추가 (color_stats에서)
+    color_stats = color_data.get('color_stats', {})
+    
+    # HSV 통계
+    hsv_stats = color_stats.get('hsv_stats', {})
+    features.extend([
+        hsv_stats.get('mean', [0, 0, 0])[0],  # H 평균
+        hsv_stats.get('mean', [0, 0, 0])[1],  # S 평균
+        hsv_stats.get('mean', [0, 0, 0])[2],  # V 평균
+        hsv_stats.get('std', [0, 0, 0])[1],   # S 표준편차
+        hsv_stats.get('std', [0, 0, 0])[2],   # V 표준편차
+    ])
+    
+    # RGB 통계
+    rgb_stats = color_stats.get('rgb_stats', {})
+    features.extend([
+        rgb_stats.get('std', [0, 0, 0])[0],   # R 표준편차
+        rgb_stats.get('std', [0, 0, 0])[1],   # G 표준편차
+        rgb_stats.get('std', [0, 0, 0])[2],   # B 표준편차
+    ])
+    
+    # LAB 통계
+    lab_stats = color_stats.get('lab_stats', {})
+    features.extend([
+        lab_stats.get('mean', [0, 0, 0])[1],  # a 평균 (빨강-녹색)
+        lab_stats.get('mean', [0, 0, 0])[2],  # b 평균 (파랑-노랑)
+    ])
+    
+    # 추가 특징
+    features.extend([
+        color_data.get('area', 0) / 10000,     # 홀드 크기 (정규화)
+        color_data.get('circularity', 0)       # 홀드 원형도
+    ])
+    
+    return np.array(features)
+
+def train_color_model(training_data: List[Dict]) -> Tuple[float, float]:
+    """🎨 색상 분류 모델 학습"""
+    
+    print(f"\n🎨 색상 분류 모델 학습 시작...")
+    print(f"   훈련 데이터: {len(training_data)}개")
+    
+    if len(training_data) < 10:
+        print(f"   ⚠️ 데이터 부족! 최소 10개 필요 (현재: {len(training_data)}개)")
+        return 0.0, 0.0
+    
+    # 특징 추출
+    X = []
+    y = []
+    
+    for data in training_data:
+        try:
+            features = extract_color_features(data)
+            X.append(features)
+            y.append(data['correct_color'])
+        except Exception as e:
+            print(f"   ⚠️ 특징 추출 실패: {e}")
+            continue
+    
+    if len(X) < 10:
+        print(f"   ⚠️ 유효 데이터 부족! (현재: {len(X)}개)")
+        return 0.0, 0.0
+    
+    X = np.array(X)
+    y = np.array(y)
+    
+    print(f"   색상 분포: {np.unique(y, return_counts=True)}")
+    
+    # 라벨 인코딩
+    label_encoder = LabelEncoder()
+    y_encoded = label_encoder.fit_transform(y)
+    
+    # 학습/테스트 분할
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y_encoded, test_size=0.2, random_state=42, stratify=y_encoded
+    )
+    
+    # 모델 학습 (Random Forest - 색상 분류에 적합)
+    model = RandomForestClassifier(
+        n_estimators=200,
+        max_depth=15,
+        min_samples_split=5,
+        min_samples_leaf=2,
+        random_state=42,
+        class_weight='balanced'  # 불균형 데이터 처리
+    )
+    
+    model.fit(X_train, y_train)
+    
+    # 정확도 평가
+    train_accuracy = model.score(X_train, y_train)
+    test_accuracy = model.score(X_test, y_test)
+    
+    # Cross-validation
+    cv_scores = cross_val_score(model, X, y_encoded, cv=min(5, len(X)//3))
+    cv_accuracy = np.mean(cv_scores)
+    
+    print(f"   ✅ 훈련 정확도: {train_accuracy*100:.1f}%")
+    print(f"   ✅ 테스트 정확도: {test_accuracy*100:.1f}%")
+    print(f"   ✅ CV 정확도: {cv_accuracy*100:.1f}%")
+    
+    # Feature Importance
+    feature_importance = model.feature_importances_
+    top_features = np.argsort(feature_importance)[::-1][:5]
+    print(f"   🔝 중요 특징 (인덱스): {top_features}")
+    
+    # 모델 저장
+    with open(COLOR_MODEL_PATH, 'wb') as f:
+        pickle.dump(model, f)
+    with open(COLOR_ENCODER_PATH, 'wb') as f:
+        pickle.dump(label_encoder, f)
+    
+    print(f"   💾 모델 저장 완료: {COLOR_MODEL_PATH}")
+    
+    return test_accuracy, cv_accuracy
+
+def predict_color(hold_features: Dict) -> Dict:
+    """🎨 학습된 모델로 홀드 색상 예측"""
+    
+    if not os.path.exists(COLOR_MODEL_PATH):
+        return {'color': None, 'confidence': 0.0, 'available': False}
+    
+    try:
+        # 모델 로드
+        with open(COLOR_MODEL_PATH, 'rb') as f:
+            model = pickle.load(f)
+        with open(COLOR_ENCODER_PATH, 'rb') as f:
+            encoder = pickle.load(f)
+        
+        # 특징 추출
+        features = extract_color_features(hold_features)
+        features = features.reshape(1, -1)
+        
+        # 예측
+        prediction = model.predict(features)[0]
+        probabilities = model.predict_proba(features)[0]
+        
+        color = encoder.inverse_transform([prediction])[0]
+        confidence = float(np.max(probabilities))
+        
+        # 상위 3개 예측
+        top_3_idx = np.argsort(probabilities)[::-1][:3]
+        top_3_colors = encoder.inverse_transform(top_3_idx)
+        top_3_probs = probabilities[top_3_idx]
+        
+        return {
+            'color': color,
+            'confidence': confidence,
+            'available': True,
+            'top_3': list(zip(top_3_colors, top_3_probs.tolist()))
+        }
+    except Exception as e:
+        print(f"⚠️ 색상 예측 실패: {e}")
+        return {'color': None, 'confidence': 0.0, 'available': False}
 

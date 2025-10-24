@@ -426,15 +426,28 @@ function App() {
     }
 
     try {
+      // 🎨 홀드의 전체 색상 특징 데이터 준비 (ML 학습용)
+      const holdFeatures = {
+        dominant_rgb: selectedHold.rgb || [128, 128, 128],
+        dominant_hsv: selectedHold.hsv || [0, 0, 128],
+        dominant_lab: selectedHold.dominant_lab || [0, 0, 0],
+        hsv_stats: selectedHold.hsv_stats || {},
+        rgb_stats: selectedHold.rgb_stats || {},
+        lab_stats: selectedHold.lab_stats || {},
+        area: selectedHold.area || 0,
+        circularity: selectedHold.circularity || 0
+      }
+
       await axios.post(`${API_URL}/api/hold-color-feedback`, {
         problem_id: selectedProblem.db_id,
         hold_id: selectedHold.id || `${selectedHold.center[0]}_${selectedHold.center[1]}`,
         predicted_color: selectedHold.individual_color || selectedHold.color,
         user_color: holdColorFeedback,
-        hold_center: selectedHold.center
+        hold_center: selectedHold.center,
+        hold_features: holdFeatures  // 🔥 전체 색상 특징 데이터 전송
       })
 
-      alert('홀드 색상 피드백이 제출되었습니다. 감사합니다!')
+      alert('홀드 색상 피드백이 제출되었습니다! ML 학습에 활용됩니다 🤖')
       setShowHoldFeedbackModal(false)
       setHoldColorFeedback('')
       
