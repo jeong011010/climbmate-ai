@@ -121,6 +121,16 @@ def init_db():
         ON hold_color_feedback(user_correct_color)
     """)
     
+    # ✅ 기존 테이블에 새 컬럼 추가 (마이그레이션)
+    try:
+        cursor.execute("ALTER TABLE hold_color_feedback ADD COLUMN confirmed INTEGER DEFAULT 0")
+        print("✅ confirmed 컬럼 추가 완료")
+    except sqlite3.OperationalError as e:
+        if "duplicate column name" in str(e).lower():
+            print("✅ confirmed 컬럼 이미 존재")
+        else:
+            print(f"⚠️ confirmed 컬럼 추가 실패: {e}")
+    
     conn.commit()
     conn.close()
     print("✅ 데이터베이스 초기화 완료")
