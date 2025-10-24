@@ -408,7 +408,9 @@ def get_color_training_data(min_samples: int = 10) -> List[Dict]:
             'hsv': [row[3], row[4], row[5]],
             'lab': [row[6], row[7], row[8]],
             'color_stats': color_stats,
-            'correct_color': row[10]
+            'correct_color': row[10],
+            'area': 0,  # 기본값
+            'circularity': 0  # 기본값
         })
     
     print(f"✅ 색상 학습 데이터 {len(training_data)}건 로드")
