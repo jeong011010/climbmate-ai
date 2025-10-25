@@ -962,8 +962,8 @@ function App() {
           />
         )}
 
-        {/* 기존 코드 (나중에 제거 예정) - 결과가 없거나 다른 뷰일 때 */}
-        {!(currentView === 'analyze' && preview && result) && preview && (
+        {/* 기존 이미지 코드 - 비활성화 (AnalyzeLayout으로 대체) */}
+        {preview && !preview && (
            <div className="relative mb-4 w-full lg:max-w-[50%] lg:float-left lg:mr-6">
              <div className="relative w-full flex justify-center">
                <div className="relative" style={{ display: 'inline-block' }}>
@@ -1278,8 +1278,8 @@ function App() {
            </div>
          )}
 
-        {/* 결과 */}
-        {result && (
+        {/* 기존 결과 코드 - 비활성화 (AnalyzeLayout으로 대체) */}
+        {result && !result && (
           <div className="w-full lg:w-[48%] lg:float-right">
             {/* 통계 */}
             <div className="flex flex-row gap-4 mx-auto mb-6 w-full justify-center items-center">
