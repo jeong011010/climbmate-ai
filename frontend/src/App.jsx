@@ -166,7 +166,7 @@ function App() {
   }
 
   const handleImageClick = (e) => {
-    if (!result || !result.problems) return
+    if (!result || !result.problems || !imageRef.current) return
     
     e.preventDefault()
     const rect = e.target.getBoundingClientRect()
@@ -213,7 +213,7 @@ function App() {
       />
 
       {/* 메인 컨텐츠 영역 */}
-      <div className="w-full pt-28 pb-20 px-2 sm:px-4">
+      <div className="w-full pt-36 pb-20 px-2 sm:px-4">
         {currentView === 'analyze' && (
           <>
             {/* 분석 결과 화면 */}

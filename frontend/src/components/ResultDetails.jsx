@@ -107,36 +107,36 @@ const ResultDetails = ({
 
       {/* 선택된 문제 상세 */}
       {selectedProblem && selectedProblem.difficulty && (
-        <div className="glass-card p-4 mx-auto mb-4 w-full text-center shadow-md">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-2xl text-slate-800 font-extrabold flex-1">
+        <div className="glass-card p-3 mx-auto mb-3 w-full text-center shadow-md">
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-lg text-slate-800 font-bold flex-1">
               {colorEmoji[selectedProblem.color_name] || '⭕'} {(selectedProblem.color_name || 'UNKNOWN').toUpperCase()} 문제
             </h3>
             <button
               onClick={() => setShowFeedbackModal(true)}
-              className="px-4 py-2 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-xl text-sm font-semibold shadow-md hover:shadow-lg transition-all"
+              className="px-3 py-1.5 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-lg text-xs font-semibold shadow-md hover:shadow-lg transition-all"
             >
               📝 피드백
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div className="bg-white/80 backdrop-blur-sm p-5 rounded-xl shadow-md transition-all duration-300 hover:translate-y-[-3px] hover:shadow-lg">
-              <h4 className="text-sm mb-3 text-slate-600 font-semibold text-center">🎯 난이도</h4>
-              <div className="text-3xl font-extrabold gradient-text text-center mb-1">{selectedProblem.difficulty || 'V?'}</div>
-              <div className="text-sm text-slate-600 mb-2 font-medium text-center">{selectedProblem.type || '미분석'}</div>
-              <div className="text-xl text-yellow-400 text-center drop-shadow-sm">
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="bg-white/80 backdrop-blur-sm p-3 rounded-xl shadow-md">
+              <h4 className="text-xs mb-2 text-slate-600 font-semibold text-center">🎯 난이도</h4>
+              <div className="text-2xl font-extrabold gradient-text text-center mb-0.5">{selectedProblem.difficulty || 'V?'}</div>
+              <div className="text-xs text-slate-600 mb-1 font-medium text-center">{selectedProblem.type || '미분석'}</div>
+              <div className="text-base text-yellow-400 text-center">
                 {'★'.repeat(Math.floor((selectedProblem.difficulty?.confidence || 0) * 5))}
                 {'☆'.repeat(5 - Math.floor((selectedProblem.difficulty?.confidence || 0) * 5))}
               </div>
             </div>
 
-            <div className="bg-white/80 backdrop-blur-sm p-5 rounded-xl shadow-md transition-all duration-300 hover:translate-y-[-3px] hover:shadow-lg">
-              <h4 className="text-sm mb-3 text-slate-600 font-semibold text-center">🏋️ 유형</h4>
-              <div className="text-lg font-bold text-slate-800 mb-2 text-center">{selectedProblem.type || '일반'}</div>
-              <div className="flex flex-wrap gap-2 justify-center">
+            <div className="bg-white/80 backdrop-blur-sm p-3 rounded-xl shadow-md">
+              <h4 className="text-xs mb-2 text-slate-600 font-semibold text-center">🏋️ 유형</h4>
+              <div className="text-base font-bold text-slate-800 mb-1.5 text-center">{selectedProblem.type || '일반'}</div>
+              <div className="flex flex-wrap gap-1.5 justify-center">
                 {selectedProblem.climb_type?.types?.slice(0, 3).map((type, idx) => (
-                  <span key={idx} className="px-3 py-1 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-full text-xs font-semibold shadow-md">
+                  <span key={idx} className="px-2 py-0.5 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-full text-xs font-semibold">
                     {type}
                   </span>
                 ))}
@@ -144,36 +144,36 @@ const ResultDetails = ({
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md mb-4">
-            <h4 className="text-sm mb-3 text-slate-800 font-bold text-center">📊 문제 정보</h4>
-            <div className="flex justify-between items-center py-2 border-b border-slate-200 text-sm transition-all duration-200 hover:bg-white/50 hover:px-4 hover:rounded-lg hover:-mx-4">
-              <span className="text-slate-600 font-medium">홀드 개수:</span>
+          <div className="bg-white/80 backdrop-blur-sm p-3 rounded-xl shadow-md mb-3">
+            <h4 className="text-xs mb-2 text-slate-800 font-bold text-center">📊 문제 정보</h4>
+            <div className="flex justify-between items-center py-1 border-b border-slate-200 text-xs">
+              <span className="text-slate-600">홀드 개수:</span>
               <span className="font-bold gradient-text">{selectedProblem.hold_count}개</span>
             </div>
-            <div className="flex justify-between items-center py-2 border-b border-slate-200 text-sm transition-all duration-200 hover:bg-white/50 hover:px-4 hover:rounded-lg hover:-mx-4">
-              <span className="text-slate-600 font-medium">난이도:</span>
+            <div className="flex justify-between items-center py-1 border-b border-slate-200 text-xs">
+              <span className="text-slate-600">난이도:</span>
               <span className="font-bold gradient-text">{selectedProblem.difficulty || 'V?'}</span>
             </div>
-            <div className="flex justify-between items-center py-2 border-b border-slate-200 text-sm transition-all duration-200 hover:bg-white/50 hover:px-4 hover:rounded-lg hover:-mx-4">
-              <span className="text-slate-600 font-medium">유형:</span>
+            <div className="flex justify-between items-center py-1 border-b border-slate-200 text-xs">
+              <span className="text-slate-600">유형:</span>
               <span className="font-bold gradient-text">{selectedProblem.type || '일반'}</span>
             </div>
-            <div className="flex justify-between items-center py-2 text-sm transition-all duration-200 hover:bg-white/50 hover:px-4 hover:rounded-lg hover:-mx-4">
-              <span className="text-slate-600 font-medium">분석 방법:</span>
+            <div className="flex justify-between items-center py-1 text-xs">
+              <span className="text-slate-600">분석 방법:</span>
               <span className="font-bold gradient-text">{selectedProblem.reasoning ? 'GPT-4 AI' : '규칙 기반'}</span>
             </div>
           </div>
 
           {selectedProblem.reasoning && (
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-xl shadow-md border-2 border-blue-200">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-2xl">🤖</span>
-                <h4 className="text-sm text-slate-800 font-bold">GPT-4 AI 상세 분석</h4>
-                <span className="ml-auto text-xs bg-blue-500 text-white px-2 py-1 rounded-full">
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-3 rounded-xl shadow-md border-2 border-blue-200">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-lg">🤖</span>
+                <h4 className="text-xs text-slate-800 font-bold">GPT-4 AI 상세 분석</h4>
+                <span className="ml-auto text-xs bg-blue-500 text-white px-1.5 py-0.5 rounded-full">
                   신뢰도: {Math.round((selectedProblem.gpt4_confidence || 0.8) * 100)}%
                 </span>
               </div>
-              <div className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
+              <div className="text-xs text-slate-700 leading-relaxed whitespace-pre-line">
                 {selectedProblem.reasoning}
               </div>
             </div>
