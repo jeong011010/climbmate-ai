@@ -11,27 +11,27 @@ const ResultDetails = ({
   if (!result) return null
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-4">
       {/* 통계 */}
-      <div className="flex flex-row gap-4 mx-auto mb-6 w-full justify-center items-center">
-        <div className="glass-card p-6 rounded-2xl text-center shadow-lg transition-all duration-300 flex-1 min-w-[80px] max-w-[120px] hover:translate-y-[-5px] hover:shadow-xl">
-          <div className="text-3xl font-extrabold gradient-text mb-1">{result.statistics.total_problems}</div>
+      <div className="flex flex-row gap-3 mx-auto mb-4 w-full justify-center items-center">
+        <div className="glass-card p-4 rounded-xl text-center shadow-md transition-all duration-300 flex-1 min-w-[70px] max-w-[100px] hover:translate-y-[-3px] hover:shadow-lg">
+          <div className="text-2xl font-extrabold gradient-text mb-1">{result.statistics.total_problems}</div>
           <div className="text-xs text-slate-600 font-semibold">문제 수</div>
         </div>
-        <div className="glass-card p-6 rounded-2xl text-center shadow-lg transition-all duration-300 flex-1 min-w-[80px] max-w-[120px] hover:translate-y-[-5px] hover:shadow-xl">
-          <div className="text-3xl font-extrabold gradient-text mb-1">{result.statistics.total_holds}</div>
+        <div className="glass-card p-4 rounded-xl text-center shadow-md transition-all duration-300 flex-1 min-w-[70px] max-w-[100px] hover:translate-y-[-3px] hover:shadow-lg">
+          <div className="text-2xl font-extrabold gradient-text mb-1">{result.statistics.total_holds}</div>
           <div className="text-xs text-slate-600 font-semibold">홀드 수</div>
         </div>
-        <div className="glass-card p-6 rounded-2xl text-center shadow-lg transition-all duration-300 flex-1 min-w-[80px] max-w-[120px] hover:translate-y-[-5px] hover:shadow-xl">
-          <div className="text-3xl font-extrabold gradient-text mb-1">{result.statistics.analyzable_problems}</div>
+        <div className="glass-card p-4 rounded-xl text-center shadow-md transition-all duration-300 flex-1 min-w-[70px] max-w-[100px] hover:translate-y-[-3px] hover:shadow-lg">
+          <div className="text-2xl font-extrabold gradient-text mb-1">{result.statistics.analyzable_problems}</div>
           <div className="text-xs text-slate-600 font-semibold">분석 가능</div>
         </div>
       </div>
 
       {/* 선택된 홀드 상세 */}
       {selectedHold && selectedProblem && (
-        <div className="glass-card p-5 mx-auto mb-4 w-full shadow-lg border-2 border-yellow-400">
-          <div className="flex items-center justify-between mb-3">
+        <div className="glass-card p-4 mx-auto mb-3 w-full shadow-md border-2 border-yellow-400">
+          <div className="flex items-center justify-between mb-2">
             <h3 className="text-xl text-slate-800 font-bold flex items-center gap-2">
               <span className="text-3xl">🎯</span>
               선택된 홀드
@@ -107,8 +107,8 @@ const ResultDetails = ({
 
       {/* 선택된 문제 상세 */}
       {selectedProblem && selectedProblem.difficulty && (
-        <div className="glass-card p-6 mx-auto mb-6 w-full text-center shadow-lg">
-          <div className="flex justify-between items-center mb-4">
+        <div className="glass-card p-4 mx-auto mb-4 w-full text-center shadow-md">
+          <div className="flex justify-between items-center mb-3">
             <h3 className="text-2xl text-slate-800 font-extrabold flex-1">
               {colorEmoji[selectedProblem.color_name] || '⭕'} {(selectedProblem.color_name || 'UNKNOWN').toUpperCase()} 문제
             </h3>
