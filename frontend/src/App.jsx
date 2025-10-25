@@ -231,6 +231,7 @@ function App() {
                 setShowFeedbackModal={setShowFeedbackModal}
                 setShowImageModal={setShowImageModal}
                 handleImageClick={handleImageClick}
+                imageRef={imageRef}
                 onProblemSelect={(problem) => {
                   setSelectedProblem(problem)
                   setSelectedHold(null)

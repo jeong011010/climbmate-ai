@@ -14,6 +14,7 @@ const AnalyzeLayout = ({
   setShowFeedbackModal,
   setShowImageModal,
   handleImageClick,
+  imageRef,
   onProblemSelect,
   colorEmoji
 }) => {
@@ -34,6 +35,7 @@ const AnalyzeLayout = ({
               setImageLoaded={setImageLoaded}
               onImageClick={handleImageClick}
               onImageDoubleClick={() => setShowImageModal(true)}
+              imageRef={imageRef}
               colorEmoji={colorEmoji}
             />
           </div>

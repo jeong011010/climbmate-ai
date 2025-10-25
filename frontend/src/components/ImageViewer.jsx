@@ -1,5 +1,3 @@
-import { useRef } from 'react'
-
 const ImageViewer = ({ 
   preview, 
   annotatedImage, 
@@ -10,9 +8,9 @@ const ImageViewer = ({
   setImageLoaded,
   onImageClick,
   onImageDoubleClick,
+  imageRef,
   colorEmoji 
 }) => {
-  const imageRef = useRef(null)
 
   if (!preview) return null
 
