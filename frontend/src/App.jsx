@@ -28,7 +28,7 @@ function App() {
   const [result, setResult] = useState(null)
   const [selectedProblem, setSelectedProblem] = useState(null)
   const [selectedHold, setSelectedHold] = useState(null)
-  const [wallAngle] = useState(null)  // 현재 미사용 (향후 확장 가능)
+  const [wallAngle, setWallAngle] = useState(null)
   const [annotatedImage, setAnnotatedImage] = useState(null)
   const [showImageModal, setShowImageModal] = useState(false)
   const [showFeedbackModal, setShowFeedbackModal] = useState(false)
@@ -247,6 +247,8 @@ function App() {
                 handleImageUpload={handleImageUpload}
                 handleCameraCapture={handleCameraCapture}
                 analyzeImage={analyzeImage}
+                wallAngle={wallAngle}
+                setWallAngle={setWallAngle}
               />
             )}
 

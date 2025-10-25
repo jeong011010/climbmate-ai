@@ -2,7 +2,9 @@ const MainPage = ({
   preview, 
   handleImageUpload, 
   handleCameraCapture,
-  analyzeImage
+  analyzeImage,
+  wallAngle,
+  setWallAngle
 }) => {
   return (
     <>
@@ -92,10 +94,49 @@ const MainPage = ({
               <h3 className="text-lg font-bold gradient-text mb-4 text-center">
                 ✅ 이미지 업로드 완료
               </h3>
-              <p className="text-sm text-slate-600 mb-6 text-center">
+              <p className="text-sm text-slate-600 mb-4 text-center">
                 이미지를 확인하시고 분석을 시작하거나<br/>
                 다른 이미지를 선택하세요
               </p>
+              
+              {/* 벽 각도 선택 (선택사항) */}
+              <div className="mb-4">
+                <p className="text-sm font-bold text-slate-700 mb-3 text-center">
+                  🏔️ 벽 각도 선택 (선택사항)
+                </p>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    className={`p-3 rounded-xl text-xs font-semibold transition-all ${
+                      wallAngle === 'overhang' 
+                        ? 'bg-gradient-to-r from-primary-500 to-purple-600 text-white shadow-lg' 
+                        : 'glass-button text-slate-700 hover:shadow-md'
+                    }`}
+                    onClick={() => setWallAngle(wallAngle === 'overhang' ? null : 'overhang')}
+                  >
+                    오버행
+                  </button>
+                  <button
+                    className={`p-3 rounded-xl text-xs font-semibold transition-all ${
+                      wallAngle === 'slab' 
+                        ? 'bg-gradient-to-r from-primary-500 to-purple-600 text-white shadow-lg' 
+                        : 'glass-button text-slate-700 hover:shadow-md'
+                    }`}
+                    onClick={() => setWallAngle(wallAngle === 'slab' ? null : 'slab')}
+                  >
+                    슬랩
+                  </button>
+                  <button
+                    className={`p-3 rounded-xl text-xs font-semibold transition-all ${
+                      wallAngle === 'face' 
+                        ? 'bg-gradient-to-r from-primary-500 to-purple-600 text-white shadow-lg' 
+                        : 'glass-button text-slate-700 hover:shadow-md'
+                    }`}
+                    onClick={() => setWallAngle(wallAngle === 'face' ? null : 'face')}
+                  >
+                    직벽
+                  </button>
+                </div>
+              </div>
               
               <div className="flex flex-col gap-3">
                 <button
