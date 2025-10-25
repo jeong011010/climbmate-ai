@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { useEffect, useRef, useState } from 'react'
+import AnalyzeLayout from './components/AnalyzeLayout'
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://climbmate.store'
 
@@ -938,7 +939,31 @@ function App() {
 
       {/* 메인 컨텐츠 영역 */}
       <div className="w-full pt-24 pb-20 px-2 sm:px-4">
-        {preview && (
+        {/* 분석 뷰: 좌우 분할 레이아웃 */}
+        {currentView === 'analyze' && preview && result && (
+          <AnalyzeLayout
+            preview={preview}
+            annotatedImage={annotatedImage}
+            result={result}
+            selectedProblem={selectedProblem}
+            selectedHold={selectedHold}
+            imageLoaded={imageLoaded}
+            setImageLoaded={setImageLoaded}
+            setSelectedHold={setSelectedHold}
+            setShowHoldFeedbackModal={setShowHoldFeedbackModal}
+            setShowFeedbackModal={setShowFeedbackModal}
+            setShowImageModal={setShowImageModal}
+            handleImageClick={handleImageClick}
+            onProblemSelect={(problem) => {
+              setSelectedProblem(problem)
+              setSelectedHold(null)
+            }}
+            colorEmoji={colorEmoji}
+          />
+        )}
+
+        {/* 기존 코드 (나중에 제거 예정) - 결과가 없거나 다른 뷰일 때 */}
+        {!(currentView === 'analyze' && preview && result) && preview && (
            <div className="relative mb-4 w-full lg:max-w-[50%] lg:float-left lg:mr-6">
              <div className="relative w-full flex justify-center">
                <div className="relative" style={{ display: 'inline-block' }}>
