@@ -170,9 +170,18 @@ function App() {
     if (!result || !result.problems || !imageRef.current) return
     
     e.preventDefault()
+    
+    // 터치 이벤트와 마우스 이벤트 모두 지원
+    const clientX = e.type === 'touchend' 
+      ? e.changedTouches[0].clientX 
+      : e.clientX
+    const clientY = e.type === 'touchend' 
+      ? e.changedTouches[0].clientY 
+      : e.clientY
+    
     const rect = e.target.getBoundingClientRect()
-    const clickX = ((e.clientX - rect.left) / rect.width) * imageRef.current.naturalWidth
-    const clickY = ((e.clientY - rect.top) / rect.height) * imageRef.current.naturalHeight
+    const clickX = ((clientX - rect.left) / rect.width) * imageRef.current.naturalWidth
+    const clickY = ((clientY - rect.top) / rect.height) * imageRef.current.naturalHeight
 
     let closestHold = null
     let closestDistance = Infinity
