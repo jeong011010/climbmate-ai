@@ -67,6 +67,7 @@ function App() {
     loadStats,
     loadColorFeedbacks,
     confirmFeedback,
+    confirmAllFeedbacks,
     deleteFeedback,
     trainColorModel,
     checkGpt4Status,
@@ -291,6 +292,7 @@ function App() {
             loadColorFeedbacks={loadColorFeedbacks}
             trainColorModel={trainColorModel}
             confirmFeedback={confirmFeedback}
+            confirmAllFeedbacks={confirmAllFeedbacks}
             deleteFeedback={deleteFeedback}
           />
         )}

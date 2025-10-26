@@ -28,6 +28,19 @@ export const confirmColorFeedback = async (feedbackId) => {
 }
 
 /**
+ * 모든 미확인 색상 피드백 일괄 확인
+ */
+export const confirmAllColorFeedbacks = async () => {
+  try {
+    const response = await axios.post(`${API_URL}/api/color-feedbacks/confirm-all`)
+    return response.data
+  } catch (error) {
+    console.error('❌ 일괄 확인 실패:', error)
+    throw error
+  }
+}
+
+/**
  * 색상 피드백 삭제
  */
 export const deleteColorFeedback = async (feedbackId) => {

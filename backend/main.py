@@ -124,10 +124,14 @@ async def analyze_image(
         if image is None:
             raise HTTPException(status_code=400, detail="Invalid image file")
         
-        # 🚀 이미지 크기 최적화 비활성화 (YOLO 전처리에서 처리)
-        # Roboflow와 동일하게 원본 이미지를 직접 YOLO로 전달
+        # 🚀 이미지 크기 최적화 (속도 향상)
         height, width = image.shape[:2]
-        print(f"📐 원본 이미지 크기: {width}x{height}")
+        if width > 1200:  # 너무 큰 이미지는 리사이즈
+            scale = 1200 / width
+            new_width = 1200
+            new_height = int(height * scale)
+            image = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
+            print(f"📐 이미지 리사이즈: {width}x{height} → {new_width}x{new_height}")
         
         # 🚀 최적화: 전처리 (홀드 감지)
         print(f"🔍 홀드 감지 시작...")
@@ -569,6 +573,24 @@ if DB_AVAILABLE:
             )
         except Exception as e:
             print(f"❌ 피드백 확인 오류: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
+    
+    @app.post("/api/color-feedbacks/confirm-all")
+    async def confirm_all_feedbacks():
+        """🎨 모든 미확인 피드백 일괄 확인 (ML 학습 데이터로 확정)"""
+        try:
+            if not DB_AVAILABLE:
+                raise HTTPException(status_code=503, detail="Database not available")
+            
+            from database import confirm_all_unconfirmed_feedbacks
+            count = confirm_all_unconfirmed_feedbacks()
+            
+            return JSONResponse(
+                status_code=200,
+                content={"message": f"{count}개 피드백 일괄 확인 완료", "count": count}
+            )
+        except Exception as e:
+            print(f"❌ 일괄 확인 오류: {e}")
             raise HTTPException(status_code=500, detail=str(e))
     
     @app.delete("/api/color-feedbacks/{feedback_id}")

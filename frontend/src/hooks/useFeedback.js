@@ -51,6 +51,29 @@ export const useFeedback = ({
     }
   }
 
+  // 🎨 모든 미확인 피드백 일괄 확인
+  const confirmAllFeedbacks = async () => {
+    const unconfirmedCount = colorFeedbacks.filter(f => !f.confirmed).length
+    
+    if (unconfirmedCount === 0) {
+      alert('확인할 피드백이 없습니다.')
+      return
+    }
+
+    if (!confirm(`⚠️ 미확인 피드백 ${unconfirmedCount}개를 모두 ML 학습 데이터로 확정하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`)) {
+      return
+    }
+
+    try {
+      const data = await api.confirmAllColorFeedbacks()
+      alert(`✅ ${data.count}개의 피드백이 확인되었습니다!`)
+      loadColorFeedbacks() // 목록 새로고침
+    } catch (error) {
+      console.error('일괄 확인 실패:', error)
+      alert('일괄 확인에 실패했습니다.')
+    }
+  }
+
   // 🎨 색상 피드백 삭제
   const deleteFeedback = async (feedbackId) => {
     if (!confirm('이 피드백을 삭제하시겠습니까?')) {
@@ -161,6 +184,7 @@ export const useFeedback = ({
     loadStats,
     loadColorFeedbacks,
     confirmFeedback,
+    confirmAllFeedbacks,
     deleteFeedback,
     trainColorModel,
     checkGpt4Status,

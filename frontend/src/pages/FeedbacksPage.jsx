@@ -4,19 +4,31 @@ const FeedbacksPage = ({
   loadColorFeedbacks,
   trainColorModel,
   confirmFeedback,
+  confirmAllFeedbacks,
   deleteFeedback
 }) => {
   return (
     <div className="w-full px-2 sm:px-4">
       <div className="glass-card p-4 sm:p-6">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-800">🎨 색상 피드백 관리</h2>
-          <button
-            onClick={loadColorFeedbacks}
-            className="px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all"
-          >
-            🔄 새로고침
-          </button>
+          <div className="flex gap-2">
+            {colorFeedbacks.filter(f => !f.confirmed).length > 0 && (
+              <button
+                onClick={confirmAllFeedbacks}
+                disabled={feedbacksLoading}
+                className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:shadow-lg transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                ✅ 전체 확인
+              </button>
+            )}
+            <button
+              onClick={loadColorFeedbacks}
+              className="px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all"
+            >
+              🔄 새로고침
+            </button>
+          </div>
         </div>
 
         {feedbacksLoading ? (

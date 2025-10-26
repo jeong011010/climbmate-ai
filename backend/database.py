@@ -470,6 +470,32 @@ def confirm_color_feedback(feedback_id: int):
     print(f"✅ 피드백 ID {feedback_id} 확인 완료 (ML 학습용)")
     return True
 
+def confirm_all_unconfirmed_feedbacks():
+    """🎨 모든 미확인 피드백을 한 번에 확인 처리"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    # 미확인 피드백 개수 확인
+    cursor.execute("SELECT COUNT(*) FROM hold_color_feedback WHERE confirmed = 0")
+    count = cursor.fetchone()[0]
+    
+    if count == 0:
+        conn.close()
+        return 0
+    
+    # 모두 확인 처리
+    cursor.execute("""
+        UPDATE hold_color_feedback 
+        SET confirmed = 1 
+        WHERE confirmed = 0
+    """)
+    
+    conn.commit()
+    conn.close()
+    
+    print(f"✅ {count}개의 피드백 일괄 확인 완료 (ML 학습용)")
+    return count
+
 def delete_color_feedback(feedback_id: int):
     """🎨 색상 피드백 삭제"""
     conn = sqlite3.connect(DB_PATH)
