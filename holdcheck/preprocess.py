@@ -1442,7 +1442,7 @@ def calculate_advanced_features(pixels_hsv, pixels_lab, pixels_rgb):
 # -------------------------------
 # 📌 Preprocess Pipeline
 # -------------------------------
-def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.pt", conf=0.4, brightness_normalization=False, 
+def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.pt", conf=0.25, brightness_normalization=False, 
                brightness_filter=False, min_brightness=0, max_brightness=100, 
                saturation_filter=False, min_saturation=0, mask_refinement=5, use_clip_ai=False):
     # image_input이 문자열(파일 경로)인지 numpy 배열인지 확인
@@ -1489,7 +1489,7 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
             largest_contour = max(contours, key=cv2.contourArea)
             area = cv2.contourArea(largest_contour)
             
-            if area < 200:
+            if area < 100:
                 continue
                 
             perimeter = cv2.arcLength(largest_contour, True)
@@ -1497,7 +1497,7 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
                 continue
                 
             circularity = 4 * np.pi * area / (perimeter * perimeter)
-            if circularity < 0.1:
+            if circularity < 0.05:
                 continue
             
             mask_clean = np.zeros_like(mask_refined)
@@ -1599,7 +1599,7 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
             area = cv2.contourArea(largest_contour)
             
             # 더 엄격한 크기 필터링
-            if area < 200:  # 최소 크기 증가
+            if area < 100:  # 최소 크기 완화
                 continue
             
             # 3단계: 컨투어 품질 검증
@@ -1609,7 +1609,7 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
             
             # 원형도 검증 (홀드는 대체로 원형에 가까움)
             circularity = 4 * np.pi * area / (perimeter * perimeter)
-            if circularity < 0.1:  # 너무 불규칙한 모양 제외
+            if circularity < 0.05:  # 불규칙한 모양도 허용
                 continue
             
             # 4단계: 최종 마스크 생성
