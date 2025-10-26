@@ -402,16 +402,42 @@ def train_color_model(training_data: List[Dict]) -> Tuple[float, float]:
     X = np.array(X)
     y = np.array(y)
     
-    print(f"   색상 분포: {np.unique(y, return_counts=True)}")
+    unique_colors, counts = np.unique(y, return_counts=True)
+    print(f"   색상 분포: {dict(zip(unique_colors, counts))}")
+    
+    # 샘플이 1개뿐인 클래스 필터링
+    min_samples_per_class = 2
+    classes_to_keep = unique_colors[counts >= min_samples_per_class]
+    
+    if len(classes_to_keep) < 2:
+        print(f"   ⚠️ 2개 이상의 샘플을 가진 색상 클래스가 부족합니다!")
+        print(f"   각 색상마다 최소 {min_samples_per_class}개의 피드백이 필요합니다.")
+        return 0.0, 0.0
+    
+    # 필터링된 데이터만 사용
+    mask = np.isin(y, classes_to_keep)
+    X = X[mask]
+    y = y[mask]
+    
+    print(f"   ✅ 학습에 사용할 데이터: {len(X)}개 (필터링 후)")
     
     # 라벨 인코딩
     label_encoder = LabelEncoder()
     y_encoded = label_encoder.fit_transform(y)
     
+    # stratify 가능 여부 체크
+    unique_encoded, counts_encoded = np.unique(y_encoded, return_counts=True)
+    can_stratify = np.all(counts_encoded >= 2)
+    
     # 학습/테스트 분할
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y_encoded, test_size=0.2, random_state=42, stratify=y_encoded
-    )
+    if can_stratify:
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y_encoded, test_size=0.2, random_state=42, stratify=y_encoded
+        )
+    else:
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y_encoded, test_size=0.2, random_state=42
+        )
     
     # 모델 학습 (Random Forest - 색상 분류에 적합)
     model = RandomForestClassifier(
@@ -429,9 +455,18 @@ def train_color_model(training_data: List[Dict]) -> Tuple[float, float]:
     train_accuracy = model.score(X_train, y_train)
     test_accuracy = model.score(X_test, y_test)
     
-    # Cross-validation
-    cv_scores = cross_val_score(model, X, y_encoded, cv=min(5, len(X)//3))
-    cv_accuracy = np.mean(cv_scores)
+    # Cross-validation (각 클래스에 충분한 샘플이 있을 때만)
+    cv_folds = min(3, len(X)//10)  # 더 보수적으로 설정
+    if cv_folds >= 2 and np.all(counts_encoded >= cv_folds):
+        try:
+            cv_scores = cross_val_score(model, X, y_encoded, cv=cv_folds)
+            cv_accuracy = np.mean(cv_scores)
+        except Exception as e:
+            print(f"   ⚠️ Cross-validation 실패: {e}")
+            cv_accuracy = test_accuracy  # CV 실패 시 test_accuracy 사용
+    else:
+        print(f"   ⚠️ Cross-validation 스킵 (데이터 부족)")
+        cv_accuracy = test_accuracy
     
     print(f"   ✅ 훈련 정확도: {train_accuracy*100:.1f}%")
     print(f"   ✅ 테스트 정확도: {test_accuracy*100:.1f}%")
