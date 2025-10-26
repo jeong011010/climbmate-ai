@@ -8,6 +8,20 @@ from celery_app import celery_app
 from holdcheck import preprocess, clustering
 from backend.gpt4_analyzer import analyze_with_gpt4_vision
 
+# 🎯 YOLO 모델 선택 (환경 변수로 설정 가능)
+# 'roboflow' (기본) 또는 'alternative' (새 모델 테스트)
+YOLO_MODEL = os.getenv('YOLO_MODEL', 'roboflow')
+
+# 모델 경로 설정
+if YOLO_MODEL == 'alternative':
+    MODEL_PATH_LOCAL = "/Users/kimjazz/Desktop/project/climbmate/holdcheck/roboflow_weights/weights_alternative.pt"
+    MODEL_PATH_DOCKER = "/app/holdcheck/roboflow_weights/weights_alternative.pt"
+    print(f"🎯 대체 YOLO 모델 사용: weights_alternative.pt")
+else:
+    MODEL_PATH_LOCAL = "/Users/kimjazz/Desktop/project/climbmate/holdcheck/roboflow_weights/weights.pt"
+    MODEL_PATH_DOCKER = "/app/holdcheck/roboflow_weights/weights.pt"
+    print(f"🎯 기본 Roboflow 모델 사용: weights.pt")
+
 def convert_to_serializable(obj):
     """numpy 타입을 JSON 직렬화 가능한 타입으로 변환"""
     if isinstance(obj, np.integer):
@@ -41,7 +55,7 @@ def analyze_image_async(self, image_base64, wall_angle=None):
     print("=" * 80)
     
     try:
-        # 1단계: 홀드 감지 (YOLO) - 시작
+        # 1단계: 홀드 감지 (YOLO) - 시작 (10% ~ 60%)
         self.update_state(
             state='PROGRESS',
             meta={'progress': 10, 'message': '🔍 YOLO 모델 로딩 중...', 'step': 'yolo_init'}
@@ -70,17 +84,27 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         # 홀드 감지 진행률 업데이트
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 15, 'message': '🔍 홀드 감지 시작...', 'step': 'yolo_detection'}
+            meta={'progress': 20, 'message': '🔍 이미지 전처리 중...', 'step': 'image_preprocessing'}
+        )
+        
+        self.update_state(
+            state='PROGRESS',
+            meta={'progress': 30, 'message': '🔍 홀드 감지 진행 중...', 'step': 'yolo_detection'}
         )
         
         # YOLO 홀드 감지
         from holdcheck.preprocess import preprocess
-        hold_data, masks = preprocess(image)
         
-        # 홀드 감지 완료 - 점진적 진행률
+        # 선택된 모델 사용
+        model_path = MODEL_PATH_DOCKER if os.path.exists(MODEL_PATH_DOCKER) else MODEL_PATH_LOCAL
+        print(f"🎯 사용 중인 모델: {model_path}")
+        
+        hold_data, masks = preprocess(image, model_path=model_path)
+        
+        # 홀드 감지 완료
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 25, 'message': f'✅ {len(hold_data) if hold_data else 0}개 홀드 감지 완료', 'step': 'yolo_complete'}
+            meta={'progress': 50, 'message': f'✅ {len(hold_data) if hold_data else 0}개 홀드 감지 완료', 'step': 'yolo_complete'}
         )
         
         if not hold_data:
@@ -102,24 +126,18 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         holds = hold_data
         total_holds = len(holds)
         
-        # 2단계: 색상 분석 - 홀드별 진행률 업데이트
+        # 2단계: 색상 분석 (50% ~ 60%) - 빠르게 진행
         self.update_state(
             state='PROGRESS',
             meta={
-                'progress': 30,
-                'message': f'🎨 색상 분석 시작... (홀드 {total_holds}개)',
-                'step': 'color_analysis_start',
+                'progress': 52,
+                'message': f'🎨 색상 분석 중... (홀드 {total_holds}개)',
+                'step': 'color_analysis',
                 'holds_count': total_holds
             }
         )
         
         from holdcheck.clustering import rule_based_color_clustering
-        
-        # 색상 분석 시작 (30%)
-        self.update_state(
-            state='PROGRESS',
-            meta={'progress': 35, 'message': f'🎨 색상 클러스터링 중... (홀드 {total_holds}개)', 'step': 'color_clustering'}
-        )
         
         colored_holds = rule_based_color_clustering(
             holds,
@@ -127,16 +145,16 @@ def analyze_image_async(self, image_base64, wall_angle=None):
             config_path="holdcheck/color_ranges.json"
         )
         
-        # 색상 분석 중간 (40%)
+        # 색상 분석 완료
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 45, 'message': f'🎨 색상 정보 처리 중...', 'step': 'color_processing'}
+            meta={'progress': 58, 'message': f'✅ 색상 분석 완료', 'step': 'color_complete'}
         )
         
         # 3단계: 문제 생성 (색상별 그룹핑)
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 55, 'message': '🧩 문제 그룹 생성 중...', 'step': 'problem_generation'}
+            meta={'progress': 60, 'message': '🧩 문제 그룹 생성 중...', 'step': 'problem_generation'}
         )
         
         # 색상별로 그룹핑
@@ -160,9 +178,9 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         
         for color_name, group_holds in problems_by_color.items():
             if len(group_holds) >= 3:  # 최소 3개 이상
-                # 진행률 업데이트 (55% ~ 65% 사이)
+                # 진행률 업데이트 (60% ~ 65% 사이) - 빠르게
                 processed_colors += 1
-                progress = 55 + int((processed_colors / total_colors) * 10)
+                progress = 60 + int((processed_colors / total_colors) * 5)
                 self.update_state(
                     state='PROGRESS',
                     meta={
@@ -225,14 +243,14 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         # 4단계: GPT-4 분석
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 70, 'message': '🤖 GPT-4 분석 중...', 'step': 'gpt4_analysis'}
+            meta={'progress': 65, 'message': '🤖 GPT-4 분석 중...', 'step': 'gpt4_analysis'}
         )
         
         # 각 문제에 GPT-4 분석 추가
         for i, problem in enumerate(problems):
             try:
-                # 진행률 업데이트 (70% + 문제별 진행률)
-                progress = 70 + int((i + 1) / len(problems) * 25)  # 70% ~ 95%
+                # 진행률 업데이트 (65% + 문제별 진행률)
+                progress = 65 + int((i + 1) / len(problems) * 30)  # 65% ~ 95%
                 self.update_state(
                     state='PROGRESS',
                     meta={
@@ -423,7 +441,9 @@ def analyze_colors_with_clip_async(self, image_base64, hold_data):
         )
         
         # 🚀 최적화: 전처리 (홀드 감지)
-        model_path = "/app/holdcheck/roboflow_weights/weights.pt" if os.path.exists("/app/holdcheck/roboflow_weights/weights.pt") else "/Users/kimjazz/Desktop/project/climbmate/holdcheck/roboflow_weights/weights.pt"
+        # 선택된 모델 사용
+        model_path = MODEL_PATH_DOCKER if os.path.exists(MODEL_PATH_DOCKER) else MODEL_PATH_LOCAL
+        print(f"🎯 사용 중인 모델: {model_path}")
         
         hold_data_raw, masks = preprocess(
             image,

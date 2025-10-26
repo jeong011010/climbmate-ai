@@ -11,6 +11,10 @@ import sys
 import os
 import base64
 
+# 🎯 YOLO 모델 선택 (환경 변수로 설정 가능)
+# 'roboflow' 또는 'alternative'
+YOLO_MODEL = os.getenv('YOLO_MODEL', 'roboflow')
+
 # holdcheck 모듈 경로 추가
 holdcheck_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'holdcheck')
 sys.path.insert(0, holdcheck_path)
