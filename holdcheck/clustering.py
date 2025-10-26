@@ -5175,15 +5175,28 @@ def rule_based_color_clustering(hold_data, vectors, config_path="holdcheck/color
         else:
             rgb = hold["dominant_rgb"]
         
-        # 색상 분류 (우선순위 순서대로)
-        if use_hsv:
-            color_name, confidence, matched_rule = classify_color_by_hsv(
-                h, s, v, rgb, colors_config
-            )
+        # 🤖 1단계: ML 모델 예측 시도 (우선 순위)
+        ml_color, ml_confidence = predict_with_ml(hold)
+        
+        if ml_color and ml_confidence >= 0.70:
+            # ML 모델이 높은 신뢰도로 예측 → 사용
+            color_name = ml_color
+            confidence = ml_confidence
+            matched_rule = f"ML_Model (confidence: {ml_confidence:.2f})"
+            print(f"   🤖 ML 예측: 홀드 {hold.get('id', hold_idx)} → {color_name} (신뢰도: {confidence:.2f})")
         else:
-            color_name, confidence, matched_rule = classify_color_by_rgb(
-                rgb, colors_config
-            )
+            # ML 모델 없거나 신뢰도 낮음 → 룰 기반 사용
+            if use_hsv:
+                color_name, confidence, matched_rule = classify_color_by_hsv(
+                    h, s, v, rgb, colors_config
+                )
+            else:
+                color_name, confidence, matched_rule = classify_color_by_rgb(
+                    rgb, colors_config
+                )
+            
+            if ml_color:
+                print(f"   ⚡ 룰 기반: 홀드 {hold.get('id', hold_idx)} → {color_name} (ML 신뢰도 낮음: {ml_confidence:.2f})")
         
         # 신뢰도 낮으면 unknown
         if confidence < confidence_threshold:
@@ -5192,7 +5205,7 @@ def rule_based_color_clustering(hold_data, vectors, config_path="holdcheck/color
         # 홀드에 정보 추가 (CLIP 호환)
         hold["clip_color_name"] = color_name
         hold["clip_confidence"] = confidence
-        hold["color_method"] = "rule_based"
+        hold["color_method"] = "ml_model" if ml_color and ml_confidence >= 0.70 else "rule_based"
         hold["matched_rule"] = matched_rule
         
         # 그룹핑
