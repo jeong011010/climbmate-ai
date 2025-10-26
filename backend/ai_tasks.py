@@ -177,7 +177,7 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         processed_colors = 0
         
         for color_name, group_holds in problems_by_color.items():
-            if len(group_holds) >= 3:  # 최소 3개 이상
+            if len(group_holds) >= 1:  # 모든 홀드 그룹 표시
                 # 진행률 업데이트 (60% ~ 65% 사이) - 빠르게
                 processed_colors += 1
                 progress = 60 + int((processed_colors / total_colors) * 5)

@@ -4409,7 +4409,7 @@ def analyze_problem(hold_data, group_id=None, wall_angle=None):
     else:
         filtered_holds = hold_data
     
-    if not filtered_holds or len(filtered_holds) < 3:
+    if not filtered_holds or len(filtered_holds) < 1:
         return None
     
     # 🎯 1. 난이도 분석
