@@ -41,10 +41,10 @@ def analyze_image_async(self, image_base64, wall_angle=None):
     print("=" * 80)
     
     try:
-        # 1단계: 홀드 감지 (YOLO)
+        # 1단계: 홀드 감지 (YOLO) - 시작
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 10, 'message': '🔍 홀드 감지 중...', 'step': 'yolo_detection'}
+            meta={'progress': 10, 'message': '🔍 YOLO 모델 로딩 중...', 'step': 'yolo_init'}
         )
         
         # Base64 이미지 디코딩
@@ -67,9 +67,21 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                 'message': '이미지를 읽을 수 없습니다.'
             }
         
+        # 홀드 감지 진행률 업데이트
+        self.update_state(
+            state='PROGRESS',
+            meta={'progress': 15, 'message': '🔍 홀드 감지 시작...', 'step': 'yolo_detection'}
+        )
+        
         # YOLO 홀드 감지
         from holdcheck.preprocess import preprocess
         hold_data, masks = preprocess(image)
+        
+        # 홀드 감지 완료 - 점진적 진행률
+        self.update_state(
+            state='PROGRESS',
+            meta={'progress': 25, 'message': f'✅ {len(hold_data) if hold_data else 0}개 홀드 감지 완료', 'step': 'yolo_complete'}
+        )
         
         if not hold_data:
             self.update_state(
@@ -88,28 +100,43 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         
         # hold_data는 홀드 리스트입니다
         holds = hold_data
+        total_holds = len(holds)
         
-        # 2단계: CLIP 색상 분석
+        # 2단계: 색상 분석 - 홀드별 진행률 업데이트
         self.update_state(
             state='PROGRESS',
             meta={
                 'progress': 30,
-                'message': f'🎨 색상 분석 중... (홀드 {len(holds)}개 감지)',
-                'step': 'clip_analysis'
+                'message': f'🎨 색상 분석 시작... (홀드 {total_holds}개)',
+                'step': 'color_analysis_start',
+                'holds_count': total_holds
             }
         )
         
         from holdcheck.clustering import rule_based_color_clustering
+        
+        # 색상 분석 시작 (30%)
+        self.update_state(
+            state='PROGRESS',
+            meta={'progress': 35, 'message': f'🎨 색상 클러스터링 중... (홀드 {total_holds}개)', 'step': 'color_clustering'}
+        )
+        
         colored_holds = rule_based_color_clustering(
             holds,
             None,
             config_path="holdcheck/color_ranges.json"
         )
         
+        # 색상 분석 중간 (40%)
+        self.update_state(
+            state='PROGRESS',
+            meta={'progress': 45, 'message': f'🎨 색상 정보 처리 중...', 'step': 'color_processing'}
+        )
+        
         # 3단계: 문제 생성 (색상별 그룹핑)
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 50, 'message': '🧩 문제 생성 중...', 'step': 'problem_generation'}
+            meta={'progress': 55, 'message': '🧩 문제 그룹 생성 중...', 'step': 'problem_generation'}
         )
         
         # 색상별로 그룹핑
@@ -128,8 +155,24 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         
         # 각 색상 그룹을 문제로 분석
         problems = []
+        total_colors = len(problems_by_color)
+        processed_colors = 0
+        
         for color_name, group_holds in problems_by_color.items():
             if len(group_holds) >= 3:  # 최소 3개 이상
+                # 진행률 업데이트 (55% ~ 65% 사이)
+                processed_colors += 1
+                progress = 55 + int((processed_colors / total_colors) * 10)
+                self.update_state(
+                    state='PROGRESS',
+                    meta={
+                        'progress': progress, 
+                        'message': f'🧩 {color_name} 문제 처리 중... ({processed_colors}/{total_colors})',
+                        'step': 'problem_enrichment',
+                        'problems_count': len(problems)
+                    }
+                )
+                
                 # 색상 RGB 추출 (첫 번째 홀드에서)
                 color_rgb = group_holds[0].get('dominant_rgb', [128, 128, 128])
                 
