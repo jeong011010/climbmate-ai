@@ -24,6 +24,82 @@ _clip_device = None
 _color_ranges_cache = None
 _color_feedback_data = []
 
+# 🤖 ML 모델 캐시
+_ml_color_model = None
+_ml_color_encoder = None
+_ml_model_loaded = False
+
+def reset_ml_model_cache():
+    """🔄 ML 모델 캐시 초기화 (재학습 후 호출)"""
+    global _ml_color_model, _ml_color_encoder, _ml_model_loaded
+    _ml_color_model = None
+    _ml_color_encoder = None
+    _ml_model_loaded = False
+    print("   🔄 ML 모델 캐시 초기화 완료")
+
+def load_ml_color_model():
+    """🤖 ML 색상 분류 모델 로드 (캐싱)"""
+    global _ml_color_model, _ml_color_encoder, _ml_model_loaded
+    
+    if _ml_model_loaded:
+        return _ml_color_model, _ml_color_encoder
+    
+    try:
+        import sys
+        backend_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'backend')
+        if backend_path not in sys.path:
+            sys.path.insert(0, backend_path)
+        
+        from ml_trainer import COLOR_MODEL_PATH, COLOR_ENCODER_PATH
+        import pickle
+        
+        if os.path.exists(COLOR_MODEL_PATH) and os.path.exists(COLOR_ENCODER_PATH):
+            with open(COLOR_MODEL_PATH, 'rb') as f:
+                _ml_color_model = pickle.load(f)
+            with open(COLOR_ENCODER_PATH, 'rb') as f:
+                _ml_color_encoder = pickle.load(f)
+            print("   ✅ ML 색상 분류 모델 로드 완료")
+            _ml_model_loaded = True
+            return _ml_color_model, _ml_color_encoder
+        else:
+            print("   ⚠️ ML 모델 파일 없음 - CLIP AI 사용")
+            _ml_model_loaded = True
+            return None, None
+    except Exception as e:
+        print(f"   ⚠️ ML 모델 로드 실패: {e}")
+        _ml_model_loaded = True
+        return None, None
+
+def predict_with_ml(hold_features):
+    """🤖 ML 모델로 홀드 색상 예측"""
+    try:
+        model, encoder = load_ml_color_model()
+        if model is None or encoder is None:
+            return None, 0.0
+        
+        # ML 모델용 특징 추출
+        import sys
+        backend_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'backend')
+        if backend_path not in sys.path:
+            sys.path.insert(0, backend_path)
+        
+        from ml_trainer import extract_color_features
+        
+        features = extract_color_features(hold_features)
+        features = features.reshape(1, -1)
+        
+        # 예측
+        prediction = model.predict(features)[0]
+        probabilities = model.predict_proba(features)[0]
+        
+        color = encoder.inverse_transform([prediction])[0]
+        confidence = float(np.max(probabilities))
+        
+        return color, confidence
+    except Exception as e:
+        print(f"   ⚠️ ML 예측 실패: {e}")
+        return None, 0.0
+
 def hsv_to_rgb(hsv):
     hsv_arr = np.uint8([[hsv]])
     rgb = cv2.cvtColor(hsv_arr, cv2.COLOR_HSV2RGB)[0][0]
@@ -492,19 +568,34 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
         # 색상 그룹 할당 (모든 홀드)
         color_groups = {}
         for i, hold in enumerate(hold_data):
-            best_idx = np.argmax(similarities[i])
-            best_prompt = color_prompts[best_idx]
-            confidence = similarities[i][best_idx]
+            # 🤖 1단계: ML 모델 예측 시도 (우선 순위)
+            ml_color, ml_confidence = predict_with_ml(hold)
             
-            # 색상 이름 추출 (프롬프트에서 키워드 매칭)
-            color_name = "unknown"
-            for color, keywords in color_map.items():
-                for keyword in keywords:
-                    if keyword in best_prompt:
-                        color_name = color
+            if ml_color and ml_confidence >= 0.70:
+                # ML 모델이 높은 신뢰도로 예측 → 사용
+                color_name = ml_color
+                confidence = ml_confidence
+                print(f"   🤖 ML 예측: 홀드 {hold['id']} → {color_name} (신뢰도: {confidence:.2f})")
+            else:
+                # ML 모델 없거나 신뢰도 낮음 → CLIP AI 사용
+                best_idx = np.argmax(similarities[i])
+                best_prompt = color_prompts[best_idx]
+                confidence = similarities[i][best_idx]
+                
+                # 색상 이름 추출 (프롬프트에서 키워드 매칭)
+                color_name = "unknown"
+                for color, keywords in color_map.items():
+                    for keyword in keywords:
+                        if keyword in best_prompt:
+                            color_name = color
+                            break
+                    if color_name != "unknown":
                         break
-                if color_name != "unknown":
-                    break
+                
+                if ml_color:
+                    print(f"   ⚡ CLIP AI: 홀드 {hold['id']} → {color_name} (ML 신뢰도 낮음: {ml_confidence:.2f})")
+                else:
+                    print(f"   ⚡ CLIP AI: 홀드 {hold['id']} → {color_name} (ML 모델 없음)")
             
             # 🎯 CLIP AI 결과 후처리 보정 (명확한 오류 수정 - 강화)
             rgb = hold.get("dominant_rgb", [128, 128, 128])

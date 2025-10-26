@@ -631,10 +631,18 @@ if ML_AVAILABLE and DB_AVAILABLE:
             # 모델 학습
             test_accuracy, cv_accuracy = train_color_model(training_data)
             
+            # 🔄 ML 모델 캐시 초기화 (다음 분석부터 새 모델 사용)
+            try:
+                from clustering import reset_ml_model_cache
+                reset_ml_model_cache()
+                print("✅ ML 모델 캐시 초기화 완료 - 다음 분석부터 새 모델 적용됩니다")
+            except Exception as e:
+                print(f"⚠️ 캐시 초기화 경고 (무시 가능): {e}")
+            
             return JSONResponse(
                 status_code=200,
                 content={
-                    "message": "ML 색상 분류 모델 학습 완료",
+                    "message": "ML 색상 분류 모델 학습 완료 - 다음 분석부터 자동 적용됩니다",
                     "test_accuracy": test_accuracy,
                     "cv_accuracy": cv_accuracy,
                     "training_samples": len(training_data)

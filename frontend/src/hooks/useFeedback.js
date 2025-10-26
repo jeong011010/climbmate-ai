@@ -106,7 +106,7 @@ export const useFeedback = ({
     try {
       setFeedbacksLoading(true)
       const data = await api.trainColorModel()
-      alert(`✅ ML 학습 완료!\n\n정확도: ${(data.test_accuracy * 100).toFixed(1)}%\nCross-validation: ${(data.cv_accuracy * 100).toFixed(1)}%`)
+      alert(`✅ ML 학습 완료!\n\n정확도: ${(data.test_accuracy * 100).toFixed(1)}%\nCross-validation: ${(data.cv_accuracy * 100).toFixed(1)}%\n\n🎯 다음 이미지 분석부터 자동으로 적용됩니다!\n피드백을 계속 쌓아서 정확도를 높여보세요.`)
       loadColorFeedbacks() // 목록 새로고침
     } catch (error) {
       console.error('ML 학습 실패:', error)
