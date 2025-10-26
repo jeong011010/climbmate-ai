@@ -1132,7 +1132,7 @@ def validate_and_correct_color(color_hsv):
     return [h, s, v]
 
 def get_dominant_color(pixels_hsv, k=3):
-    """🎯 상위 밝기 방식: 가장 밝은 픽셀들의 평균 색상 추출"""
+    """🎯 개선된 방식: 가장 밝은 픽셀들의 중앙값으로 색상 추출"""
     if len(pixels_hsv) == 0:
         return [0, 0, 0]
     
@@ -1142,26 +1142,33 @@ def get_dominant_color(pixels_hsv, k=3):
                 int(np.median(pixels_hsv[:, 1])), 
                 int(np.median(pixels_hsv[:, 2]))]
     
-    # 🚀 상위 30% 밝은 픽셀만 사용 (그림자/경계 제외)
+    # 🚀 상위 10% 가장 밝은 픽셀만 사용 (그림자/어두운 영역 강력 제외)
     brightness_scores = pixels_hsv[:, 2]  # V 채널
-    bright_threshold = np.percentile(brightness_scores, 70)  # 상위 30%
+    bright_threshold = np.percentile(brightness_scores, 90)  # 상위 10% (70→90 변경)
     
     bright_mask = brightness_scores >= bright_threshold
     
     if np.sum(bright_mask) > 10:  # 충분한 밝은 픽셀이 있으면
         pixels_hsv = pixels_hsv[bright_mask]
-        print(f"   상위 밝기 픽셀 선별: {len(pixels_hsv)}개 (밝기≥{bright_threshold:.0f})")
+        print(f"   ⭐ 최상위 밝기 픽셀 선별: {len(pixels_hsv)}개 (밝기≥{bright_threshold:.0f})")
     else:
-        print(f"   밝은 픽셀 부족, 전체 사용: {len(pixels_hsv)}개")
+        # 그래도 부족하면 상위 20%로 완화
+        bright_threshold = np.percentile(brightness_scores, 80)
+        bright_mask = brightness_scores >= bright_threshold
+        if np.sum(bright_mask) > 5:
+            pixels_hsv = pixels_hsv[bright_mask]
+            print(f"   ⚡ 상위 20% 픽셀 사용: {len(pixels_hsv)}개 (밝기≥{bright_threshold:.0f})")
+        else:
+            print(f"   ⚠️ 밝은 픽셀 부족, 전체 사용: {len(pixels_hsv)}개")
     
-    # 🎯 단순 평균 방식: 밝은 픽셀들의 평균 색상 (더 밝은 결과)
-    h_avg = np.mean(pixels_hsv[:, 0])
-    s_avg = np.mean(pixels_hsv[:, 1])
-    v_avg = np.mean(pixels_hsv[:, 2])
+    # 🎯 중앙값 방식: outlier(그림자, 반사)에 강함 (평균→중앙값 변경)
+    h_med = np.median(pixels_hsv[:, 0])
+    s_med = np.median(pixels_hsv[:, 1])
+    v_med = np.median(pixels_hsv[:, 2])
     
-    print(f"   밝은 픽셀 평균: HSV({h_avg:.1f}, {s_avg:.1f}, {v_avg:.1f})")
+    print(f"   💎 밝은 픽셀 중앙값: HSV({h_med:.1f}, {s_med:.1f}, {v_med:.1f})")
     
-    return [int(h_avg), int(s_avg), int(v_avg)]
+    return [int(h_med), int(s_med), int(v_med)]
 
 # -------------------------------
 # 📌 픽셀 기반 통계치 추출
@@ -1442,7 +1449,7 @@ def calculate_advanced_features(pixels_hsv, pixels_lab, pixels_rgb):
 # -------------------------------
 # 📌 Preprocess Pipeline
 # -------------------------------
-def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.pt", conf=0.25, brightness_normalization=False, 
+def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.pt", conf=0.4, brightness_normalization=False, 
                brightness_filter=False, min_brightness=0, max_brightness=100, 
                saturation_filter=False, min_saturation=0, mask_refinement=5, use_clip_ai=False):
     # image_input이 문자열(파일 경로)인지 numpy 배열인지 확인
@@ -1460,8 +1467,7 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
 
     # 🚀 캐싱된 YOLO 모델 사용 (속도 대폭 향상)
     model = get_yolo_model(model_path)
-    # Roboflow와 동일한 설정: conf=0.25 (낮춤), iou=0.5 (Overlap Threshold)
-    results = model(padded_image, conf=conf, iou=0.5)[0]
+    results = model(padded_image, conf=conf)[0]
 
     masks_raw = results.masks.data.cpu().numpy()
     masks = [restore_mask_to_original(m, (h_img, w_img), scale, pad_left, pad_top) for m in masks_raw]
@@ -1490,7 +1496,7 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
             largest_contour = max(contours, key=cv2.contourArea)
             area = cv2.contourArea(largest_contour)
             
-            if area < 100:
+            if area < 200:
                 continue
                 
             perimeter = cv2.arcLength(largest_contour, True)
@@ -1498,7 +1504,7 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
                 continue
                 
             circularity = 4 * np.pi * area / (perimeter * perimeter)
-            if circularity < 0.05:
+            if circularity < 0.1:
                 continue
             
             mask_clean = np.zeros_like(mask_refined)
@@ -1600,7 +1606,7 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
             area = cv2.contourArea(largest_contour)
             
             # 더 엄격한 크기 필터링
-            if area < 100:  # 최소 크기 완화
+            if area < 200:  # 최소 크기 증가
                 continue
             
             # 3단계: 컨투어 품질 검증
@@ -1610,7 +1616,7 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
             
             # 원형도 검증 (홀드는 대체로 원형에 가까움)
             circularity = 4 * np.pi * area / (perimeter * perimeter)
-            if circularity < 0.05:  # 불규칙한 모양도 허용
+            if circularity < 0.1:  # 너무 불규칙한 모양 제외
                 continue
             
             # 4단계: 최종 마스크 생성
