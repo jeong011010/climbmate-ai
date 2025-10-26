@@ -1460,7 +1460,8 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
 
     # 🚀 캐싱된 YOLO 모델 사용 (속도 대폭 향상)
     model = get_yolo_model(model_path)
-    results = model(padded_image, conf=conf)[0]
+    # Roboflow와 동일한 설정: conf=0.25 (낮춤), iou=0.5 (Overlap Threshold)
+    results = model(padded_image, conf=conf, iou=0.5)[0]
 
     masks_raw = results.masks.data.cpu().numpy()
     masks = [restore_mask_to_original(m, (h_img, w_img), scale, pad_left, pad_top) for m in masks_raw]
