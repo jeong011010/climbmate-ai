@@ -4,8 +4,6 @@ from typing import Dict, List, Optional
 import json
 import re
 import asyncio
-from PIL import Image
-import io
 
 # OpenAI 클라이언트 (환경변수에서 API 키 로드)
 try:
@@ -16,33 +14,10 @@ except:
     GPT4_AVAILABLE = False
     print("⚠️ OpenAI API 사용 불가 (환경변수 OPENAI_API_KEY 필요)")
 
-def resize_image_for_gpt4(image_base64: str, max_size: int = 512) -> str:
-    """
-    🚀 GPT-4 전송용 이미지 크기 축소 (속도 최적화)
-    - 큰 이미지를 작게 만들어 API 응답 속도 향상
-    - 홀드 인식에는 고해상도가 필요하지 않음
-    """
-    try:
-        # Base64 디코딩
-        img_data = base64.b64decode(image_base64)
-        img = Image.open(io.BytesIO(img_data))
-        
-        # 이미 작으면 그대로 반환
-        if max(img.size) <= max_size:
-            return image_base64
-        
-        # 비율 유지하며 리사이즈
-        ratio = max_size / max(img.size)
-        new_size = tuple(int(dim * ratio) for dim in img.size)
-        img_resized = img.resize(new_size, Image.Resampling.LANCZOS)
-        
-        # Base64로 재인코딩
-        buffer = io.BytesIO()
-        img_resized.save(buffer, format='JPEG', quality=85)
-        return base64.b64encode(buffer.getvalue()).decode('utf-8')
-    except Exception as e:
-        print(f"⚠️ 이미지 리사이즈 실패 (원본 사용): {e}")
-        return image_base64
+# 이미지 리사이즈 함수 제거 (원본 이미지 사용)
+# def resize_image_for_gpt4(image_base64: str, max_size: int = 512) -> str:
+#     """원본 이미지를 그대로 사용하도록 변경"""
+#     return image_base64
 
 async def analyze_with_gpt4_vision(
     image_base64: str,
@@ -98,10 +73,7 @@ async def analyze_with_gpt4_vision(
                 distances.append(dist)
         max_dist = max(distances) if distances else 0
         
-        # 🚀 이미지 크기 축소 (API 속도 향상)
-        image_base64_optimized = resize_image_for_gpt4(image_base64, max_size=512)
-        
-        # 프롬프트 구성 (원래대로)
+        # 프롬프트 구성 (원본 이미지 사용)
         wall_info = f"\n벽 각도: {wall_angle}" if wall_angle else ""
         
         prompt = f"""이 클라이밍 벽 이미지를 분석해주세요. {num_holds}개의 홀드가 있습니다.{wall_info}
@@ -127,7 +99,7 @@ JSON 형식으로 응답해주세요:
   "comparison": "일반적인 V3보다 약간 어렵습니다."
 }}"""
 
-        # 🚀 GPT-4o 사용 + 병렬처리
+        # 🚀 GPT-4o 사용 + 병렬처리 (원본 이미지)
         response = await client.chat.completions.create(
             model="gpt-4o",
             messages=[{
@@ -140,13 +112,13 @@ JSON 형식으로 응답해주세요:
                     {
                         "type": "image_url",
                         "image_url": {
-                            "url": f"data:image/jpeg;base64,{image_base64_optimized}",
-                            "detail": "low"  # low로 유지 (속도 우선)
+                            "url": f"data:image/jpeg;base64,{image_base64}",  # 원본 이미지 사용
+                            "detail": "low"
                         }
                     }
                 ]
             }],
-            max_tokens=500,  # 적당한 길이
+            max_tokens=500,
             temperature=0.3,
             timeout=12
         )
