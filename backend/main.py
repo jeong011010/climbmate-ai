@@ -1052,6 +1052,13 @@ async def analyze_image_sync(
                                 problem['analysis'] = rule_analysis
                                 problem['gpt4_reasoning'] = result.get('gpt4_reasoning', '')
                                 problem['gpt4_confidence'] = result.get('gpt4_confidence', 0.8)
+                                problem['gpt4_secondary_types'] = result.get('gpt4_secondary_types', [])
+                                problem['gpt4_key_factors'] = result.get('gpt4_key_factors', [])
+                                problem['gpt4_crux'] = result.get('gpt4_crux', '')
+                                problem['gpt4_movements'] = result.get('gpt4_movements', [])
+                                problem['gpt4_challenges'] = result.get('gpt4_challenges', [])
+                                problem['gpt4_tips'] = result.get('gpt4_tips', [])
+                                problem['gpt4_comparison'] = result.get('gpt4_comparison', '')
                 
                 # 병렬 분석 실행
                 try:
@@ -1185,9 +1192,13 @@ async def analyze_image_sync(
                         },
                         'gpt4_reasoning': problem.get('gpt4_reasoning', ''),
                         'gpt4_confidence': problem.get('gpt4_confidence', 0.0),
+                        'gpt4_secondary_types': problem.get('gpt4_secondary_types', []),
+                        'gpt4_key_factors': problem.get('gpt4_key_factors', []),
+                        'gpt4_crux': problem.get('gpt4_crux', ''),
                         'gpt4_movements': problem.get('gpt4_movements', []),
                         'gpt4_challenges': problem.get('gpt4_challenges', []),
-                        'gpt4_tips': problem.get('gpt4_tips', [])
+                        'gpt4_tips': problem.get('gpt4_tips', []),
+                        'gpt4_comparison': problem.get('gpt4_comparison', '')
                     }
                     cleaned.append(cleaned_problem)
                 return cleaned

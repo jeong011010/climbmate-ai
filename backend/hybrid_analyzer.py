@@ -93,6 +93,7 @@ async def hybrid_analyze(
                 result['method_used'] = 'gpt4_vision'
                 result['methods_tried'].append('gpt4_vision')
                 result['gpt4_reasoning'] = enhanced_result['detailed_analysis']
+                result['gpt4_secondary_types'] = secondary_types  # 프론트엔드 전달용
                 result['gpt4_key_factors'] = enhanced_result.get('key_factors', [])
                 result['gpt4_crux'] = enhanced_result.get('crux', '')
                 result['gpt4_movements'] = enhanced_result.get('movements', [])
