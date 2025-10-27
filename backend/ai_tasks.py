@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import base64
 import json
+import asyncio
 from celery import current_task
 from celery_app import celery_app
 from holdcheck import preprocess, clustering
@@ -240,33 +241,41 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                         'analysis': analysis
                     })
         
-        # 4단계: GPT-4 분석
+        # 4단계: GPT-4 분석 (🚀 비동기 병렬 처리)
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 65, 'message': '🤖 GPT-4 분석 중...', 'step': 'gpt4_analysis'}
+            meta={'progress': 65, 'message': '🤖 GPT-4 분석 중... (병렬 처리)', 'step': 'gpt4_analysis'}
         )
         
-        # 각 문제에 GPT-4 분석 추가
-        for i, problem in enumerate(problems):
-            try:
-                # 진행률 업데이트 (65% + 문제별 진행률)
-                progress = 65 + int((i + 1) / len(problems) * 30)  # 65% ~ 95%
-                self.update_state(
-                    state='PROGRESS',
-                    meta={
-                        'progress': progress,
-                        'message': f'🤖 GPT-4 분석 중... ({i+1}/{len(problems)})',
-                        'step': 'gpt4_analysis'
-                    }
-                )
-                
-                gpt4_result = analyze_with_gpt4_vision(
+        # 🚀 모든 문제를 동시에 GPT-4에 요청 (병렬 처리)
+        async def analyze_all_problems():
+            tasks = []
+            for problem in problems:
+                task = analyze_with_gpt4_vision(
                     image_base64,
                     problem['holds'],
                     wall_angle
                 )
-                problem.update(gpt4_result)
-            except Exception as e:
+                tasks.append(task)
+            
+            # 모든 요청을 동시에 처리
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            
+            # 결과를 각 문제에 적용
+            for i, (problem, result) in enumerate(zip(problems, results)):
+                if isinstance(result, Exception):
+                    print(f"⚠️ 문제 {i} GPT-4 분석 실패: {result}")
+                    problem['gpt4_available'] = False
+                else:
+                    problem.update(result)
+        
+        # 비동기 함수 실행
+        import asyncio
+        try:
+            asyncio.run(analyze_all_problems())
+        except Exception as e:
+            print(f"⚠️ GPT-4 병렬 분석 오류: {e}")
+            for problem in problems:
                 problem['gpt4_available'] = False
         
         # 5단계: 홀드가 표시된 이미지 생성

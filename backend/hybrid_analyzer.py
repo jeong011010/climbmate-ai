@@ -47,7 +47,7 @@ async def hybrid_analyze(
     if gpt4_status['available'] and os.getenv('OPENAI_API_KEY'):
         print("🤖 GPT-4 Vision 사용 중...")
         
-        gpt4_result = analyze_with_gpt4_vision(image_base64, holds_data, wall_angle)
+        gpt4_result = await analyze_with_gpt4_vision(image_base64, holds_data, wall_angle)
         print(f"🔍 GPT-4 결과: {gpt4_result}")
         
         if gpt4_result.get('used_gpt4'):

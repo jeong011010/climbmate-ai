@@ -222,49 +222,85 @@ async def analyze_image(
         _, buffer = cv2.imencode('.jpg', image)
         image_base64 = base64.b64encode(buffer).decode('utf-8')
         
-        # 홀드 수 업데이트 및 분석
+        # 홀드 수 업데이트
         for group_id, problem in problems.items():
             problem['hold_count'] = len(problem['holds'])
+        
+        # 🚀 3개 이상인 문제를 병렬로 분석
+        analyzable_problems = [(group_id, problem) for group_id, problem in problems.items() if problem['hold_count'] >= 3]
+        
+        if analyzable_problems and HYBRID_AVAILABLE:
+            print(f"🚀 {len(analyzable_problems)}개 문제 병렬 분석 시작...")
             
-            # 3개 이상인 문제만 분석
-            if problem['hold_count'] >= 3:
-                print(f"🤖 문제 {group_id} 분석 중...")
+            async def analyze_all_problems_parallel():
+                tasks = []
                 
-                # 기본 통계 기반 분석 (백업용)
-                rule_analysis = analyze_problem(
-                    hold_data,
-                    group_id,
-                    wall_angle if wall_angle != "null" else None
-                )
-                
-                # 🚀 하이브리드 분석 (가능한 경우)
-                print(f"   🔍 HYBRID_AVAILABLE: {HYBRID_AVAILABLE}")
-                print(f"   🔍 GPT4_AVAILABLE: {GPT4_AVAILABLE}")
-                print(f"   🔍 OPENAI_API_KEY 존재: {bool(os.getenv('OPENAI_API_KEY'))}")
-                if HYBRID_AVAILABLE:
-                    print(f"   🚀 하이브리드 분석 시작...")
-                    hybrid_result = await hybrid_analyze(
+                for group_id, problem in analyzable_problems:
+                    # 규칙 기반 분석
+                    rule_analysis = analyze_problem(
+                        hold_data,
+                        group_id,
+                        wall_angle if wall_angle != "null" else None
+                    )
+                    
+                    # 하이브리드 분석 태스크 생성
+                    task = hybrid_analyze(
                         image_base64=image_base64,
                         holds_data=problem['holds'],
                         wall_angle=wall_angle if wall_angle != "null" else None,
                         rule_based_analysis=rule_analysis
                     )
-                    
-                    # 하이브리드 결과를 기존 분석 구조에 통합
-                    rule_analysis['difficulty']['grade'] = hybrid_result['difficulty']['grade']
-                    rule_analysis['difficulty']['confidence'] = hybrid_result['difficulty']['confidence']
-                    rule_analysis['climb_type']['primary_type'] = hybrid_result['type']['primary_type']
-                    rule_analysis['climb_type']['confidence'] = hybrid_result['type']['confidence']
-                    rule_analysis['analysis_method'] = hybrid_result['method_used']
-                    
-                    if 'gpt4_reasoning' in hybrid_result:
-                        rule_analysis['gpt4_reasoning'] = hybrid_result['gpt4_reasoning']
+                    tasks.append((group_id, problem, task, rule_analysis))
                 
+                # 모든 분석을 동시에 실행
+                hybrid_tasks = [task for _, _, task, _ in tasks]
+                results = await asyncio.gather(*hybrid_tasks, return_exceptions=True)
+                
+                # 결과 적용
+                for (group_id, problem, _, rule_analysis), result in zip(tasks, results):
+                    if isinstance(result, Exception):
+                        print(f"⚠️ 문제 {group_id} 하이브리드 분석 실패: {result}")
+                        problem['analysis'] = rule_analysis
+                    else:
+                        # 하이브리드 결과를 기존 분석 구조에 통합
+                        rule_analysis['difficulty']['grade'] = result['difficulty']['grade']
+                        rule_analysis['difficulty']['confidence'] = result['difficulty']['confidence']
+                        rule_analysis['climb_type']['primary_type'] = result['type']['primary_type']
+                        rule_analysis['climb_type']['confidence'] = result['type']['confidence']
+                        rule_analysis['analysis_method'] = result['method_used']
+                        
+                        if 'gpt4_reasoning' in result:
+                            rule_analysis['gpt4_reasoning'] = result['gpt4_reasoning']
+                        
+                        problem['analysis'] = rule_analysis
+            
+            # 병렬 분석 실행
+            try:
+                await analyze_all_problems_parallel()
+                print(f"✅ {len(analyzable_problems)}개 문제 병렬 분석 완료!")
+            except Exception as e:
+                print(f"⚠️ 병렬 분석 오류: {e}")
+                # 실패 시 순차 처리로 폴백
+                for group_id, problem in analyzable_problems:
+                    rule_analysis = analyze_problem(hold_data, group_id, wall_angle if wall_angle != "null" else None)
+                    problem['analysis'] = rule_analysis
+        else:
+            # 병렬 처리 없이 규칙 기반만 사용
+            for group_id, problem in analyzable_problems:
+                print(f"🤖 문제 {group_id} 규칙 기반 분석...")
+                rule_analysis = analyze_problem(
+                    hold_data,
+                    group_id,
+                    wall_angle if wall_angle != "null" else None
+                )
                 problem['analysis'] = rule_analysis
-                
-                # DB에 저장 (가능한 경우)
-                if DB_AVAILABLE:
+        
+        # DB에 저장 (가능한 경우)
+        if DB_AVAILABLE:
+            for group_id, problem in analyzable_problems:
+                if problem.get('analysis'):
                     try:
+                        rule_analysis = problem['analysis']
                         gpt4_save_data = {
                             'difficulty': rule_analysis['difficulty']['grade'],
                             'type': rule_analysis['climb_type']['primary_type'],
@@ -948,66 +984,89 @@ async def analyze_image_sync(
             _, buffer = cv2.imencode('.jpg', image)
             image_base64 = base64.b64encode(buffer).decode('utf-8')
             
-            # 4단계: 문제 분석
-            yield await send_progress_update("🤖 AI 문제 분석 중...", 70, "analysis")
+            # 4단계: 문제 분석 (🚀 비동기 병렬 처리)
+            yield await send_progress_update("🤖 AI 문제 분석 중... (병렬 처리)", 70, "analysis")
             
-            # 홀드 수 업데이트 및 분석
+            # 홀드 수 업데이트
             for group_id, problem in problems.items():
                 problem['hold_count'] = len(problem['holds'])
+            
+            # 3개 이상인 문제만 분석 (병렬 처리)
+            analyzable_problems = [(group_id, problem) for group_id, problem in problems.items() if problem['hold_count'] >= 3]
+            
+            if analyzable_problems:
+                print(f"🚀 {len(analyzable_problems)}개 문제 병렬 분석 시작...")
                 
-                # 3개 이상인 문제만 분석
-                if problem['hold_count'] >= 3:
-                    print(f"🤖 문제 {group_id} 분석 중...")
+                # 🚀 모든 문제를 동시에 분석
+                async def analyze_all_problems_parallel():
+                    tasks = []
                     
-                    # 기본 통계 기반 분석 (백업용)
-                    rule_analysis = analyze_problem(
-                        hold_data,
-                        group_id,
-                        wall_angle if wall_angle != "null" else None
-                    )
-                    
-                    # analyze_problem이 None을 반환할 수 있음
-                    if rule_analysis is None:
-                        print(f"   ⚠️ 규칙 기반 분석 실패 (홀드 부족): {group_id}")
-                        rule_analysis = {
-                            'difficulty': {'grade': 'V?', 'confidence': 0.0},
-                            'climb_type': {'primary_type': '분석 불가', 'confidence': 0.0},
-                            'statistics': {}
-                        }
-                    
-                    # 하이브리드 분석 (GPT-4 + ML)
-                    if HYBRID_AVAILABLE:
-                        try:
-                            print(f"   🔍 하이브리드 분석 시작 - GPT4_AVAILABLE: {GPT4_AVAILABLE}, API_KEY: {bool(os.getenv('OPENAI_API_KEY'))}")
-                            hybrid_result = await hybrid_analyze(
+                    for group_id, problem in analyzable_problems:
+                        # 기본 통계 기반 분석
+                        rule_analysis = analyze_problem(
+                            hold_data,
+                            group_id,
+                            wall_angle if wall_angle != "null" else None
+                        )
+                        
+                        if rule_analysis is None:
+                            rule_analysis = {
+                                'difficulty': {'grade': 'V?', 'confidence': 0.0},
+                                'climb_type': {'primary_type': '분석 불가', 'confidence': 0.0},
+                                'statistics': {}
+                            }
+                        
+                        # 하이브리드 분석 태스크 생성
+                        if HYBRID_AVAILABLE:
+                            task = hybrid_analyze(
                                 image_base64=image_base64,
                                 holds_data=problem['holds'],
                                 wall_angle=wall_angle if wall_angle != "null" else None,
                                 rule_based_analysis=rule_analysis
                             )
-                            
-                            print(f"   🔍 하이브리드 결과: {hybrid_result}")
-                            
-                            # 하이브리드 결과를 기존 분석 구조에 통합
-                            rule_analysis['difficulty']['grade'] = hybrid_result['difficulty']['grade']
-                            rule_analysis['difficulty']['confidence'] = hybrid_result['difficulty']['confidence']
-                            rule_analysis['climb_type']['primary_type'] = hybrid_result['type']['primary_type']
-                            rule_analysis['climb_type']['confidence'] = hybrid_result['type']['confidence']
-                            rule_analysis['analysis_method'] = hybrid_result['method_used']
-                            
-                            if 'gpt4_reasoning' in hybrid_result:
-                                rule_analysis['gpt4_reasoning'] = hybrid_result['gpt4_reasoning']
-                            
+                            tasks.append((group_id, problem, task, rule_analysis))
+                        else:
                             problem['analysis'] = rule_analysis
-                            problem['gpt4_reasoning'] = hybrid_result.get('gpt4_reasoning', '')
-                            problem['gpt4_confidence'] = hybrid_result.get('gpt4_confidence', 0.8)
-                            print(f"   🔍 GPT-4 데이터 확인: reasoning='{problem['gpt4_reasoning']}', confidence={problem['gpt4_confidence']}")
-                        except Exception as e:
-                            print(f"⚠️ 하이브리드 분석 실패, 규칙 기반 사용: {e}")
-                            problem['analysis'] = rule_analysis
-                    else:
-                        print(f"   ⚠️ 하이브리드 분석 사용 불가 - HYBRID_AVAILABLE: {HYBRID_AVAILABLE}")
-                        problem['analysis'] = rule_analysis
+                    
+                    # 모든 하이브리드 분석을 동시에 실행
+                    if tasks:
+                        hybrid_tasks = [task for _, _, task, _ in tasks]
+                        results = await asyncio.gather(*hybrid_tasks, return_exceptions=True)
+                        
+                        # 결과 적용
+                        for (group_id, problem, _, rule_analysis), result in zip(tasks, results):
+                            if isinstance(result, Exception):
+                                print(f"⚠️ 문제 {group_id} 하이브리드 분석 실패: {result}")
+                                problem['analysis'] = rule_analysis
+                            else:
+                                # 하이브리드 결과를 기존 분석 구조에 통합
+                                rule_analysis['difficulty']['grade'] = result['difficulty']['grade']
+                                rule_analysis['difficulty']['confidence'] = result['difficulty']['confidence']
+                                rule_analysis['climb_type']['primary_type'] = result['type']['primary_type']
+                                rule_analysis['climb_type']['confidence'] = result['type']['confidence']
+                                rule_analysis['analysis_method'] = result['method_used']
+                                
+                                if 'gpt4_reasoning' in result:
+                                    rule_analysis['gpt4_reasoning'] = result['gpt4_reasoning']
+                                
+                                problem['analysis'] = rule_analysis
+                                problem['gpt4_reasoning'] = result.get('gpt4_reasoning', '')
+                                problem['gpt4_confidence'] = result.get('gpt4_confidence', 0.8)
+                
+                # 병렬 분석 실행
+                try:
+                    await analyze_all_problems_parallel()
+                    print(f"✅ {len(analyzable_problems)}개 문제 병렬 분석 완료!")
+                except Exception as e:
+                    print(f"⚠️ 병렬 분석 오류: {e}")
+                    # 실패 시 순차 처리로 폴백
+                    for group_id, problem in analyzable_problems:
+                        rule_analysis = analyze_problem(hold_data, group_id, wall_angle if wall_angle != "null" else None)
+                        problem['analysis'] = rule_analysis if rule_analysis else {
+                            'difficulty': {'grade': 'V?', 'confidence': 0.0},
+                            'climb_type': {'primary_type': '분석 불가', 'confidence': 0.0},
+                            'statistics': {}
+                        }
             
             # 분석 완료
             yield await send_progress_update("✅ AI 분석 완료", 90, "analysis_complete")
