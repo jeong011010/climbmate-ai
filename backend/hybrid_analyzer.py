@@ -80,18 +80,29 @@ async def hybrid_analyze(
                     'grade': gpt4_result.get('difficulty', 'V?'),
                     'confidence': gpt4_result.get('confidence', 0.5)
                 }
+                
+                # 주요 타입과 부가 타입 처리
+                primary_type = gpt4_result.get('type', gpt4_result.get('primary_type', '일반'))
+                secondary_types = gpt4_result.get('secondary_types', [])
+                
                 result['type'] = {
-                    'primary_type': gpt4_result.get('type', '일반'),
+                    'primary_type': primary_type,
+                    'secondary_types': secondary_types,
                     'confidence': gpt4_result.get('confidence', 0.5)
                 }
                 result['method_used'] = 'gpt4_vision'
                 result['methods_tried'].append('gpt4_vision')
                 result['gpt4_reasoning'] = enhanced_result['detailed_analysis']
+                result['gpt4_key_factors'] = enhanced_result.get('key_factors', [])
+                result['gpt4_crux'] = enhanced_result.get('crux', '')
                 result['gpt4_movements'] = enhanced_result.get('movements', [])
                 result['gpt4_challenges'] = enhanced_result.get('challenges', [])
                 result['gpt4_tips'] = enhanced_result.get('tips', [])
+                result['gpt4_comparison'] = enhanced_result.get('comparison', '')
                 
-                print(f"   ✅ GPT-4 결과: {gpt4_result.get('difficulty')}, {gpt4_result.get('type')}")
+                print(f"   ✅ GPT-4 결과: {gpt4_result.get('difficulty')}, {primary_type}")
+                if secondary_types:
+                    print(f"   ✅ 부가 스타일: {', '.join(secondary_types)}")
                 print(f"   ✅ GPT-4 상세 분석 생성 완료")
                 return result
         else:

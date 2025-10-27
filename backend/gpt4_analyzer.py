@@ -99,35 +99,85 @@ async def analyze_with_gpt4_vision(
         max_dist = max(distances) if distances else 0
         
         # 🚀 이미지 크기 축소 (API 속도 향상)
-        image_base64_optimized = resize_image_for_gpt4(image_base64, max_size=512)
+        image_base64_optimized = resize_image_for_gpt4(image_base64, max_size=768)
         
-        # 프롬프트 구성
-        wall_info = f"\n벽 각도: {wall_angle}" if wall_angle else ""
+        # 프롬프트 구성 - 훨씬 더 자세하게
+        wall_info = f"벽 각도: {wall_angle} (overhang은 경사벽, slab은 슬랩, face는 수직)" if wall_angle else "벽 각도: 수직으로 추정"
         
-        prompt = f"""이 클라이밍 벽 이미지를 분석해주세요. {num_holds}개의 홀드가 있습니다.
+        # 홀드 분포 정보
+        color_distribution = ", ".join([f"{color}: {count}개" for color, count in color_groups.items()])
+        
+        prompt = f"""당신은 경험이 풍부한 클라이밍 코치입니다. 이 볼더링 문제를 매우 상세하게 분석해주세요.
 
-다음을 제공해주세요:
-1. 난이도 (V0-V10)
-2. 스타일 (dynamic/static/crimp/sloper/balance)
-3. 간단한 분석
+## 📊 문제 정보
+- 홀드 개수: {num_holds}개
+- {wall_info}
+- 색상 분포: {color_distribution}
+- 평균 홀드 크기: {avg_area:.0f}px²
+- 최대 홀드 간격: {max_dist:.0f}px
 
-JSON 형식으로 응답해주세요:
+## 🎯 분석 요청사항
+
+**1. 난이도 평가 (V0-V17)**
+- V-grade를 정확히 판단하세요
+- 홀드 크기, 간격, 벽 각도, 홀드 유형을 모두 고려
+- 초급(V0-V2), 중급(V3-V5), 고급(V6-V9), 전문가(V10+) 구분
+
+**2. 클라이밍 스타일 분석**
+- **주요 스타일** 1개를 선택: dynamic(다이나믹), static(스태틱), crimp(크림프), sloper(슬로퍼), pinch(핀치), balance(밸런스), power(파워), endurance(지구력), technical(기술), coordination(협응)
+- **부가 스타일** 2-3개를 추가로 선택
+- 각 스타일이 필요한 이유를 구체적으로 설명
+
+**3. 상세 분석**
+- 이 문제의 핵심 난이도 요인 (크럭스 구간)
+- 필요한 구체적인 동작들 (예: "왼손 언더클링에서 오른발 하이스텝", "오른손 다이노로 톱홀드 잡기")
+- 주요 도전과제 3-5가지
+- 실전 팁 3-5가지 (구체적인 신체 사용법, 시퀀스 제안)
+- 비슷한 난이도의 다른 문제와 비교
+
+**응답 형식 (JSON):**
 {{
-  "difficulty": "V3",
-  "type": "dynamic",
-  "confidence": 0.75,
-  "reasoning": "홀드 간격이 넓어서 다이나믹한 움직임이 필요합니다",
-  "movements": ["큰 리치", "다이나믹 점프"],
-  "challenges": ["밸런스 유지"],
-  "tips": ["코어를 활용하세요", "모멘텀을 사용하세요"]
-}}"""
+  "difficulty": "V4",
+  "confidence": 0.85,
+  "primary_type": "dynamic",
+  "secondary_types": ["power", "coordination"],
+  "reasoning": "홀드 간격이 평균보다 30% 넓어 다이나믹한 움직임이 필수적입니다. 특히 중간 구간에서 큰 리치가 요구되며, 이는 V4 수준의 난이도를 형성합니다. 벽 각도가 {wall_angle}이므로 상체 근력도 중요합니다.",
+  "key_factors": [
+    "중간 홀드 간격 60cm - 큰 리치 필요",
+    "슬로퍼 홀드 2개 - 오픈 그립 필수",
+    "벽 각도로 인한 상체 근력 요구"
+  ],
+  "crux": "3번째에서 5번째 홀드로 이동하는 구간. 오른손 언더클링 상태에서 왼손으로 슬로퍼를 잡아야 하며, 발 위치 선택이 핵심입니다.",
+  "movements": [
+    "시작: 양손 매칭으로 첫 홀드 안정화",
+    "중간: 오른발 하이스텝 후 왼손 다이나믹 무브",
+    "크럭스: 슬로퍼 홀드에서 바디텐션 유지하며 다음 홀드로 전환",
+    "마무리: 마지막 홀드는 매칭 후 컨트롤된 동작으로"
+  ],
+  "challenges": [
+    "큰 리치 구간 - 작은 체격은 점프 필요",
+    "슬로퍼 홀드 - 접촉력과 바디텐션 필수",
+    "지속적인 상체 근력 - 지구력 관리 중요",
+    "발 위치 선택 - 작은 풋홀드 정확히 사용"
+  ],
+  "tips": [
+    "시작 전 전체 시퀀스를 미리 시각화하세요",
+    "크럭스 구간에서 호흡을 멈추지 말고 계속 호흡하세요",
+    "슬로퍼 홀드는 팔을 곧게 펴고 체중을 실어 마찰력 극대화",
+    "발 위치를 먼저 정한 후 손 무브를 시도하세요",
+    "다이나믹 구간에서는 주저하지 말고 과감하게 commit하세요"
+  ],
+  "comparison": "일반적인 V3보다 한 단계 높은 수준입니다. 비슷한 스타일의 체육관 세팅과 비교하면 크럭스 난이도가 더 높습니다."
+}}
 
-        # 🚀 GPT-4o-mini 사용 (2-3배 빠름 + 저렴함)
+**중요:** 반드시 위 JSON 형식으로만 답변하고, 추가 설명 없이 JSON만 출력하세요."""
+
+        # 🚀 GPT-4o 사용 (고품질 분석)
         response = await client.chat.completions.create(
-            model="gpt-4o-mini",  # gpt-4o에서 변경
+            model="gpt-4o",  # 다시 gpt-4o 사용
             messages=[{
                 "role": "system",
-                "content": "You are a climbing coach. Analyze bouldering routes and respond in JSON format only."
+                "content": "You are an expert climbing coach with 15+ years of experience. Analyze bouldering problems in detail and respond ONLY with valid JSON. No markdown, no explanations, just pure JSON."
             }, {
                 "role": "user",
                 "content": [
@@ -136,30 +186,77 @@ JSON 형식으로 응답해주세요:
                         "type": "image_url",
                         "image_url": {
                             "url": f"data:image/jpeg;base64,{image_base64_optimized}",
-                            "detail": "low"
+                            "detail": "high"  # low에서 high로 변경 (더 상세한 분석)
                         }
                     }
                 ]
             }],
-            max_tokens=150,
-            temperature=0.3,
-            timeout=8  # 타임아웃 단축
+            max_tokens=800,  # 150에서 대폭 증가 (상세한 답변용)
+            temperature=0.4,  # 약간 높여서 창의적 분석
+            timeout=15  # 타임아웃 증가
         )
         
         # 응답 파싱
         content = response.choices[0].message.content
-        print(f"📝 GPT-4 응답: {content}")
+        print(f"📝 GPT-4 응답 (처음 500자): {content[:500]}...")
         
         # JSON 추출
         try:
-            # JSON 블록 찾기
-            json_match = re.search(r'\{[\s\S]*\}', content)
-            if json_match:
-                result = json.loads(json_match.group())
+            # JSON 블록 찾기 (마크다운 코드 블록 제거)
+            if "```json" in content:
+                json_start = content.find("```json") + 7
+                json_end = content.find("```", json_start)
+                json_str = content[json_start:json_end].strip()
+            elif "```" in content:
+                json_start = content.find("```") + 3
+                json_end = content.find("```", json_start)
+                json_str = content[json_start:json_end].strip()
             else:
-                # JSON이 없으면 텍스트 파싱
-                result = parse_text_response(content)
-        except:
+                json_match = re.search(r'\{[\s\S]*\}', content)
+                if json_match:
+                    json_str = json_match.group()
+                else:
+                    json_str = content.strip()
+            
+            result = json.loads(json_str)
+            
+            # 새로운 필드 처리
+            # primary_type이 있으면 type으로 매핑
+            if 'primary_type' in result:
+                result['type'] = result['primary_type']
+            elif 'type' not in result:
+                result['type'] = '일반'
+            
+            # secondary_types 추가
+            if 'secondary_types' not in result:
+                result['secondary_types'] = []
+            
+            # 새 필드들 추가
+            if 'key_factors' not in result:
+                result['key_factors'] = []
+            if 'crux' not in result:
+                result['crux'] = ''
+            if 'comparison' not in result:
+                result['comparison'] = ''
+            
+            # movements, challenges, tips는 기존과 동일
+            if 'movements' not in result:
+                result['movements'] = []
+            if 'challenges' not in result:
+                result['challenges'] = []
+            if 'tips' not in result:
+                result['tips'] = []
+            
+            print(f"✅ GPT-4 JSON 파싱 성공:")
+            print(f"   - 난이도: {result.get('difficulty')}")
+            print(f"   - 주요 스타일: {result.get('type')}")
+            print(f"   - 부가 스타일: {result.get('secondary_types')}")
+            print(f"   - 핵심 요인: {len(result.get('key_factors', []))}개")
+            print(f"   - 크럭스: {'있음' if result.get('crux') else '없음'}")
+            
+        except Exception as e:
+            print(f"⚠️ JSON 파싱 실패: {e}")
+            print(f"   원본 응답: {content[:200]}...")
             result = parse_text_response(content)
         
         result['used_gpt4'] = True
@@ -193,30 +290,119 @@ def translate_and_enhance_gpt4_result(gpt4_result):
         'static': '스태틱', 
         'crimp': '크림프',
         'sloper': '슬로퍼',
+        'pinch': '핀치',
         'traverse': '트래버스',
         'campusing': '캠퍼싱',
         'balance': '밸런스',
+        'power': '파워',
+        'endurance': '지구력',
+        'technical': '기술',
+        'coordination': '협응',
         'lunge': '런지',
         'dyno': '다이노',
         '일반': '일반'
     }
     
+    # 주요 타입 번역
+    primary_type = gpt4_result.get('type', gpt4_result.get('primary_type', '일반'))
+    primary_type_kr = type_map.get(primary_type, primary_type)
+    
+    # 부가 타입 번역
+    secondary_types = gpt4_result.get('secondary_types', [])
+    secondary_types_kr = [type_map.get(t, t) for t in secondary_types]
+    
     # 기본 결과
     result = {
         'difficulty': difficulty_map.get(gpt4_result.get('difficulty', 'V?'), 'V? (미분석)'),
-        'type': type_map.get(gpt4_result.get('type', '일반'), '일반'),
+        'type': primary_type_kr,
+        'secondary_types': secondary_types_kr,
         'confidence': gpt4_result.get('confidence', 0.0),
         'reasoning': gpt4_result.get('reasoning', ''),
+        'key_factors': gpt4_result.get('key_factors', []),
+        'crux': gpt4_result.get('crux', ''),
         'movements': gpt4_result.get('movements', []),
         'challenges': gpt4_result.get('challenges', []),
-        'tips': gpt4_result.get('tips', [])
+        'tips': gpt4_result.get('tips', []),
+        'comparison': gpt4_result.get('comparison', '')
     }
     
-    # 상세 분석 생성
-    detailed_analysis = generate_detailed_analysis(gpt4_result)
+    # 상세 분석 생성 (훨씬 더 자세하게)
+    detailed_analysis = generate_detailed_analysis_v2(gpt4_result, result)
     result['detailed_analysis'] = detailed_analysis
     
     return result
+
+def generate_detailed_analysis_v2(gpt4_result, translated_result):
+    """GPT-4 결과를 바탕으로 매우 상세한 한글 분석 생성"""
+    
+    difficulty = translated_result.get('difficulty', 'V?')
+    primary_type = translated_result.get('type', '일반')
+    secondary_types = translated_result.get('secondary_types', [])
+    reasoning = translated_result.get('reasoning', '')
+    key_factors = translated_result.get('key_factors', [])
+    crux = translated_result.get('crux', '')
+    movements = translated_result.get('movements', [])
+    challenges = translated_result.get('challenges', [])
+    tips = translated_result.get('tips', [])
+    comparison = translated_result.get('comparison', '')
+    
+    analysis_parts = []
+    
+    # 1. 난이도 및 타입 요약
+    type_desc = f"**{primary_type}**"
+    if secondary_types:
+        type_desc += f" (부가: {', '.join(secondary_types)})"
+    
+    analysis_parts.append(f"🎯 **난이도**: {difficulty}")
+    analysis_parts.append(f"🧗 **클라이밍 스타일**: {type_desc}")
+    analysis_parts.append("")
+    
+    # 2. 종합 분석
+    if reasoning:
+        analysis_parts.append(f"📊 **종합 분석**")
+        analysis_parts.append(reasoning)
+        analysis_parts.append("")
+    
+    # 3. 핵심 난이도 요인
+    if key_factors:
+        analysis_parts.append(f"🔑 **핵심 난이도 요인**")
+        for i, factor in enumerate(key_factors, 1):
+            analysis_parts.append(f"  {i}. {factor}")
+        analysis_parts.append("")
+    
+    # 4. 크럭스 구간
+    if crux:
+        analysis_parts.append(f"⚡ **크럭스 (가장 어려운 구간)**")
+        analysis_parts.append(crux)
+        analysis_parts.append("")
+    
+    # 5. 필요한 동작 시퀀스
+    if movements:
+        analysis_parts.append(f"🎬 **동작 시퀀스**")
+        for i, movement in enumerate(movements, 1):
+            analysis_parts.append(f"  {i}. {movement}")
+        analysis_parts.append("")
+    
+    # 6. 주요 도전과제
+    if challenges:
+        analysis_parts.append(f"⚠️ **주요 도전과제**")
+        for i, challenge in enumerate(challenges, 1):
+            analysis_parts.append(f"  {i}. {challenge}")
+        analysis_parts.append("")
+    
+    # 7. 실전 팁
+    if tips:
+        analysis_parts.append(f"💡 **실전 공략 팁**")
+        for i, tip in enumerate(tips, 1):
+            analysis_parts.append(f"  {i}. {tip}")
+        analysis_parts.append("")
+    
+    # 8. 비교 분석
+    if comparison:
+        analysis_parts.append(f"📈 **비교 분석**")
+        analysis_parts.append(comparison)
+    
+    return "\n".join(analysis_parts)
 
 def generate_detailed_analysis(gpt4_result):
     """GPT-4 결과를 바탕으로 간결한 한글 분석 생성"""

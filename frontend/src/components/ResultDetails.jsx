@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 const ResultDetails = ({ 
   result, 
   selectedHold, 
@@ -8,6 +10,8 @@ const ResultDetails = ({
   colorEmoji,
   onProblemSelect
 }) => {
+  const [isHoldInfoExpanded, setIsHoldInfoExpanded] = useState(true)
+  
   if (!result) return null
 
   return (
@@ -28,33 +32,44 @@ const ResultDetails = ({
         </div>
       </div>
 
-      {/* 선택된 홀드 상세 */}
+      {/* 선택된 홀드 상세 (아코디언) */}
       {selectedHold && selectedProblem && (
-        <div className="glass-card p-4 mx-auto mb-3 w-full shadow-md border-2 border-yellow-400">
-          <div className="flex items-center justify-between mb-2">
+        <div className="glass-card mx-auto mb-3 w-full shadow-md border-2 border-yellow-400 overflow-hidden">
+          {/* 헤더 - 항상 보임 */}
+          <div 
+            className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors"
+            onClick={() => setIsHoldInfoExpanded(!isHoldInfoExpanded)}
+          >
             <h3 className="text-xl text-slate-800 font-bold flex items-center gap-2">
               <span className="text-3xl">🎯</span>
-              선택된 홀드
+              홀드 정보
+              <span className="text-sm font-normal text-slate-600 ml-2">
+                (홀드 #{selectedHold.id})
+              </span>
             </h3>
-            <button
-              onClick={() => setSelectedHold(null)}
-              className="px-3 py-1 text-slate-600 hover:text-slate-800 text-sm"
-            >
-              ✕
-            </button>
-          </div>
-          
-          {/* 문제 색상 */}
-          <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-xl shadow-md mb-4 border-2 border-purple-200">
-            <h4 className="text-xs mb-2 text-slate-600 font-semibold text-center">🎨 문제 그룹 색상</h4>
-            <div className="flex items-center justify-center gap-2">
-              <span className="text-4xl">{colorEmoji[selectedHold.color] || '⭕'}</span>
-              <span className="text-xl font-bold gradient-text">{(selectedHold.color || 'UNKNOWN').toUpperCase()}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-slate-600 text-sm">
+                {isHoldInfoExpanded ? '접기' : '펼치기'}
+              </span>
+              <span className={`transform transition-transform duration-200 ${isHoldInfoExpanded ? 'rotate-180' : ''}`}>
+                ▼
+              </span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setSelectedHold(null)
+                }}
+                className="ml-2 px-3 py-1 text-slate-600 hover:text-slate-800 text-sm hover:bg-slate-200 rounded"
+              >
+                ✕
+              </button>
             </div>
-            <p className="text-xs text-slate-500 text-center mt-2">이 홀드가 속한 문제의 색상</p>
           </div>
           
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          {/* 내용 - 펼쳤을 때만 보임 */}
+          <div className={`transition-all duration-300 ease-in-out ${isHoldInfoExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+            <div className="p-4 pt-0">
+              <div className="grid grid-cols-2 gap-4 mb-4">
             <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md">
               <h4 className="text-xs mb-2 text-slate-600 font-semibold text-center">💎 홀드 실제 색상</h4>
               <div className="flex flex-col items-center justify-center gap-2">
@@ -87,20 +102,22 @@ const ResultDetails = ({
                   HSV({selectedHold.hsv[0]}, {selectedHold.hsv[1]}, {selectedHold.hsv[2]})
                 </div>
               )}
+              </div>
             </div>
-          </div>
-          
-          <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-3 rounded-xl border border-yellow-200">
-            <h4 className="text-sm mb-2 text-slate-800 font-bold text-center">💬 색상 피드백</h4>
-            <p className="text-xs text-slate-600 mb-3 text-center">
-              AI가 예측한 색상이 맞나요? 피드백을 주시면 더 정확해집니다!
-            </p>
-            <button
-              onClick={() => setShowHoldFeedbackModal(true)}
-              className="w-full px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl text-sm font-semibold shadow-md hover:shadow-lg transition-all"
-            >
-              🎨 색상 피드백 제출
-            </button>
+            
+            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-3 rounded-xl border border-yellow-200">
+              <h4 className="text-sm mb-2 text-slate-800 font-bold text-center">💬 색상 피드백</h4>
+              <p className="text-xs text-slate-600 mb-3 text-center">
+                AI가 예측한 색상이 맞나요? 피드백을 주시면 더 정확해집니다!
+              </p>
+              <button
+                onClick={() => setShowHoldFeedbackModal(true)}
+                className="w-full px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl text-sm font-semibold shadow-md hover:shadow-lg transition-all"
+              >
+                🎨 색상 피드백 제출
+              </button>
+            </div>
+            </div>
           </div>
         </div>
       )}
