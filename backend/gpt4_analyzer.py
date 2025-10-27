@@ -99,85 +99,40 @@ async def analyze_with_gpt4_vision(
         max_dist = max(distances) if distances else 0
         
         # 🚀 이미지 크기 축소 (API 속도 향상)
-        image_base64_optimized = resize_image_for_gpt4(image_base64, max_size=768)
+        image_base64_optimized = resize_image_for_gpt4(image_base64, max_size=512)
         
-        # 프롬프트 구성 - 훨씬 더 자세하게
-        wall_info = f"벽 각도: {wall_angle} (overhang은 경사벽, slab은 슬랩, face는 수직)" if wall_angle else "벽 각도: 수직으로 추정"
+        # 프롬프트 구성 (원래대로)
+        wall_info = f"\n벽 각도: {wall_angle}" if wall_angle else ""
         
-        # 홀드 분포 정보
-        color_distribution = ", ".join([f"{color}: {count}개" for color, count in color_groups.items()])
-        
-        prompt = f"""당신은 경험이 풍부한 클라이밍 코치입니다. 이 볼더링 문제를 매우 상세하게 분석해주세요.
+        prompt = f"""이 클라이밍 벽 이미지를 분석해주세요. {num_holds}개의 홀드가 있습니다.{wall_info}
 
-## 📊 문제 정보
-- 홀드 개수: {num_holds}개
-- {wall_info}
-- 색상 분포: {color_distribution}
-- 평균 홀드 크기: {avg_area:.0f}px²
-- 최대 홀드 간격: {max_dist:.0f}px
+다음을 제공해주세요:
+1. 난이도 (V0-V10)
+2. 주요 스타일 1개 (dynamic/static/crimp/sloper/balance/power/technical)
+3. 부가 스타일 2-3개
+4. 상세 분석 (난이도 요인, 크럭스, 필요한 동작, 도전과제, 팁)
 
-## 🎯 분석 요청사항
-
-**1. 난이도 평가 (V0-V17)**
-- V-grade를 정확히 판단하세요
-- 홀드 크기, 간격, 벽 각도, 홀드 유형을 모두 고려
-- 초급(V0-V2), 중급(V3-V5), 고급(V6-V9), 전문가(V10+) 구분
-
-**2. 클라이밍 스타일 분석**
-- **주요 스타일** 1개를 선택: dynamic(다이나믹), static(스태틱), crimp(크림프), sloper(슬로퍼), pinch(핀치), balance(밸런스), power(파워), endurance(지구력), technical(기술), coordination(협응)
-- **부가 스타일** 2-3개를 추가로 선택
-- 각 스타일이 필요한 이유를 구체적으로 설명
-
-**3. 상세 분석**
-- 이 문제의 핵심 난이도 요인 (크럭스 구간)
-- 필요한 구체적인 동작들 (예: "왼손 언더클링에서 오른발 하이스텝", "오른손 다이노로 톱홀드 잡기")
-- 주요 도전과제 3-5가지
-- 실전 팁 3-5가지 (구체적인 신체 사용법, 시퀀스 제안)
-- 비슷한 난이도의 다른 문제와 비교
-
-**응답 형식 (JSON):**
+JSON 형식으로 응답해주세요:
 {{
-  "difficulty": "V4",
-  "confidence": 0.85,
+  "difficulty": "V3",
+  "confidence": 0.75,
   "primary_type": "dynamic",
   "secondary_types": ["power", "coordination"],
-  "reasoning": "홀드 간격이 평균보다 30% 넓어 다이나믹한 움직임이 필수적입니다. 특히 중간 구간에서 큰 리치가 요구되며, 이는 V4 수준의 난이도를 형성합니다. 벽 각도가 {wall_angle}이므로 상체 근력도 중요합니다.",
-  "key_factors": [
-    "중간 홀드 간격 60cm - 큰 리치 필요",
-    "슬로퍼 홀드 2개 - 오픈 그립 필수",
-    "벽 각도로 인한 상체 근력 요구"
-  ],
-  "crux": "3번째에서 5번째 홀드로 이동하는 구간. 오른손 언더클링 상태에서 왼손으로 슬로퍼를 잡아야 하며, 발 위치 선택이 핵심입니다.",
-  "movements": [
-    "시작: 양손 매칭으로 첫 홀드 안정화",
-    "중간: 오른발 하이스텝 후 왼손 다이나믹 무브",
-    "크럭스: 슬로퍼 홀드에서 바디텐션 유지하며 다음 홀드로 전환",
-    "마무리: 마지막 홀드는 매칭 후 컨트롤된 동작으로"
-  ],
-  "challenges": [
-    "큰 리치 구간 - 작은 체격은 점프 필요",
-    "슬로퍼 홀드 - 접촉력과 바디텐션 필수",
-    "지속적인 상체 근력 - 지구력 관리 중요",
-    "발 위치 선택 - 작은 풋홀드 정확히 사용"
-  ],
-  "tips": [
-    "시작 전 전체 시퀀스를 미리 시각화하세요",
-    "크럭스 구간에서 호흡을 멈추지 말고 계속 호흡하세요",
-    "슬로퍼 홀드는 팔을 곧게 펴고 체중을 실어 마찰력 극대화",
-    "발 위치를 먼저 정한 후 손 무브를 시도하세요",
-    "다이나믹 구간에서는 주저하지 말고 과감하게 commit하세요"
-  ],
-  "comparison": "일반적인 V3보다 한 단계 높은 수준입니다. 비슷한 스타일의 체육관 세팅과 비교하면 크럭스 난이도가 더 높습니다."
-}}
+  "reasoning": "홀드 간격이 넓어서 다이나믹한 움직임이 필요합니다.",
+  "key_factors": ["큰 리치 필요", "파워 요구"],
+  "crux": "중간 구간에서 큰 점프가 필요합니다.",
+  "movements": ["시작: 양손 잡기", "중간: 다이나믹 무브", "마무리: 안정화"],
+  "challenges": ["큰 리치", "밸런스 유지"],
+  "tips": ["코어를 활용하세요", "모멘텀을 사용하세요"],
+  "comparison": "일반적인 V3보다 약간 어렵습니다."
+}}"""
 
-**중요:** 반드시 위 JSON 형식으로만 답변하고, 추가 설명 없이 JSON만 출력하세요."""
-
-        # 🚀 GPT-4o 사용 (고품질 분석)
+        # 🚀 GPT-4o 사용 + 병렬처리
         response = await client.chat.completions.create(
-            model="gpt-4o",  # 다시 gpt-4o 사용
+            model="gpt-4o",
             messages=[{
                 "role": "system",
-                "content": "You are an expert climbing coach with 15+ years of experience. Analyze bouldering problems in detail and respond ONLY with valid JSON. No markdown, no explanations, just pure JSON."
+                "content": "You are a climbing coach. Analyze bouldering routes and respond in JSON format only."
             }, {
                 "role": "user",
                 "content": [
@@ -186,14 +141,14 @@ async def analyze_with_gpt4_vision(
                         "type": "image_url",
                         "image_url": {
                             "url": f"data:image/jpeg;base64,{image_base64_optimized}",
-                            "detail": "high"  # low에서 high로 변경 (더 상세한 분석)
+                            "detail": "low"  # low로 유지 (속도 우선)
                         }
                     }
                 ]
             }],
-            max_tokens=800,  # 150에서 대폭 증가 (상세한 답변용)
-            temperature=0.4,  # 약간 높여서 창의적 분석
-            timeout=15  # 타임아웃 증가
+            max_tokens=500,  # 적당한 길이
+            temperature=0.3,
+            timeout=12
         )
         
         # 응답 파싱
