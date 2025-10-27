@@ -152,7 +152,7 @@ def analyze_image_async(self, image_base64, wall_angle=None):
             meta={'progress': 45, 'message': f'✅ 색상 분석 완료', 'step': 'color_complete'}
         )
         
-        # 3단계: 문제 생성 (색상별 그룹핑) (50% ~ 65%)
+        # 3단계: 문제 생성 (색상별 그룹핑) (50% ~ 60%)
         self.update_state(
             state='PROGRESS',
             meta={'progress': 50, 'message': '🧩 문제 그룹 생성 중...', 'step': 'problem_generation'}
@@ -179,9 +179,9 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         
         for color_name, group_holds in problems_by_color.items():
             if len(group_holds) >= 1:  # 모든 홀드 그룹 표시
-                # 진행률 업데이트 (60% ~ 65% 사이) - 빠르게
+                # 진행률 업데이트 (50% ~ 60% 사이)
                 processed_colors += 1
-                progress = 60 + int((processed_colors / total_colors) * 5)
+                progress = 50 + int((processed_colors / total_colors) * 10)
                 self.update_state(
                     state='PROGRESS',
                     meta={
@@ -272,24 +272,35 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                     print(f"⚠️ 문제 {i} GPT-4 분석 실패: {result}")
                     problem['gpt4_available'] = False
                 else:
+                    # GPT-4 결과를 문제에 병합
                     problem.update(result)
+                    # 프론트엔드 전달용 필드 추가
+                    problem['gpt4_secondary_types'] = result.get('secondary_types', [])
+                    problem['gpt4_key_factors'] = result.get('key_factors', [])
+                    problem['gpt4_crux'] = result.get('crux', '')
+                    problem['gpt4_movements'] = result.get('movements', [])
+                    problem['gpt4_challenges'] = result.get('challenges', [])
+                    problem['gpt4_tips'] = result.get('tips', [])
+                    problem['gpt4_comparison'] = result.get('comparison', '')
         
         # 비동기 함수 실행 + 진행률 틱 업데이트
         import asyncio
         import threading
         
         try:
-            # 진행률 업데이트 쓰레드
-            stop_progress = False
+            # 진행률 업데이트를 위한 공유 변수
+            progress_state = {'stop': False, 'value': 65}
+            
             def update_progress_tick():
-                progress = 65
-                while not stop_progress and progress < 95:
-                    time.sleep(0.5)  # 0.5초마다 업데이트
-                    progress = min(progress + 1, 95)
-                    self.update_state(
-                        state='PROGRESS',
-                        meta={'progress': progress, 'message': f'🤖 {total_problems}개 문제 분석 중...', 'step': 'gpt4_analysis'}
-                    )
+                """65%부터 95%까지 0.5초마다 1%씩 증가"""
+                while not progress_state['stop'] and progress_state['value'] < 95:
+                    time.sleep(0.5)
+                    if not progress_state['stop']:
+                        progress_state['value'] = min(progress_state['value'] + 1, 95)
+                        self.update_state(
+                            state='PROGRESS',
+                            meta={'progress': progress_state['value'], 'message': f'🤖 {total_problems}개 문제 분석 중...', 'step': 'gpt4_analysis'}
+                        )
             
             # 진행률 쓰레드 시작
             progress_thread = threading.Thread(target=update_progress_tick, daemon=True)
@@ -299,11 +310,11 @@ def analyze_image_async(self, image_base64, wall_angle=None):
             asyncio.run(analyze_all_problems())
             
             # 진행률 쓰레드 종료
-            stop_progress = True
-            progress_thread.join(timeout=1)
+            progress_state['stop'] = True
+            progress_thread.join(timeout=2)
             
         except Exception as e:
-            stop_progress = True
+            progress_state['stop'] = True
             print(f"⚠️ GPT-4 병렬 분석 오류: {e}")
             for problem in problems:
                 problem['gpt4_available'] = False
