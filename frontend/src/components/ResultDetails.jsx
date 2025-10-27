@@ -299,29 +299,29 @@ const ResultDetails = ({
             🎨 감지된 문제들
           </h3>
           
-          {/* 모바일: 2열 그리드, 데스크톱: 3열 그리드 */}
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+          {/* 모바일: 3-4열 그리드, 데스크톱: 4열 그리드 */}
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
             {result.problems.map((problem, idx) => (
               <div 
                 key={idx}
                 onClick={() => onProblemSelect(problem)}
-                className={`glass-card p-4 rounded-xl cursor-pointer transition-all duration-300 hover:translate-y-[-3px] hover:shadow-xl ${
+                className={`glass-card p-2.5 rounded-lg cursor-pointer transition-all duration-300 hover:translate-y-[-2px] hover:shadow-lg ${
                   selectedProblem && selectedProblem.id === problem.id 
-                    ? 'ring-4 ring-primary-500 shadow-2xl' 
-                    : 'shadow-lg'
+                    ? 'ring-2 ring-primary-500 shadow-xl' 
+                    : 'shadow-md'
                 }`}
               >
                 <div className="text-center">
-                  <div className="text-4xl sm:text-5xl mb-2 drop-shadow-lg">{colorEmoji[problem.color_name] || '⭕'}</div>
-                  <div className="text-base sm:text-lg font-bold gradient-text mb-1">{problem.color_name?.toUpperCase()}</div>
-                  <div className="text-xs text-slate-600 mb-2">홀드 {problem.hold_count}개</div>
+                  <div className="text-3xl mb-1.5 drop-shadow-lg">{colorEmoji[problem.color_name] || '⭕'}</div>
+                  <div className="text-xs font-bold gradient-text mb-0.5 truncate">{problem.color_name?.toUpperCase()}</div>
+                  <div className="text-[10px] text-slate-600 mb-1.5">{problem.hold_count}개</div>
                   
                   {problem.difficulty && (
-                    <div className="bg-white/80 backdrop-blur-sm p-2 rounded-lg shadow-inner">
-                      <div className="text-xl sm:text-2xl font-extrabold gradient-text mb-0.5">
+                    <div className="bg-white/80 backdrop-blur-sm p-1.5 rounded-lg shadow-inner">
+                      <div className="text-base font-extrabold gradient-text">
                         {problem.difficulty?.grade || problem.difficulty}
                       </div>
-                      <div className="text-xs text-slate-600 font-medium truncate">
+                      <div className="text-[9px] text-slate-600 font-medium truncate">
                         {problem.climb_type?.primary_type || problem.type || '일반'}
                       </div>
                     </div>

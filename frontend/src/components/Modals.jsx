@@ -147,21 +147,11 @@ const Modals = ({
               정확한 색상을 알려주시면 AI가 더 똑똑해집니다! 🙏
             </p>
 
-            {/* 현재 예측된 색상 */}
-            <div className="mb-6 space-y-3">
-              <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border-2 border-purple-200">
-                <div className="text-center">
-                  <p className="text-xs text-slate-600 mb-2">문제 그룹 색상</p>
-                  <div className="flex items-center justify-center gap-2">
-                    <span className="text-4xl">{colorEmoji[selectedHold.color] || '⭕'}</span>
-                    <span className="text-xl font-bold gradient-text">{(selectedHold.color || 'UNKNOWN').toUpperCase()}</span>
-                  </div>
-                </div>
-              </div>
-              
+            {/* AI가 감지한 색상 */}
+            <div className="mb-6">
               <div className="p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl border-2 border-blue-200">
                 <div className="text-center">
-                  <p className="text-xs text-slate-600 mb-3">AI가 감지한 홀드 실제 색상</p>
+                  <p className="text-xs text-slate-600 mb-3">AI가 감지한 홀드 색상</p>
                   <div className="flex flex-col items-center justify-center gap-2">
                     {/* 실제 RGB 색상 원형 표시 */}
                     <div 

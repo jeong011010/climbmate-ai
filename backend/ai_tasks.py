@@ -102,10 +102,10 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         
         hold_data, masks = preprocess(image, model_path=model_path)
         
-        # 홀드 감지 완료
+        # 홀드 감지 완료 (40%까지)
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 50, 'message': f'✅ {len(hold_data) if hold_data else 0}개 홀드 감지 완료', 'step': 'yolo_complete'}
+            meta={'progress': 40, 'message': f'✅ {len(hold_data) if hold_data else 0}개 홀드 감지 완료', 'step': 'yolo_complete'}
         )
         
         if not hold_data:
@@ -127,11 +127,11 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         holds = hold_data
         total_holds = len(holds)
         
-        # 2단계: 색상 분석 (50% ~ 60%) - 빠르게 진행
+        # 2단계: 색상 분석 (42% ~ 45%)
         self.update_state(
             state='PROGRESS',
             meta={
-                'progress': 52,
+                'progress': 42,
                 'message': f'🎨 색상 분석 중... (홀드 {total_holds}개)',
                 'step': 'color_analysis',
                 'holds_count': total_holds
@@ -146,16 +146,16 @@ def analyze_image_async(self, image_base64, wall_angle=None):
             config_path="holdcheck/color_ranges.json"
         )
         
-        # 색상 분석 완료
+        # 색상 분석 완료 (45%까지)
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 58, 'message': f'✅ 색상 분석 완료', 'step': 'color_complete'}
+            meta={'progress': 45, 'message': f'✅ 색상 분석 완료', 'step': 'color_complete'}
         )
         
-        # 3단계: 문제 생성 (색상별 그룹핑)
+        # 3단계: 문제 생성 (색상별 그룹핑) (50% ~ 65%)
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 60, 'message': '🧩 문제 그룹 생성 중...', 'step': 'problem_generation'}
+            meta={'progress': 50, 'message': '🧩 문제 그룹 생성 중...', 'step': 'problem_generation'}
         )
         
         # 색상별로 그룹핑
