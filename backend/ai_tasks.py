@@ -242,12 +242,17 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                     })
         
         # 4단계: GPT-4 분석 (🚀 비동기 병렬 처리)
+        total_problems = len(problems)
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 65, 'message': '🤖 GPT-4 분석 중... (병렬 처리)', 'step': 'gpt4_analysis'}
+            meta={'progress': 65, 'message': f'🤖 {total_problems}개 문제 분석 중...', 'step': 'gpt4_analysis'}
         )
         
         # 🚀 모든 문제를 동시에 GPT-4에 요청 (병렬 처리)
+        # 진행률 업데이트를 위한 타이머
+        import time
+        start_time = time.time()
+        
         async def analyze_all_problems():
             tasks = []
             for problem in problems:
@@ -258,7 +263,7 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                 )
                 tasks.append(task)
             
-            # 모든 요청을 동시에 처리
+            # 모든 요청을 동시에 처리 (병렬)
             results = await asyncio.gather(*tasks, return_exceptions=True)
             
             # 결과를 각 문제에 적용
@@ -269,11 +274,36 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                 else:
                     problem.update(result)
         
-        # 비동기 함수 실행
+        # 비동기 함수 실행 + 진행률 틱 업데이트
         import asyncio
+        import threading
+        
         try:
+            # 진행률 업데이트 쓰레드
+            stop_progress = False
+            def update_progress_tick():
+                progress = 65
+                while not stop_progress and progress < 95:
+                    time.sleep(0.5)  # 0.5초마다 업데이트
+                    progress = min(progress + 1, 95)
+                    self.update_state(
+                        state='PROGRESS',
+                        meta={'progress': progress, 'message': f'🤖 {total_problems}개 문제 분석 중...', 'step': 'gpt4_analysis'}
+                    )
+            
+            # 진행률 쓰레드 시작
+            progress_thread = threading.Thread(target=update_progress_tick, daemon=True)
+            progress_thread.start()
+            
+            # GPT-4 분석 실행
             asyncio.run(analyze_all_problems())
+            
+            # 진행률 쓰레드 종료
+            stop_progress = True
+            progress_thread.join(timeout=1)
+            
         except Exception as e:
+            stop_progress = True
             print(f"⚠️ GPT-4 병렬 분석 오류: {e}")
             for problem in problems:
                 problem['gpt4_available'] = False
