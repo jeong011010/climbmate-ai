@@ -86,11 +86,25 @@ for color, data in color_data.items():
     h_min = max(0, int(np.percentile(h_arr, 5)))  # 하위 5%
     h_max = min(180, int(np.percentile(h_arr, 95)))  # 상위 5%
     
+    # ⚠️ H 범위가 너무 좁으면 안 됨 (최소 10 이상)
+    if h_max - h_min < 10 and h_min < 170:  # red 예외
+        center = (h_min + h_max) // 2
+        h_min = max(0, center - 5)
+        h_max = min(180, center + 5)
+    
     s_min = max(0, int(np.percentile(s_arr, 5)))
     s_max = min(255, int(np.percentile(s_arr, 95)))
     
+    # S 범위 최소값 보장 (최소 30 이상)
+    if s_max - s_min < 30:
+        s_max = min(255, s_min + 30)
+    
     v_min = max(0, int(np.percentile(v_arr, 5)))
     v_max = min(255, int(np.percentile(v_arr, 95)))
+    
+    # V 범위 최소값 보장 (최소 40 이상)
+    if v_max - v_min < 40:
+        v_max = min(255, v_min + 40)
     
     # Red는 H가 0 근처와 180 근처 두 범위
     if color == 'red':
