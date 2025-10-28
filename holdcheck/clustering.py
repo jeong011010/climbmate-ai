@@ -5262,11 +5262,17 @@ def classify_color_simple_hsv(h, s, v):
         return "lime", 0.90  # 연두
     elif h >= 45 and h < 80:
         return "green", 0.90
-    elif h >= 80 and h < 95:
-        return "mint", 0.85  # 민트/청록
-    elif h >= 95 and h < 125:
+    elif h >= 80 and h < 100:
+        # 민트: 채도/명도 체크
+        if s >= 50 and v >= 90:
+            return "mint", 0.85
+        elif v < 90:
+            return "black", 0.85  # 어두운 민트 → 검정
+        else:
+            return "mint", 0.75  # 낮은 신뢰도
+    elif h >= 100 and h < 125:
         # 파랑: 채도/명도 체크로 검정 구분
-        if s >= 120 and v >= 120:
+        if s >= 80 and v >= 110:
             return "blue", 0.90
         elif v < 100:
             return "black", 0.85  # 어두운 파랑 → 검정
