@@ -9,8 +9,13 @@ import sys
 import os
 import sqlite3
 
-# DB 경로
-DB_PATH = os.path.join(os.path.dirname(__file__), 'backend', 'climbmate.db')
+# DB 경로 (Docker 환경 고려)
+if os.path.exists('/app/backend/climbmate.db'):
+    # Docker 컨테이너 안
+    DB_PATH = '/app/backend/climbmate.db'
+else:
+    # 로컬 환경
+    DB_PATH = os.path.join(os.path.dirname(__file__), 'backend', 'climbmate.db')
 
 def reset_feedback():
     """unknown 피드백 데이터 삭제"""
