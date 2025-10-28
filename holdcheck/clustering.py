@@ -5240,21 +5240,19 @@ def rule_based_color_clustering(hold_data, vectors, config_path="holdcheck/color
 def classify_color_simple_hsv(h, s, v):
     """🎨 상식적인 HSV 기반 색상 분류 (명도 우선 판단)"""
     
-    # 🔥 1단계: 명도 우선 판단 (검정/흰색은 채도 무관)
+    # 🔥 1단계: 명도+채도 기반 무채색 판단
     if v < 90:
         # 매우 어두움 → 검정 (채도 무관!)
         return "black", 0.95
-    elif v > 200 and s < 50:
+    elif v >= 150 and s < 40:
         # 매우 밝음 + 낮은 채도 → 흰색
         return "white", 0.95
-    
-    # 🔥 2단계: 채도 기반 무채색 판단 (중간 명도)
-    if s < 30:
-        # 채도가 매우 낮음 → 흰색 (회색 개념 제거)
-        return "white", 0.90
+    elif v < 150 and s < 30:
+        # 중간 명도 + 채도 매우 낮음 → 검정 (어두운 회색)
+        return "black", 0.90
     
     # 2단계: 유채색 판단 (OpenCV H는 0-180)
-    if (h >= 0 and h < 8) or (h >= 170):
+    if (h >= 0 and h < 8) or (h >= 175):
         return "red", 0.90
     elif h >= 8 and h < 18:
         return "orange", 0.90
@@ -5268,9 +5266,9 @@ def classify_color_simple_hsv(h, s, v):
         return "mint", 0.85  # 민트/청록
     elif h >= 95 and h < 130:
         return "blue", 0.90
-    elif h >= 130 and h < 150:
+    elif h >= 130 and h < 165:
         return "purple", 0.90
-    elif h >= 150 and h < 170:
+    elif h >= 165 and h < 175:
         return "pink", 0.90
     else:
         # 갈색 판단 (낮은 채도 + 낮은 명도)
