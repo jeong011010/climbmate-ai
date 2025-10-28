@@ -261,8 +261,7 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
         
         color_map = {
             "black": ["black", "very dark black", "dark black"],
-            "white": ["white", "bright white", "pure white"],
-            "gray": ["gray", "light gray", "dark gray"],
+            "white": ["white", "bright white", "pure white", "gray", "light gray", "dark gray"],
             "orange": ["orange", "bright orange", "vivid orange"],
             "yellow": ["yellow", "bright yellow", "pure yellow"],
             "red": ["red", "bright red", "vivid red"],
@@ -517,10 +516,8 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
                      "coal black", "midnight black"],
             
             "white": ["white", "bright white", "pure white", "snow white", "pearl white", "clean white",
-                     "chalk white", "fresh white"],
-            
-            "gray": ["gray", "light gray", "dark gray", "medium gray", "silver", "neutral gray",
-                    "slate", "stone"],
+                     "chalk white", "fresh white", "gray", "light gray", "dark gray", "medium gray", 
+                     "silver", "neutral gray", "slate", "stone"],
             
             "orange": ["orange", "bright orange", "vivid orange", "pumpkin", "tangerine", "flame",
                       "traffic", "sunset"],
@@ -652,9 +649,9 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
                             confidence = 0.95
                             print(f"   🔧 RGB 재분류: 홀드 {hold['id']} - unknown → white (밝은 무채색)")
                         elif avg_brightness > 100:
-                            color_name = "gray"
+                            color_name = "white"
                             confidence = 0.95
-                            print(f"   🔧 RGB 재분류: 홀드 {hold['id']} - unknown → gray (중간 무채색)")
+                            print(f"   🔧 RGB 재분류: 홀드 {hold['id']} - unknown → white (중간 무채색)")
                         else:
                             color_name = "black"
                             confidence = 0.95
@@ -673,7 +670,7 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
                         elif b > r and b > g:
                             color_name = "blue"
                         else:
-                            color_name = "gray"
+                            color_name = "white"
                         confidence = 0.70
                         print(f"   🔧 RGB 재분류 (최종): 홀드 {hold['id']} - unknown → {color_name} (최고 채널 기준)")
                 
@@ -692,18 +689,12 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
                             print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - {color_name} → white (밝은 무채색)")
                             color_name = "white"
                             confidence = 0.99
-                    # 중간 밝기 회색 (RGB(194,199,198) 같은 케이스)
-                    elif avg_brightness > 150:
-                        if color_name not in ["white", "gray"]:
-                            print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - {color_name} → gray (중간 무채색)")
-                            color_name = "gray"
-                            confidence = 0.99
-                    # 어두운 회색
+                    # 중간 밝기 무채색 (RGB(194,199,198) 같은 케이스) → 흰색
                     elif avg_brightness > 80:
-                        if color_name not in ["gray", "black"]:
-                            print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - {color_name} → gray (어두운 무채색)")
-                            color_name = "gray"
-                            confidence = 0.98
+                        if color_name not in ["white"]:
+                            print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - {color_name} → white (무채색)")
+                            color_name = "white"
+                            confidence = 0.99
                     # 매우 어두운 검정
                     else:
                         if color_name not in ["black"]:
@@ -713,7 +704,7 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
                 
                 # ⚪ 흰색 보정: 매우 밝은 색상 (평균 밝기 > 200, 채널 차이 < 30)
                 elif avg_brightness > 200 and channel_diff < 30:
-                    if color_name not in ["white", "gray"]:
+                    if color_name not in ["white"]:
                         print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - {color_name} → white (매우 밝음)")
                         color_name = "white"
                         confidence = 0.98
@@ -739,8 +730,8 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
                             color_name = "white"
                             confidence = 0.95
                         else:
-                            print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - black → gray (밝은 회색)")
-                            color_name = "gray"
+                            print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - black → white (밝은 무채색)")
+                            color_name = "white"
                             confidence = 0.95
                     # 일반 밝은 색상
                     else:
@@ -1244,10 +1235,10 @@ def color_specific_classification(hold_data):
         
         # 검정색/흰색 특별 처리 제거 - RGB 큐브에서 순수 거리 기반으로 처리
         
-        # 회색 홀드 (Saturation 낮음, Value 중간)
-        if s < 40 and 30 <= v <= 200:
-            hold["color_category"] = "gray"
-            hold["group"] = None  # 나중에 회색 전용 군집화
+        # 무채색 홀드 (Saturation 낮음) → 흰색 (회색 개념 제거)
+        if s < 40 and v >= 30:
+            hold["color_category"] = "white"
+            hold["group"] = None
         # 4. 빨간색 계열 (Hue 0-30도, 330-360도)
         elif (0 <= h <= 30) or (330 <= h <= 360):
             if s > 100 and v > 100:  # 진한 빨간색
@@ -5259,8 +5250,8 @@ def classify_color_simple_hsv(h, s, v):
     
     # 🔥 2단계: 채도 기반 무채색 판단 (중간 명도)
     if s < 30:
-        # 채도가 매우 낮음 → 회색
-        return "gray", 0.90
+        # 채도가 매우 낮음 → 흰색 (회색 개념 제거)
+        return "white", 0.90
     
     # 2단계: 유채색 판단 (OpenCV H는 0-180)
     if (h >= 0 and h < 8) or (h >= 170):
@@ -5433,10 +5424,8 @@ def find_nearest_color_hsv(h, s, v, colors_config):
     if s < 50:
         if v < 80:
             return "black", 0.6, "Fallback: dark achromatic"
-        elif v > 180:
-            return "white", 0.6, "Fallback: bright achromatic"
         else:
-            return "gray", 0.6, "Fallback: mid achromatic"
+            return "white", 0.6, "Fallback: achromatic (회색 영역 포함)"
     
     # Hue 기반 분류
     if h < 10 or h > 170:

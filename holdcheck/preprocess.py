@@ -128,8 +128,7 @@ def extract_color_with_clip_ai(image, mask):
     # 색상 매핑 (CLIP 프롬프트 → 표준 색상 이름)
     color_map = {
         "black": ["black", "very dark black"],
-        "white": ["white", "bright white"],
-        "gray": ["gray", "light gray", "dark gray"],
+        "white": ["white", "bright white", "gray", "light gray", "dark gray"],
         "orange": ["orange", "bright orange", "dark orange"],
         "yellow": ["yellow", "bright yellow", "light yellow"],
         "red": ["red", "bright red", "dark red"],
@@ -339,8 +338,7 @@ def extract_colors_with_clip_ai_batch(hold_images, masks):
     # 색상 매핑 (CLIP 프롬프트 → 표준 색상 이름)
     color_map = {
         "black": ["black", "very dark black"],
-        "white": ["white", "bright white"],
-        "gray": ["gray", "light gray", "dark gray"],
+        "white": ["white", "bright white", "gray", "light gray", "dark gray"],
         "orange": ["orange", "bright orange", "dark orange"],
         "yellow": ["yellow", "bright yellow", "light yellow"],
         "red": ["red", "bright red", "dark red"],
