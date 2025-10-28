@@ -6,9 +6,7 @@ export {
 
 // Feedback APIs
 export {
-    confirmColorFeedback,
-    confirmAllColorFeedbacks,
-    deleteColorFeedback, getColorFeedbacks, submitHoldColorFeedback, submitProblemFeedback, trainColorModel
+    confirmAllColorFeedbacks, confirmColorFeedback, deleteColorFeedback, getColorFeedbacks, submitHoldColorFeedback, submitProblemFeedback, trainColorModel
 } from './feedback'
 
 // Stats APIs

@@ -87,3 +87,4 @@ elif predicted_dist and predicted_dist[0][0] == 'unknown':
 else:
     print(f"   ✅ 데이터가 유효합니다. ML 학습 가능!")
 
+

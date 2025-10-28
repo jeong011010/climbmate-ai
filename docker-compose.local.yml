@@ -1,0 +1,78 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - CLIP_MODEL=ViT-B/32
+      - REDIS_URL=redis://redis:6379/0
+      - YOLO_MODEL=${YOLO_MODEL:-roboflow}
+    depends_on:
+      - redis
+    volumes:
+      - ./backend/climbmate.db:/app/backend/climbmate.db
+      - ./backend/models:/app/backend/models
+      - ./holdcheck:/app/holdcheck
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A celery_app worker --loglevel=info --concurrency=2
+    working_dir: /app
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - CLIP_MODEL=ViT-B/32
+      - REDIS_URL=redis://redis:6379/0
+      - YOLO_MODEL=${YOLO_MODEL:-roboflow}
+    volumes:
+      - ./backend/climbmate.db:/app/backend/climbmate.db
+      - ./backend/models:/app/backend/models
+      - ./holdcheck:/app/holdcheck
+    depends_on:
+      - redis
+      - backend
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+      args:
+        VITE_API_URL: http://localhost:8000
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  db-data:
+  model-data:
+  redis_data:
+
+
+

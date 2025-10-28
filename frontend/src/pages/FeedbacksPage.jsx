@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 // 원형 게이지 컴포넌트
 const CircularGauge = ({ value, label, color = "blue" }) => {

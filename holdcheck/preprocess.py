@@ -1142,13 +1142,13 @@ def get_dominant_color(pixels_hsv, k=3):
     
     original_count = len(pixels_hsv)
     
-    # 🧹 Step 1: 초크 제거 (V > 200 and S < 30)
+    # 🧹 Step 1: 초크 제거 (V > 180 and S < 50)
     h_values = pixels_hsv[:, 0]
     s_values = pixels_hsv[:, 1]
     v_values = pixels_hsv[:, 2]
     
     # 초크가 아닌 픽셀 선택 (밝고 채도 낮은 픽셀 제외)
-    chalk_mask = (v_values > 200) & (s_values < 30)
+    chalk_mask = (v_values > 180) & (s_values < 50)
     non_chalk_mask = ~chalk_mask
     
     # 초크 제거 후 픽셀 수 확인
