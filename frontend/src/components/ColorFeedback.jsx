@@ -9,7 +9,6 @@ import './ColorFeedback.css'
 const COLOR_OPTIONS = [
   { value: 'black', label: '검정', color: '#000000' },
   { value: 'white', label: '흰색', color: '#FFFFFF' },
-  { value: 'gray', label: '회색', color: '#808080' },
   { value: 'red', label: '빨강', color: '#FF0000' },
   { value: 'orange', label: '주황', color: '#FF8800' },
   { value: 'yellow', label: '노랑', color: '#FFFF00' },

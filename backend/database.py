@@ -401,18 +401,28 @@ def get_color_training_data(min_samples: int = 10) -> List[Dict]:
     conn.close()
     
     training_data = []
+    gray_to_white_count = 0
     for row in rows:
         color_stats = json.loads(row[9]) if row[9] else {}
+        correct_color = row[10]
+        
+        # 🔄 회색을 흰색으로 변환 (gray 개념 제거)
+        if correct_color == 'gray':
+            correct_color = 'white'
+            gray_to_white_count += 1
+        
         training_data.append({
             'rgb': [row[0], row[1], row[2]],
             'hsv': [row[3], row[4], row[5]],
             'lab': [row[6], row[7], row[8]],
             'color_stats': color_stats,
-            'correct_color': row[10],
+            'correct_color': correct_color,
             'area': 0,  # 기본값
             'circularity': 0  # 기본값
         })
     
+    if gray_to_white_count > 0:
+        print(f"   🔄 학습 데이터: gray {gray_to_white_count}개 → white로 변환")
     print(f"✅ 색상 학습 데이터 {len(training_data)}건 로드")
     return training_data
 

@@ -9,7 +9,6 @@ export const API_URL = import.meta.env.VITE_API_URL || 'https://climbmate.store'
 export const colorEmoji = {
   black: '⚫',
   white: '⚪',
-  gray: '🔘',
   red: '🔴',
   orange: '🟠',
   yellow: '🟡',

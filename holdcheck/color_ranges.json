@@ -1,0 +1,356 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-01-01",
+  "feedback_count": 0,
+  "colors": {
+    "black": {
+      "name": "검정색",
+      "priority": 1,
+      "hsv_ranges": [
+        {
+          "h": [
+            0,
+            180
+          ],
+          "s": [
+            0,
+            255
+          ],
+          "v": [
+            0,
+            80
+          ]
+        }
+      ],
+      "rgb_conditions": [
+        {
+          "type": "max_value",
+          "threshold": 80
+        },
+        {
+          "type": "achromatic",
+          "brightness_max": 150,
+          "channel_diff_max": 50
+        }
+      ]
+    },
+    "white": {
+      "name": "흰색",
+      "priority": 2,
+      "hsv_ranges": [
+        {
+          "h": [
+            0,
+            180
+          ],
+          "s": [
+            0,
+            50
+          ],
+          "v": [
+            80,
+            255
+          ]
+        }
+      ],
+      "rgb_conditions": [
+        {
+          "type": "min_value",
+          "threshold": 80
+        },
+        {
+          "type": "achromatic",
+          "brightness_min": 80,
+          "brightness_max": 255,
+          "channel_diff_max": 50
+        }
+      ]
+    },
+    "red": {
+      "name": "빨간색",
+      "priority": 4,
+      "hsv_ranges": [
+        {
+          "h": [
+            0,
+            10
+          ],
+          "s": [
+            100,
+            255
+          ],
+          "v": [
+            100,
+            255
+          ]
+        },
+        {
+          "h": [
+            170,
+            180
+          ],
+          "s": [
+            100,
+            255
+          ],
+          "v": [
+            100,
+            255
+          ]
+        }
+      ],
+      "rgb_conditions": [
+        {
+          "type": "dominant_channel",
+          "channel": "r",
+          "min_value": 150,
+          "diff_threshold": 50
+        }
+      ]
+    },
+    "orange": {
+      "name": "주황색",
+      "priority": 5,
+      "hsv_ranges": [
+        {
+          "h": [
+            10,
+            25
+          ],
+          "s": [
+            100,
+            255
+          ],
+          "v": [
+            100,
+            255
+          ]
+        }
+      ],
+      "rgb_conditions": [
+        {
+          "type": "two_channel_high",
+          "channels": [
+            "r",
+            "g"
+          ],
+          "r_min": 150,
+          "g_min": 80,
+          "b_max": 120,
+          "r_over_g": true
+        }
+      ]
+    },
+    "yellow": {
+      "name": "노란색",
+      "priority": 6,
+      "hsv_ranges": [
+        {
+          "h": [
+            25,
+            40
+          ],
+          "s": [
+            100,
+            255
+          ],
+          "v": [
+            150,
+            255
+          ]
+        }
+      ],
+      "rgb_conditions": [
+        {
+          "type": "two_channel_high",
+          "channels": [
+            "r",
+            "g"
+          ],
+          "r_min": 150,
+          "g_min": 150,
+          "b_max": 150,
+          "similar": true
+        }
+      ]
+    },
+    "green": {
+      "name": "초록색",
+      "priority": 7,
+      "hsv_ranges": [
+        {
+          "h": [
+            40,
+            75
+          ],
+          "s": [
+            100,
+            255
+          ],
+          "v": [
+            100,
+            255
+          ]
+        }
+      ],
+      "rgb_conditions": [
+        {
+          "type": "dominant_channel",
+          "channel": "g",
+          "min_value": 100,
+          "diff_threshold": 30
+        }
+      ]
+    },
+    "mint": {
+      "name": "민트색",
+      "priority": 8,
+      "hsv_ranges": [
+        {
+          "h": [
+            75,
+            105
+          ],
+          "s": [
+            100,
+            255
+          ],
+          "v": [
+            150,
+            255
+          ]
+        }
+      ],
+      "rgb_conditions": [
+        {
+          "type": "two_channel_high",
+          "channels": [
+            "g",
+            "b"
+          ],
+          "g_min": 150,
+          "b_min": 150,
+          "r_max": 150
+        }
+      ]
+    },
+    "blue": {
+      "name": "파란색",
+      "priority": 9,
+      "hsv_ranges": [
+        {
+          "h": [
+            105,
+            130
+          ],
+          "s": [
+            100,
+            255
+          ],
+          "v": [
+            100,
+            255
+          ]
+        }
+      ],
+      "rgb_conditions": [
+        {
+          "type": "dominant_channel",
+          "channel": "b",
+          "min_value": 100,
+          "diff_threshold": 30
+        }
+      ]
+    },
+    "purple": {
+      "name": "보라색",
+      "priority": 10,
+      "hsv_ranges": [
+        {
+          "h": [
+            130,
+            160
+          ],
+          "s": [
+            100,
+            255
+          ],
+          "v": [
+            100,
+            255
+          ]
+        }
+      ],
+      "rgb_conditions": [
+        {
+          "type": "two_channel_high",
+          "channels": [
+            "r",
+            "b"
+          ],
+          "r_min": 100,
+          "b_min": 100,
+          "g_diff": 20
+        }
+      ]
+    },
+    "pink": {
+      "name": "분홍색",
+      "priority": 11,
+      "hsv_ranges": [
+        {
+          "h": [
+            160,
+            170
+          ],
+          "s": [
+            50,
+            150
+          ],
+          "v": [
+            180,
+            255
+          ]
+        }
+      ],
+      "rgb_conditions": [
+        {
+          "type": "dominant_channel",
+          "channel": "r",
+          "min_value": 180,
+          "g_min": 100,
+          "b_min": 100
+        }
+      ]
+    },
+    "brown": {
+      "name": "갈색",
+      "priority": 12,
+      "hsv_ranges": [
+        {
+          "h": [
+            0,
+            10
+          ],
+          "s": [
+            80,
+            200
+          ],
+          "v": [
+            50,
+            150
+          ]
+        }
+      ],
+      "rgb_conditions": [
+        {
+          "type": "dominant_channel",
+          "channel": "r",
+          "min_value": 80,
+          "max_value": 150,
+          "dark": true
+        }
+      ]
+    }
+  }
+}

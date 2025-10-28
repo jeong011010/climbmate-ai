@@ -5222,23 +5222,7 @@ def rule_based_color_clustering(hold_data, vectors, config_path="holdcheck/color
             "rule": matched_rule
         })
     
-    # 🔄 회색을 흰색으로 병합 (구분이 모호하고 대부분 볼륨)
-    gray_count = 0
-    for hold in hold_data:
-        if hold.get("clip_color_name") == "gray":
-            hold["clip_color_name"] = "white"
-            gray_count += 1
-    
-    if gray_count > 0:
-        print(f"   🔄 회색 {gray_count}개 → 흰색으로 병합")
-        # 회색 그룹을 흰색 그룹으로 병합
-        if "gray" in color_groups:
-            if "white" not in color_groups:
-                color_groups["white"] = []
-            color_groups["white"].extend(color_groups["gray"])
-            del color_groups["gray"]
-    
-    # 그룹 ID 할당 (색상 이름 기준 정렬, gray 제외)
+    # 그룹 ID 할당 (색상 이름 기준 정렬, gray 완전 제거)
     color_order = ["black", "white", "red", "orange", "yellow", 
                    "lime", "green", "mint", "blue", "purple", "pink", "brown", "unknown"]
     
@@ -5252,9 +5236,9 @@ def rule_based_color_clustering(hold_data, vectors, config_path="holdcheck/color
     elapsed = time.time() - start_time
     
     print(f"\n✅ 룰 기반 클러스터링 완료 (⚡ {elapsed:.2f}초)")
-    print(f"   생성된 그룹 수: {len(color_groups) - (1 if 'gray' in color_groups else 0)}개")
+    print(f"   생성된 그룹 수: {len(color_groups)}개")
     for color_name in color_order:
-        if color_name in color_groups and color_name != "gray":  # gray 제외하고 표시
+        if color_name in color_groups:
             count = len(color_groups[color_name])
             avg_conf = np.mean([h["clip_confidence"] for h in color_groups[color_name]])
             print(f"   {color_name}: {count}개 홀드 (평균 신뢰도: {avg_conf:.2f})")
