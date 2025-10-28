@@ -1130,7 +1130,7 @@ def validate_and_correct_color(color_hsv):
     return [h, s, v]
 
 def get_dominant_color(pixels_hsv, k=3):
-    """🎯 개선된 방식: 가장 밝은 픽셀들의 중앙값으로 색상 추출"""
+    """🎯 개선된 방식: 초크 제거 후 홀드 본연 색상 추출"""
     if len(pixels_hsv) == 0:
         return [0, 0, 0]
     
@@ -1140,9 +1140,31 @@ def get_dominant_color(pixels_hsv, k=3):
                 int(np.median(pixels_hsv[:, 1])), 
                 int(np.median(pixels_hsv[:, 2]))]
     
-    # 🚀 상위 10% 가장 밝은 픽셀만 사용 (그림자/어두운 영역 강력 제외)
+    original_count = len(pixels_hsv)
+    
+    # 🧹 Step 1: 초크 제거 (V > 200 and S < 30)
+    h_values = pixels_hsv[:, 0]
+    s_values = pixels_hsv[:, 1]
+    v_values = pixels_hsv[:, 2]
+    
+    # 초크가 아닌 픽셀 선택 (밝고 채도 낮은 픽셀 제외)
+    chalk_mask = (v_values > 200) & (s_values < 30)
+    non_chalk_mask = ~chalk_mask
+    
+    # 초크 제거 후 픽셀 수 확인
+    non_chalk_pixels = pixels_hsv[non_chalk_mask]
+    chalk_removed_count = np.sum(chalk_mask)
+    
+    if len(non_chalk_pixels) > original_count * 0.3:  # 30% 이상 남아있으면 사용
+        pixels_hsv = non_chalk_pixels
+        if chalk_removed_count > 0:
+            print(f"   🧹 초크 제거: {chalk_removed_count}개 픽셀 제거 ({original_count} → {len(pixels_hsv)})")
+    else:
+        print(f"   ⚠️ 초크 제거하면 픽셀 부족 ({len(non_chalk_pixels)}/{original_count}), 전체 사용")
+    
+    # 🚀 Step 2: 상위 10% 가장 밝은 픽셀만 사용 (그림자/어두운 영역 제외)
     brightness_scores = pixels_hsv[:, 2]  # V 채널
-    bright_threshold = np.percentile(brightness_scores, 90)  # 상위 10% (70→90 변경)
+    bright_threshold = np.percentile(brightness_scores, 90)  # 상위 10%
     
     bright_mask = brightness_scores >= bright_threshold
     
@@ -1159,12 +1181,12 @@ def get_dominant_color(pixels_hsv, k=3):
         else:
             print(f"   ⚠️ 밝은 픽셀 부족, 전체 사용: {len(pixels_hsv)}개")
     
-    # 🎯 중앙값 방식: outlier(그림자, 반사)에 강함 (평균→중앙값 변경)
+    # 🎯 Step 3: 중앙값 방식으로 대표 색상 추출 (outlier에 강함)
     h_med = np.median(pixels_hsv[:, 0])
     s_med = np.median(pixels_hsv[:, 1])
     v_med = np.median(pixels_hsv[:, 2])
     
-    print(f"   💎 밝은 픽셀 중앙값: HSV({h_med:.1f}, {s_med:.1f}, {v_med:.1f})")
+    print(f"   💎 최종 대표 색상: HSV({h_med:.1f}, {s_med:.1f}, {v_med:.1f})")
     
     return [int(h_med), int(s_med), int(v_med)]
 
