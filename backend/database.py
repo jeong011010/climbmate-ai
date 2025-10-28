@@ -380,12 +380,15 @@ def save_hold_color_feedback(
     print(f"✅ 홀드 색상 피드백 ID {feedback_id} 저장 완료")
     return feedback_id
 
-def get_color_training_data(min_samples: int = 10) -> List[Dict]:
-    """🎨 색상 학습 데이터 가져오기 (확인된 피드백만)"""
+def get_color_training_data(min_samples: int = 10, confirmed_only: bool = False) -> List[Dict]:
+    """🎨 색상 학습 데이터 가져오기"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
-    cursor.execute("""
+    # confirmed_only=False면 모든 데이터 사용 (규칙 기반 결과 활용)
+    where_clause = "WHERE confirmed = 1" if confirmed_only else ""
+    
+    cursor.execute(f"""
         SELECT 
             rgb_r, rgb_g, rgb_b,
             hsv_h, hsv_s, hsv_v,
@@ -393,7 +396,7 @@ def get_color_training_data(min_samples: int = 10) -> List[Dict]:
             color_stats,
             user_correct_color
         FROM hold_color_feedback
-        WHERE confirmed = 1
+        {where_clause}
         ORDER BY created_at DESC
     """)
     
