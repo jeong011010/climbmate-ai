@@ -245,52 +245,22 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         total_problems = len(problems)
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 65, 'message': f'🤖 {total_problems}개 문제 분석 중...', 'step': 'gpt4_analysis'}
+            meta={'progress': 95, 'message': f'🤖 {total_problems}개 문제 분석 중...', 'step': 'gpt4_analysis'}
         )
         
         # 🚀 모든 문제를 동시에 GPT-4에 요청 (병렬 처리)
-        import time
-        import asyncio
-        
-        async def analyze_all_problems_with_progress():
-            """GPT-4 분석 + 진행률 업데이트를 함께 처리"""
-            
-            # 진행률 업데이트 코루틴
-            async def update_progress():
-                """65%부터 95%까지 부드럽게 진행"""
-                try:
-                    for progress in range(66, 96):
-                        await asyncio.sleep(0.5)  # 0.5초마다
-                        self.update_state(
-                            state='PROGRESS',
-                            meta={'progress': progress, 'message': f'🤖 {total_problems}개 문제 분석 중...', 'step': 'gpt4_analysis'}
-                        )
-                except asyncio.CancelledError:
-                    print("진행률 업데이트 취소됨")
-            
-            # GPT-4 분석 태스크들 생성
-            analysis_tasks = []
+        async def analyze_all_problems():
+            tasks = []
             for problem in problems:
                 task = analyze_with_gpt4_vision(
                     image_base64,
                     problem['holds'],
                     wall_angle
                 )
-                analysis_tasks.append(task)
+                tasks.append(task)
             
-            # 진행률 업데이트와 GPT-4 분석을 동시에 실행
-            progress_task = asyncio.create_task(update_progress())
-            
-            try:
-                # 모든 분석 요청을 동시에 처리 (병렬)
-                results = await asyncio.gather(*analysis_tasks, return_exceptions=True)
-            finally:
-                # 분석 완료 후 진행률 태스크 취소
-                progress_task.cancel()
-                try:
-                    await progress_task
-                except asyncio.CancelledError:
-                    pass
+            # 모든 요청을 동시에 처리 (병렬)
+            results = await asyncio.gather(*tasks, return_exceptions=True)
             
             # 결과를 각 문제에 적용
             for i, (problem, result) in enumerate(zip(problems, results)):
@@ -310,8 +280,9 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                     problem['gpt4_comparison'] = result.get('comparison', '')
         
         # 비동기 함수 실행
+        import asyncio
         try:
-            asyncio.run(analyze_all_problems_with_progress())
+            asyncio.run(analyze_all_problems())
         except Exception as e:
             print(f"⚠️ GPT-4 병렬 분석 오류: {e}")
             for problem in problems:
