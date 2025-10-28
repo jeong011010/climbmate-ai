@@ -1,3 +1,59 @@
+import { useState, useEffect } from 'react'
+
+// 원형 게이지 컴포넌트
+const CircularGauge = ({ value, label, color = "blue" }) => {
+  const percentage = Math.min(100, Math.max(0, value || 0))
+  const circumference = 2 * Math.PI * 45
+  const strokeDashoffset = circumference - (percentage / 100) * circumference
+  
+  const colorMap = {
+    blue: { stroke: "stroke-blue-500", text: "text-blue-600" },
+    green: { stroke: "stroke-green-500", text: "text-green-600" },
+    orange: { stroke: "stroke-orange-500", text: "text-orange-600" },
+    red: { stroke: "stroke-red-500", text: "text-red-600" }
+  }
+  
+  const colors = colorMap[color] || colorMap.blue
+  
+  return (
+    <div className="flex flex-col items-center">
+      <div className="relative w-24 h-24">
+        <svg className="transform -rotate-90" width="96" height="96">
+          {/* 배경 원 */}
+          <circle
+            cx="48"
+            cy="48"
+            r="45"
+            stroke="currentColor"
+            strokeWidth="8"
+            fill="none"
+            className="text-slate-200"
+          />
+          {/* 진행 원 */}
+          <circle
+            cx="48"
+            cy="48"
+            r="45"
+            stroke="currentColor"
+            strokeWidth="8"
+            fill="none"
+            className={colors.stroke}
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            strokeLinecap="round"
+          />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className={`text-2xl font-bold ${colors.text}`}>
+            {percentage.toFixed(0)}%
+          </span>
+        </div>
+      </div>
+      <span className="text-sm text-slate-600 mt-2 text-center">{label}</span>
+    </div>
+  )
+}
+
 const FeedbacksPage = ({ 
   feedbacksLoading, 
   colorFeedbacks, 
@@ -7,6 +63,28 @@ const FeedbacksPage = ({
   confirmAllFeedbacks,
   deleteFeedback
 }) => {
+  const [mlStats, setMlStats] = useState(null)
+  const [statsLoading, setStatsLoading] = useState(false)
+  
+  // ML 통계 로드
+  const loadMlStats = async () => {
+    setStatsLoading(true)
+    try {
+      const response = await fetch('/api/ml-model-stats')
+      const data = await response.json()
+      setMlStats(data)
+    } catch (error) {
+      console.error('ML 통계 로드 실패:', error)
+    } finally {
+      setStatsLoading(false)
+    }
+  }
+  
+  // 페이지 로드 시 & 피드백 변경 시 통계 로드
+  useEffect(() => {
+    loadMlStats()
+  }, [colorFeedbacks.length])
+  
   return (
     <div className="w-full px-2 sm:px-4">
       <div className="glass-card p-4 sm:p-6">
@@ -23,13 +101,86 @@ const FeedbacksPage = ({
               </button>
             )}
             <button
-              onClick={loadColorFeedbacks}
+              onClick={() => { loadColorFeedbacks(); loadMlStats(); }}
               className="px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all"
             >
               🔄 새로고침
             </button>
           </div>
         </div>
+        
+        {/* ML 모델 상태 대시보드 */}
+        {mlStats && (
+          <div className="mb-6 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200 shadow-lg">
+            <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+              🤖 ML 모델 성능 대시보드
+              {mlStats.model_exists && <span className="text-sm px-2 py-1 bg-green-500 text-white rounded-full">✓ 학습됨</span>}
+              {!mlStats.model_exists && <span className="text-sm px-2 py-1 bg-slate-400 text-white rounded-full">미학습</span>}
+            </h3>
+            
+            {/* 원형 게이지 */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-6">
+              <CircularGauge 
+                value={mlStats.rule_based_accuracy} 
+                label="규칙 기반 정확도" 
+                color="blue"
+              />
+              {mlStats.ml_test_accuracy && (
+                <CircularGauge 
+                  value={mlStats.ml_test_accuracy} 
+                  label="ML 테스트 정확도" 
+                  color="green"
+                />
+              )}
+              {mlStats.ml_cv_accuracy && (
+                <CircularGauge 
+                  value={mlStats.ml_cv_accuracy} 
+                  label="ML CV 정확도" 
+                  color="orange"
+                />
+              )}
+              <CircularGauge 
+                value={(mlStats.total_samples / 100) * 100} 
+                label={`학습 데이터 ${mlStats.total_samples}개`}
+                color={mlStats.can_train ? "green" : "red"}
+              />
+            </div>
+            
+            {/* 색상별 분포 */}
+            {mlStats.color_distribution && Object.keys(mlStats.color_distribution).length > 0 && (
+              <div className="mb-4">
+                <h4 className="text-sm font-bold text-slate-700 mb-2">📊 색상별 데이터 분포</h4>
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                  {Object.entries(mlStats.color_distribution)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([color, count]) => (
+                      <div key={color} className="px-3 py-2 bg-white rounded-lg border border-slate-200 text-center">
+                        <div className="text-xs text-slate-600 uppercase">{color}</div>
+                        <div className="text-lg font-bold text-slate-800">{count}</div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+            
+            {/* 오분류 Top 5 */}
+            {mlStats.top_misclassifications && Object.keys(mlStats.top_misclassifications).length > 0 && (
+              <div>
+                <h4 className="text-sm font-bold text-slate-700 mb-2">⚠️ 자주 틀리는 색상 조합 (Top 5)</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {Object.entries(mlStats.top_misclassifications)
+                    .slice(0, 5)
+                    .map(([combination, count]) => (
+                      <div key={combination} className="px-3 py-2 bg-red-50 rounded-lg border border-red-200 text-sm">
+                        <span className="font-mono text-red-700">{combination}</span>
+                        <span className="ml-2 text-red-600 font-bold">{count}회</span>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {feedbacksLoading ? (
           <p className="text-slate-600 text-center py-8">피드백 로딩 중...</p>

@@ -645,10 +645,87 @@ if DB_AVAILABLE:
             raise HTTPException(status_code=500, detail=str(e))
 
 if ML_AVAILABLE and DB_AVAILABLE:
+    @app.get("/api/ml-model-stats")
+    async def get_ml_model_stats():
+        """🤖 ML 모델 학습 상태 및 성능 조회"""
+        try:
+            import os
+            import pickle
+            from collections import Counter
+            from database import get_color_training_data
+            
+            # 모델 파일 존재 여부
+            model_path = os.path.join(os.path.dirname(__file__), 'models', 'color_model.pkl')
+            encoder_path = os.path.join(os.path.dirname(__file__), 'models', 'color_encoder.pkl')
+            
+            model_exists = os.path.exists(model_path)
+            
+            # 학습 데이터 통계
+            training_data = get_color_training_data(min_samples=1, confirmed_only=False)
+            total_samples = len(training_data)
+            
+            # 색상별 분포
+            color_distribution = Counter([d['correct_color'] for d in training_data])
+            
+            # predicted vs correct 오분류 통계
+            misclassifications = {}
+            correct_predictions = 0
+            
+            for data in training_data:
+                predicted = data.get('predicted_color', 'unknown')
+                correct = data.get('correct_color', 'unknown')
+                
+                if predicted == correct:
+                    correct_predictions += 1
+                elif predicted != 'unknown':  # unknown은 제외
+                    key = f"{predicted}→{correct}"
+                    misclassifications[key] = misclassifications.get(key, 0) + 1
+            
+            # 규칙 기반 정확도 (unknown 제외)
+            valid_predictions = sum(1 for d in training_data if d.get('predicted_color') != 'unknown')
+            rule_based_accuracy = (correct_predictions / valid_predictions * 100) if valid_predictions > 0 else 0
+            
+            # ML 모델 성능 (파일에서 읽기)
+            ml_accuracy = None
+            ml_cv_accuracy = None
+            
+            if model_exists:
+                try:
+                    # 모델 메타데이터 읽기 (저장되어 있다면)
+                    meta_path = os.path.join(os.path.dirname(__file__), 'models', 'color_model_meta.pkl')
+                    if os.path.exists(meta_path):
+                        with open(meta_path, 'rb') as f:
+                            meta = pickle.load(f)
+                            ml_accuracy = meta.get('test_accuracy', None)
+                            ml_cv_accuracy = meta.get('cv_accuracy', None)
+                except:
+                    pass
+            
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "model_exists": model_exists,
+                    "model_trained": model_exists,
+                    "total_samples": total_samples,
+                    "valid_samples": valid_predictions,
+                    "rule_based_accuracy": round(rule_based_accuracy, 1),
+                    "ml_test_accuracy": round(ml_accuracy * 100, 1) if ml_accuracy else None,
+                    "ml_cv_accuracy": round(ml_cv_accuracy * 100, 1) if ml_cv_accuracy else None,
+                    "color_distribution": dict(color_distribution),
+                    "top_misclassifications": dict(sorted(misclassifications.items(), key=lambda x: -x[1])[:10]),
+                    "can_train": total_samples >= 30,
+                    "samples_needed": max(0, 30 - total_samples)
+                }
+            )
+        except Exception as e:
+            print(f"❌ ML 통계 조회 오류: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
+    
     @app.post("/api/train-color-model")
     async def train_color_model_endpoint():
         """🤖 ML 색상 분류 모델 학습"""
         try:
+            import pickle
             from database import get_color_training_data
             from ml_trainer import train_color_model as train_color_ml
             
@@ -666,6 +743,16 @@ if ML_AVAILABLE and DB_AVAILABLE:
             # 모델 학습
             test_accuracy, cv_accuracy = train_color_ml(training_data)
             
+            # 모델 메타데이터 저장
+            meta_path = os.path.join(os.path.dirname(__file__), 'models', 'color_model_meta.pkl')
+            with open(meta_path, 'wb') as f:
+                pickle.dump({
+                    'test_accuracy': test_accuracy,
+                    'cv_accuracy': cv_accuracy,
+                    'training_samples': len(training_data),
+                    'trained_at': __import__('datetime').datetime.now().isoformat()
+                }, f)
+            
             # 🔄 ML 모델 캐시 초기화 (다음 분석부터 새 모델 사용)
             try:
                 from clustering import reset_ml_model_cache
@@ -678,8 +765,8 @@ if ML_AVAILABLE and DB_AVAILABLE:
                 status_code=200,
                 content={
                     "message": "ML 색상 분류 모델 학습 완료 - 다음 분석부터 자동 적용됩니다",
-                    "test_accuracy": test_accuracy,
-                    "cv_accuracy": cv_accuracy,
+                    "test_accuracy": round(test_accuracy * 100, 1),
+                    "cv_accuracy": round(cv_accuracy * 100, 1),
                     "training_samples": len(training_data)
                 }
             )
