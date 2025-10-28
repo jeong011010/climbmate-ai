@@ -646,14 +646,16 @@ if DB_AVAILABLE:
 
 if ML_AVAILABLE and DB_AVAILABLE:
     @app.post("/api/train-color-model")
-    async def train_color_model():
+    async def train_color_model_endpoint():
         """🤖 ML 색상 분류 모델 학습"""
         try:
             from database import get_color_training_data
-            from ml_trainer import train_color_model
+            from ml_trainer import train_color_model as train_color_ml
             
-            # 확인된 피드백만 가져오기
-            training_data = get_color_training_data()
+            # 모든 피드백 데이터 사용 (confirmed 상관없이)
+            training_data = get_color_training_data(min_samples=1, confirmed_only=False)
+            
+            print(f"📊 학습 데이터 로드: {len(training_data)}개")
             
             if len(training_data) < 30:
                 raise HTTPException(
@@ -662,7 +664,7 @@ if ML_AVAILABLE and DB_AVAILABLE:
                 )
             
             # 모델 학습
-            test_accuracy, cv_accuracy = train_color_model(training_data)
+            test_accuracy, cv_accuracy = train_color_ml(training_data)
             
             # 🔄 ML 모델 캐시 초기화 (다음 분석부터 새 모델 사용)
             try:
