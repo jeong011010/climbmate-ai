@@ -5319,8 +5319,8 @@ def classify_color_simple_hsv(h, s, v):
             return "black", 0.80  # 매우 어두움 → 검정
         else:
             return "unknown", 0.65  # 애매함
-    elif h >= 100 and h < 125:
-        # 파랑: 채도 체크 필수
+    elif h >= 100 and h < 120:
+        # 파랑: purple과 분리 (H<120)
         if s >= 50 and v >= 110:
             return "blue", 0.90
         elif s < 15 and v >= 220:
@@ -5331,6 +5331,14 @@ def classify_color_simple_hsv(h, s, v):
             return "black", 0.80  # 매우 어두움 → 검정
         else:
             return "blue", 0.70  # 애매함
+    elif h >= 120 and h < 125:
+        # 파랑-보라 경계
+        if s >= 70 and v >= 200:
+            return "purple", 0.85  # 채도 높고 밝으면 → 보라
+        elif s >= 50:
+            return "blue", 0.85
+        else:
+            return "blue", 0.70
     elif h >= 125 and h < 160:
         # 보라: 채도 완화
         if s >= 50 and v >= 90:
@@ -5341,12 +5349,16 @@ def classify_color_simple_hsv(h, s, v):
             return "black", 0.80  # 매우 어두운 보라만 → 검정
         else:
             return "purple", 0.70  # 나머지는 보라 (낮은 신뢰도)
-    elif h >= 160 and h < 175:
-        # 핑크: 밝고 채도 높은 것만
-        if s >= 80 and v >= 200:
-            return "pink", 0.90
+    elif h >= 160 and h < 180:
+        # 핑크: 범위 확대 (H<180)
+        if s >= 100 and v >= 180:
+            return "pink", 0.90  # 쨍한 핑크
+        elif s >= 70 and v >= 160:
+            return "pink", 0.85  # 중간 핑크
+        elif s >= 50 and v >= 140:
+            return "pink", 0.80  # 연한 핑크
         else:
-            return "purple", 0.80  # 어두운 핑크 → 보라
+            return "purple", 0.75  # 어두운 핑크 → 보라
     else:
         # 갈색 판단 (낮은 채도 + 낮은 명도)
         if s < 60 and v < 120:
