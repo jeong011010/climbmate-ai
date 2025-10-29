@@ -736,7 +736,7 @@ if ML_AVAILABLE and DB_AVAILABLE:
             
             cursor.execute("""
                 SELECT predicted_color, user_correct_color, hold_hsv
-                FROM color_feedback
+                FROM hold_color_feedback
                 WHERE user_correct_color IS NOT NULL AND user_correct_color != ''
             """)
             
