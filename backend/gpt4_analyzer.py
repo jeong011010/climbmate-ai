@@ -120,7 +120,7 @@ JSON 형식으로 응답해주세요:
             }],
             max_tokens=500,
             temperature=0.3,
-            timeout=12
+            timeout=30  # 12초 → 30초 증가 (병렬 처리 대응)
         )
         
         # 응답 파싱
