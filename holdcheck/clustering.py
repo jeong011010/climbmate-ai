@@ -5266,10 +5266,14 @@ def classify_color_simple_hsv(h, s, v):
             # 밝음 + 채도 매우 낮음 → 흰색
             return "white", 0.85
     
-    # 2단계: 유채색 범위에서도 검정 판단 (우선)
-    if is_chromatic_range and v < 150 and s < 50:
-        # 유채색 범위이지만 명도 낮고 채도 낮음 → 검정
-        return "black", 0.90
+    # 2단계: 유채색 범위에서도 무채색 판단 (우선)
+    if is_chromatic_range:
+        # 채도 낮고 밝으면 → 흰색 (민트/파랑 범위에서)
+        if s <= 30 and v >= 170:
+            return "white", 0.85
+        # 채도 낮고 어두우면 → 검정
+        elif s <= 25 and v < 165:
+            return "black", 0.85
     
     # 3단계: 유채색 판단 (OpenCV H는 0-180)
     if (h >= 0 and h < 8) or (h >= 175):
@@ -5281,7 +5285,13 @@ def classify_color_simple_hsv(h, s, v):
         else:
             return "unknown", 0.60  # 회색톤 orange
     elif h >= 18 and h < 30:
-        return "yellow", 0.90
+        # Yellow: 채도 체크
+        if s >= 50:
+            return "yellow", 0.90
+        elif s < 20 and v >= 170:
+            return "white", 0.80  # 채도 낮고 밝으면 → 흰색
+        else:
+            return "yellow", 0.75
     elif h >= 30 and h < 45:
         return "lime", 0.90  # 연두
     elif h >= 45 and h < 80:
@@ -5295,15 +5305,14 @@ def classify_color_simple_hsv(h, s, v):
     elif h >= 80 and h < 100:
         # 민트: 채도 체크 필수!
         if s >= 40 and v >= 140:
-            return "mint", 0.90  # 진한 민트
-        elif s >= 25 and v >= 180:
-            return "mint", 0.85  # 연한 민트
-        elif s < 15 and v >= 220:
-            return "white", 0.85  # 채도 낮고 밝으면 → 흰색
+            return "mint", 0.90  # 진한 민트 (HSV(84,48,143))
+        elif s >= 30 and v >= 170:
+            return "mint", 0.85  # 중간 민트 (HSV(87,30,173))
+        # 나머지는 2단계에서 처리됨 (white/black)
         elif v < 70:
             return "black", 0.80  # 매우 어두움 → 검정
         else:
-            return "unknown", 0.60  # 애매함
+            return "unknown", 0.65  # 애매함
     elif h >= 100 and h < 125:
         # 파랑: 채도 체크 필수
         if s >= 50 and v >= 110:
@@ -5320,10 +5329,12 @@ def classify_color_simple_hsv(h, s, v):
         # 보라: 채도 완화
         if s >= 50 and v >= 90:
             return "purple", 0.90
+        elif s >= 35 and v >= 140:
+            return "purple", 0.85  # 연한 보라 (HSV(159,39,148))
         elif v < 70:
             return "black", 0.80  # 매우 어두운 보라만 → 검정
         else:
-            return "purple", 0.75  # 나머지는 보라 (낮은 신뢰도)
+            return "purple", 0.70  # 나머지는 보라 (낮은 신뢰도)
     elif h >= 160 and h < 175:
         # 핑크: 밝고 채도 높은 것만
         if s >= 80 and v >= 200:
