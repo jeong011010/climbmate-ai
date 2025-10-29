@@ -5324,10 +5324,12 @@ def classify_color_simple_hsv(h, s, v):
         if s >= 50 and v >= 200:
             if h >= 115:
                 return "purple", 0.85  # H≥115, 밝으면 → purple (HSV(115,55,217))
+            elif s >= 50 and s < 60:
+                return "black", 0.85  # S=50~60, 밝지만 채도 애매 → 검정 (HSV(108,52,202))
             else:
                 return "blue", 0.90
         elif s >= 60 and v < 205:
-            return "black", 0.85  # 채도 높지만 어두움 → 검정 (HSV(108,64,163), HSV(108,52,202))
+            return "black", 0.85  # 채도 높지만 어두움 → 검정 (HSV(108,64,163))
         elif s >= 50 and v >= 110:
             return "blue", 0.90
         elif s < 15 and v >= 220:
