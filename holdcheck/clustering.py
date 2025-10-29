@@ -5268,6 +5268,9 @@ def classify_color_simple_hsv(h, s, v):
     
     # 2단계: 유채색 범위에서도 무채색 판단 (우선)
     if is_chromatic_range:
+        # 🔥 매우 어두우면 무조건 검정! (채도 무관)
+        if v < 90:
+            return "black", 0.95  # V<90 → 검정 (HSV(30,57,11), HSV(109,55,88))
         # 채도 낮고 밝으면 → 흰색 (민트/파랑 범위에서)
         # 단, mint 범위(H=80~100)는 S≤15로 더 엄격하게!
         if h >= 80 and h < 100:
