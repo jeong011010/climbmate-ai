@@ -735,7 +735,7 @@ if ML_AVAILABLE and DB_AVAILABLE:
             cursor = conn.cursor()
             
             cursor.execute("""
-                SELECT predicted_color, user_correct_color, hold_hsv
+                SELECT predicted_color, user_correct_color, hsv_h, hsv_s, hsv_v
                 FROM hold_color_feedback
                 WHERE user_correct_color IS NOT NULL AND user_correct_color != ''
             """)
@@ -753,13 +753,15 @@ if ML_AVAILABLE and DB_AVAILABLE:
             
             # HSV 데이터 파싱 및 색상별 분류
             color_hsv_data = {}
-            for predicted, correct, hsv_str in feedback_data:
-                if not hsv_str:
+            for predicted, correct, h, s, v in feedback_data:
+                if h is None or s is None or v is None:
                     continue
                 
                 try:
-                    # "H,S,V" 형식 파싱
-                    h, s, v = map(int, hsv_str.split(','))
+                    # HSV 값 정수 변환
+                    h = int(h)
+                    s = int(s)
+                    v = int(v)
                     
                     if correct not in color_hsv_data:
                         color_hsv_data[correct] = []
