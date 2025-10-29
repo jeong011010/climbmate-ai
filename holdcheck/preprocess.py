@@ -1130,7 +1130,7 @@ def validate_and_correct_color(color_hsv):
     return [h, s, v]
 
 def get_dominant_color(pixels_hsv, k=3):
-    """🎯 개선된 방식: 초크 공격적 제거 + 채도 기반 색상 추출"""
+    """🎯 개선된 방식: 초크 + 벽색 제거 + 채도 기반 색상 추출"""
     if len(pixels_hsv) == 0:
         return [0, 0, 0]
     
@@ -1146,30 +1146,44 @@ def get_dominant_color(pixels_hsv, k=3):
     v_values = pixels_hsv[:, 2]
     
     # 🧹 Step 1: 초크 공격적 제거 (V > 160 and S < 60)
-    # 자주색 홀드에 묻은 하얀 초크를 더 강력하게 제거
     chalk_mask = (v_values > 160) & (s_values < 60)
     non_chalk_pixels = pixels_hsv[~chalk_mask]
     chalk_removed_count = np.sum(chalk_mask)
     
-    # 초크 제거 후 충분한 픽셀이 남아있으면 사용
-    if len(non_chalk_pixels) > original_count * 0.25:  # 25% 이상 남으면 OK
+    if len(non_chalk_pixels) > original_count * 0.25:
         pixels_hsv = non_chalk_pixels
         if chalk_removed_count > 0:
             print(f"   🧹 초크 제거: {chalk_removed_count}개 픽셀 제거 ({original_count} → {len(pixels_hsv)})")
     else:
-        print(f"   ⚠️ 초크 제거하면 픽셀 부족 ({len(non_chalk_pixels)}/{original_count}), 완화된 필터 사용")
-        # 완화된 초크 필터 (V > 200 and S < 40)
+        # 완화된 초크 필터
         chalk_mask_relaxed = (v_values > 200) & (s_values < 40)
         non_chalk_pixels_relaxed = pixels_hsv[~chalk_mask_relaxed]
         if len(non_chalk_pixels_relaxed) > original_count * 0.2:
             pixels_hsv = non_chalk_pixels_relaxed
             print(f"   🧹 완화 필터 적용: {np.sum(chalk_mask_relaxed)}개 제거")
     
-    # 🎨 Step 2: 채도 높은 픽셀 우선 선택 (홀드 본래 색상)
-    # 밝기 대신 채도를 기준으로! (초크=낮은 채도)
+    # 🧱 Step 2: 벽색 제거 (갈색/회색 어두운 픽셀)
+    # 벽색 특징: 낮은 명도(V<60) 또는 (갈색 계열: H=8~30, V<100, S<150)
+    v_values_filtered = pixels_hsv[:, 2]
+    h_values_filtered = pixels_hsv[:, 0]
     s_values_filtered = pixels_hsv[:, 1]
     
-    # 채도 상위 30% 선택 (홀드의 진짜 색상)
+    wall_mask = (v_values_filtered < 60) | (
+        (h_values_filtered >= 8) & (h_values_filtered <= 30) & 
+        (v_values_filtered < 100) & (s_values_filtered < 150)
+    )
+    non_wall_pixels = pixels_hsv[~wall_mask]
+    wall_removed_count = np.sum(wall_mask)
+    
+    if len(non_wall_pixels) > original_count * 0.2:  # 20% 이상 남으면
+        pixels_hsv = non_wall_pixels
+        if wall_removed_count > 0:
+            print(f"   🧱 벽색 제거: {wall_removed_count}개 픽셀 제거 ({len(pixels_hsv) + wall_removed_count} → {len(pixels_hsv)})")
+    else:
+        print(f"   ⚠️ 벽색 제거하면 픽셀 부족 ({len(non_wall_pixels)}/{original_count}), 스킵")
+    
+    # 🎨 Step 3: 채도 높은 픽셀 우선 선택 (홀드 본래 색상)
+    s_values_filtered = pixels_hsv[:, 1]
     saturation_threshold = np.percentile(s_values_filtered, 70)  # 상위 30%
     
     if saturation_threshold > 40:  # 채도가 충분히 높으면
@@ -1184,7 +1198,7 @@ def get_dominant_color(pixels_hsv, k=3):
     else:
         print(f"   ℹ️ 전체 채도 낮음 (무채색 홀드), 중앙값 사용")
     
-    # 🎯 Step 3: 중앙값 방식으로 대표 색상 추출
+    # 🎯 Step 4: 중앙값 방식으로 대표 색상 추출
     h_med = np.median(pixels_hsv[:, 0])
     s_med = np.median(pixels_hsv[:, 1])
     v_med = np.median(pixels_hsv[:, 2])
