@@ -5251,9 +5251,12 @@ def classify_color_simple_hsv(h, s, v):
     if v < 90:
         # 매우 어두움 → 검정 (채도 무관!)
         return "black", 0.95
-    elif v >= 210 and s <= 10:
-        # 매우 밝음 + 채도 극도로 낮음 → 흰색 (초초엄격!)
+    elif v >= 200 and s <= 15:
+        # 매우 밝음 + 채도 낮음 → 흰색
         return "white", 0.95
+    elif v >= 180 and s <= 20:
+        # 밝음 + 채도 낮음 → 흰색 (약한 흰색)
+        return "white", 0.85
     elif v < 150 and s < 30:
         # 중간 명도 + 채도 매우 낮음 → 검정 (어두운 회색)
         return "black", 0.90
@@ -5262,7 +5265,11 @@ def classify_color_simple_hsv(h, s, v):
     if (h >= 0 and h < 8) or (h >= 175):
         return "red", 0.90
     elif h >= 8 and h < 18:
-        return "orange", 0.90
+        # Orange: 채도 낮으면 회색톤!
+        if s >= 60:
+            return "orange", 0.90
+        else:
+            return "unknown", 0.60  # 회색톤 orange
     elif h >= 18 and h < 30:
         return "yellow", 0.90
     elif h >= 30 and h < 45:
@@ -5281,6 +5288,8 @@ def classify_color_simple_hsv(h, s, v):
         # 파랑: 채도/명도 체크로 검정 구분
         if s >= 50 and v >= 110:
             return "blue", 0.90
+        elif s < 20:
+            return "unknown", 0.60  # 채도 낮으면 무채색!
         elif v < 100:
             return "black", 0.85  # 어두운 파랑 → 검정
         else:
