@@ -5392,8 +5392,12 @@ def classify_color_simple_hsv(h, s, v):
         # 보라-핑크 경계 (H=155~165): 채도+명도로 구분!
         if s >= 86 and v >= 186:
             return "pink", 0.90  # 밝고 채도 높음 → pink (HSV(155~165, 86~173, 186~255))
+        elif s >= 77 and v >= 219:
+            return "pink", 0.90  # 밝고 채도 중간 → pink (HSV(158,77,219))
         elif s >= 69 and v >= 210:
             return "pink", 0.90  # 매우 밝고 채도 중간 → pink (HSV(157,69,216))
+        elif v < 140:
+            return "purple", 0.90  # 어두움 → purple (HSV(173,121,137))
         elif s >= 50 and v >= 90:
             return "purple", 0.90  # 어둡거나 채도 낮음 → purple (HSV(161,63,152))
         elif s >= 35 and v >= 140:
@@ -5413,6 +5417,8 @@ def classify_color_simple_hsv(h, s, v):
             return "pink", 0.90  # H≥176, S=100~132 → pink (HSV(176,132,171))
         elif h >= 174 and s >= 120 and v >= 170:
             return "red", 0.90  # H=174, S≥120 → red (HSV(174,122,172))
+        elif h >= 173 and v < 140:
+            return "purple", 0.90  # H=173~174, V<140 → purple (HSV(174,173,112))
         elif s >= 86 and v >= 190:
             return "pink", 0.90  # 채도 높고 밝음 → pink
         elif s >= 100 and v >= 180:
