@@ -1162,36 +1162,45 @@ def get_dominant_color(pixels_hsv, k=3):
             pixels_hsv = non_chalk_pixels_relaxed
             print(f"   🧹 완화 필터 적용: {np.sum(chalk_mask_relaxed)}개 제거")
     
-    # 🧱 Step 2: 벽색 제거 (갈색/회색 어두운 픽셀 + 밝은 벽색도 제거!)
-    # 벽색 특징: 
-    # 1. 낮은 명도(V<60) - 어두운 벽/그림자
-    # 2. 갈색 계열: H=8~30 범위 (주황~연두 경계)
-    #    - 어두운 갈색: V<100, S<150
-    #    - 밝은 갈색/베이지: V≥150, S<120 (추가! 작은/둥근 홀드 세그먼테이션 보정)
-    v_values_filtered = pixels_hsv[:, 2]
-    h_values_filtered = pixels_hsv[:, 0]
-    s_values_filtered = pixels_hsv[:, 1]
+    # 🧱 Step 2: 통계적 outlier 제거 (세그먼테이션 오류로 포함된 벽색 자동 제거)
+    # 원리: 홀드 픽셀 >> 벽색 픽셀 → 벽색은 outlier!
+    # K-means나 DBSCAN 대신 간단한 통계 기반 방식 사용
     
-    # 벽색 조건 확장: 밝은 벽색(베이지)도 제거
-    wall_mask = (
-        (v_values_filtered < 60) |  # 매우 어두운 벽/그림자
-        (
-            (h_values_filtered >= 8) & (h_values_filtered <= 30) &  # 갈색 계열 H 범위
-            (
-                (v_values_filtered < 100) & (s_values_filtered < 150) |  # 어두운 갈색
-                (v_values_filtered >= 150) & (s_values_filtered < 120)  # 밝은 베이지 (추가!)
-            )
-        )
+    # 2-1. HSV 각 채널별 중앙값과 표준편차 계산
+    h_median = np.median(pixels_hsv[:, 0])
+    s_median = np.median(pixels_hsv[:, 1])
+    v_median = np.median(pixels_hsv[:, 2])
+    
+    h_std = np.std(pixels_hsv[:, 0])
+    s_std = np.std(pixels_hsv[:, 1])
+    v_std = np.std(pixels_hsv[:, 2])
+    
+    # 2-2. Outlier 판정: 중앙값에서 2σ 이상 벗어난 픽셀 제거
+    # H는 원형이므로 특별 처리 (0~180 범위)
+    h_diff = np.abs(pixels_hsv[:, 0] - h_median)
+    h_diff_circular = np.minimum(h_diff, 180 - h_diff)  # 원형 거리
+    
+    s_diff = np.abs(pixels_hsv[:, 1] - s_median)
+    v_diff = np.abs(pixels_hsv[:, 2] - v_median)
+    
+    # 2-3. 각 채널에서 2σ 이내인 픽셀만 선택 (너무 다른 색상 제외)
+    inlier_mask = (
+        (h_diff_circular <= 2 * max(h_std, 15)) &  # H는 최소 15도 허용
+        (s_diff <= 2 * max(s_std, 30)) &  # S는 최소 30 허용
+        (v_diff <= 2 * max(v_std, 30))    # V는 최소 30 허용
     )
-    non_wall_pixels = pixels_hsv[~wall_mask]
-    wall_removed_count = np.sum(wall_mask)
     
-    if len(non_wall_pixels) > original_count * 0.2:  # 20% 이상 남으면
-        pixels_hsv = non_wall_pixels
-        if wall_removed_count > 0:
-            print(f"   🧱 벽색 제거: {wall_removed_count}개 픽셀 제거 ({len(pixels_hsv) + wall_removed_count} → {len(pixels_hsv)})")
+    inlier_pixels = pixels_hsv[inlier_mask]
+    outlier_removed = original_count - len(inlier_pixels)
+    
+    # 2-4. 충분한 픽셀이 남아있으면 적용 (outlier가 30% 이하면 적용)
+    if len(inlier_pixels) > original_count * 0.7:  # 70% 이상 남아있으면
+        pixels_hsv = inlier_pixels
+        if outlier_removed > 0:
+            print(f"   🧹 Outlier 제거: {outlier_removed}개 픽셀 제거 ({original_count} → {len(pixels_hsv)})")
+            print(f"      중앙값 HSV({h_median:.0f}, {s_median:.0f}, {v_median:.0f}) 기준")
     else:
-        print(f"   ⚠️ 벽색 제거하면 픽셀 부족 ({len(non_wall_pixels)}/{original_count}), 스킵")
+        print(f"   ℹ️ Outlier 너무 많음 ({100-len(inlier_pixels)*100/original_count:.0f}%), 전체 사용")
     
     # 🎨 Step 3: 채도 높은 픽셀 우선 선택 (홀드 본래 색상)
     s_values_filtered = pixels_hsv[:, 1]
