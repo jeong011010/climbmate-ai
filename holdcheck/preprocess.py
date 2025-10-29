@@ -1162,15 +1162,26 @@ def get_dominant_color(pixels_hsv, k=3):
             pixels_hsv = non_chalk_pixels_relaxed
             print(f"   🧹 완화 필터 적용: {np.sum(chalk_mask_relaxed)}개 제거")
     
-    # 🧱 Step 2: 벽색 제거 (갈색/회색 어두운 픽셀)
-    # 벽색 특징: 낮은 명도(V<60) 또는 (갈색 계열: H=8~30, V<100, S<150)
+    # 🧱 Step 2: 벽색 제거 (갈색/회색 어두운 픽셀 + 밝은 벽색도 제거!)
+    # 벽색 특징: 
+    # 1. 낮은 명도(V<60) - 어두운 벽/그림자
+    # 2. 갈색 계열: H=8~30 범위 (주황~연두 경계)
+    #    - 어두운 갈색: V<100, S<150
+    #    - 밝은 갈색/베이지: V≥150, S<120 (추가! 작은/둥근 홀드 세그먼테이션 보정)
     v_values_filtered = pixels_hsv[:, 2]
     h_values_filtered = pixels_hsv[:, 0]
     s_values_filtered = pixels_hsv[:, 1]
     
-    wall_mask = (v_values_filtered < 60) | (
-        (h_values_filtered >= 8) & (h_values_filtered <= 30) & 
-        (v_values_filtered < 100) & (s_values_filtered < 150)
+    # 벽색 조건 확장: 밝은 벽색(베이지)도 제거
+    wall_mask = (
+        (v_values_filtered < 60) |  # 매우 어두운 벽/그림자
+        (
+            (h_values_filtered >= 8) & (h_values_filtered <= 30) &  # 갈색 계열 H 범위
+            (
+                (v_values_filtered < 100) & (s_values_filtered < 150) |  # 어두운 갈색
+                (v_values_filtered >= 150) & (s_values_filtered < 120)  # 밝은 베이지 (추가!)
+            )
+        )
     )
     non_wall_pixels = pixels_hsv[~wall_mask]
     wall_removed_count = np.sum(wall_mask)
