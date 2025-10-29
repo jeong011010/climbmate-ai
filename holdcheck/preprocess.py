@@ -1335,9 +1335,7 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
     pixels_yuv = yuv_image[eroded_mask > 0.5]
     pixels_xyz = xyz_image[eroded_mask > 0.5]
     
-    # 🚫 초크 제거 및 outlier 제거 비활성화 (원본 색상 보존)
-    # CLIP AI와 동일하게 원본 픽셀 사용
-    print(f"   ✨ 원본 픽셀 사용: {len(pixels_hsv)}개 (필터링 없음)")
+    print(f"   📊 추출된 원본 픽셀: {len(pixels_hsv)}개")
     
     # 🎨 색상 품질 필터링 적용
     if len(pixels_hsv) > 0:
