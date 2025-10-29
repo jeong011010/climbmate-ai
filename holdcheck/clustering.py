@@ -5282,11 +5282,6 @@ def classify_color_simple_hsv(h, s, v):
     # 3단계: 유채색 판단 (OpenCV H는 0-180)
     if h >= 0 and h < 8:
         return "red", 0.90
-    elif h >= 174 and h < 180:
-        # Red-Pink 경계 (H=174~180)
-        if h == 174 and s >= 120 and v >= 170:
-            return "red", 0.90  # H=174, 채도 매우 높으면 → red (HSV(174,122,172))
-        # H≥175는 대부분 pink - 아래 pink 범위로
     elif h >= 8 and h < 18:
         # Orange: 채도 낮으면 회색톤!
         if s >= 60:
@@ -5365,7 +5360,9 @@ def classify_color_simple_hsv(h, s, v):
             return "purple", 0.70  # 나머지는 보라 (낮은 신뢰도)
     elif h >= 157 and h < 180:
         # Pink 전용 범위 (H=157~180)
-        if s >= 100 and v >= 180:
+        if h == 174 and s >= 120 and v >= 170:
+            return "red", 0.90  # H=174만 특수 케이스 → red (HSV(174,122,172))
+        elif s >= 100 and v >= 180:
             return "pink", 0.90  # 쨍한 핑크
         elif s >= 70 and v >= 160:
             return "pink", 0.85  # 중간 핑크
