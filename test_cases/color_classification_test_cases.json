@@ -1,0 +1,79 @@
+{
+  "description": "색상 분류 테스트 케이스 - 피드백 누적용",
+  "version": "1.0.0",
+  "test_cases": [
+    {
+      "id": "hold_51",
+      "name": "홀드 #51 - Orange",
+      "hsv": [19, 186, 230],
+      "expected": "orange",
+      "description": "높은 채도(S=186)는 무조건 orange여야 함 (이전: WHITE)",
+      "date_added": "2024-01-XX",
+      "fix_applied": "S>=100이면 orange 처리 추가"
+    },
+    {
+      "id": "hold_44",
+      "name": "홀드 #44 - Green",
+      "hsv": [64, 161, 78],
+      "expected": "green",
+      "description": "높은 채도(S=161)는 무조건 green이어야 함 (이전: BLACK)",
+      "date_added": "2024-01-XX",
+      "fix_applied": "Green 범위 확대, S>=100이면 green 처리"
+    },
+    {
+      "id": "hold_13",
+      "name": "홀드 #13 - Mint",
+      "hsv": [73, 75, 208],
+      "expected": "mint",
+      "description": "H=73, S>=70이면 mint (이전: MINT였으나 조건 개선)",
+      "date_added": "2024-01-XX",
+      "fix_applied": "H=73~75, S>=70 조건 추가"
+    },
+    {
+      "id": "hold_45",
+      "name": "홀드 #45 - Green",
+      "hsv": [69, 43, 199],
+      "expected": "green",
+      "description": "H=68~73은 green으로 처리 (이전: MINT)",
+      "date_added": "2024-01-XX",
+      "fix_applied": "Green 범위 H=45~73로 확대"
+    },
+    {
+      "id": "hold_4",
+      "name": "홀드 #4 - Blue",
+      "hsv": [120, 16, 228],
+      "expected": "blue",
+      "description": "S>=16이면 blue-tinted (이전: WHITE)",
+      "date_added": "2024-01-XX",
+      "fix_applied": "S>=16 조건 추가"
+    },
+    {
+      "id": "hold_33",
+      "name": "홀드 #33 - Pink",
+      "hsv": [172, 52, 247],
+      "expected": "pink",
+      "description": "H=172, S>=50이면 pink (이전: PURPLE)",
+      "date_added": "2024-01-XX",
+      "fix_applied": "H=172, S>=50 조건 추가"
+    },
+    {
+      "id": "hold_14",
+      "name": "홀드 #14 - Red/Maroon",
+      "hsv": [169, 157, 111],
+      "expected": "red",
+      "description": "H=155~173, S>=150이면 red/maroon (이전: PURPLE)",
+      "date_added": "2024-01-XX",
+      "fix_applied": "H=155~173, S>=150 조건 추가"
+    },
+    {
+      "id": "hold_29",
+      "name": "홀드 #29 - Red/Maroon",
+      "hsv": [170, 169, 99],
+      "expected": "red",
+      "description": "H=169~173, S>=150이면 red/maroon (이전: PURPLE)",
+      "date_added": "2024-01-XX",
+      "fix_applied": "H=169~173, S>=150 조건 추가"
+    }
+  ]
+}
+
