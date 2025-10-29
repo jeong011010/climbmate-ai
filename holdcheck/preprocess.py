@@ -1162,61 +1162,56 @@ def get_dominant_color(pixels_hsv, k=3):
             pixels_hsv = non_chalk_pixels_relaxed
             print(f"   🧹 완화 필터 적용: {np.sum(chalk_mask_relaxed)}개 제거")
     
-    # 🧱 Step 2: 통계적 outlier 제거 (세그먼테이션 오류로 포함된 벽색 자동 제거)
-    # 원리: 홀드 픽셀 >> 벽색 픽셀 → 벽색은 outlier!
-    # K-means나 DBSCAN 대신 간단한 통계 기반 방식 사용
-    
-    # 2-1. HSV 각 채널별 중앙값과 표준편차 계산
-    h_median = np.median(pixels_hsv[:, 0])
-    s_median = np.median(pixels_hsv[:, 1])
-    v_median = np.median(pixels_hsv[:, 2])
-    
-    h_std = np.std(pixels_hsv[:, 0])
-    s_std = np.std(pixels_hsv[:, 1])
-    v_std = np.std(pixels_hsv[:, 2])
-    
-    # 2-2. Outlier 판정: 중앙값에서 2σ 이상 벗어난 픽셀 제거
-    # H는 원형이므로 특별 처리 (0~180 범위)
-    h_diff = np.abs(pixels_hsv[:, 0] - h_median)
-    h_diff_circular = np.minimum(h_diff, 180 - h_diff)  # 원형 거리
-    
-    s_diff = np.abs(pixels_hsv[:, 1] - s_median)
-    v_diff = np.abs(pixels_hsv[:, 2] - v_median)
-    
-    # 2-3. 각 채널에서 2σ 이내인 픽셀만 선택 (너무 다른 색상 제외)
-    inlier_mask = (
-        (h_diff_circular <= 2 * max(h_std, 15)) &  # H는 최소 15도 허용
-        (s_diff <= 2 * max(s_std, 30)) &  # S는 최소 30 허용
-        (v_diff <= 2 * max(v_std, 30))    # V는 최소 30 허용
-    )
-    
-    inlier_pixels = pixels_hsv[inlier_mask]
-    outlier_removed = original_count - len(inlier_pixels)
-    
-    # 2-4. 충분한 픽셀이 남아있으면 적용 (outlier가 30% 이하면 적용)
-    if len(inlier_pixels) > original_count * 0.7:  # 70% 이상 남아있으면
-        pixels_hsv = inlier_pixels
-        if outlier_removed > 0:
-            print(f"   🧹 Outlier 제거: {outlier_removed}개 픽셀 제거 ({original_count} → {len(pixels_hsv)})")
-            print(f"      중앙값 HSV({h_median:.0f}, {s_median:.0f}, {v_median:.0f}) 기준")
-    else:
-        print(f"   ℹ️ Outlier 너무 많음 ({100-len(inlier_pixels)*100/original_count:.0f}%), 전체 사용")
-    
-    # 🎨 Step 3: 채도 높은 픽셀 우선 선택 (홀드 본래 색상)
+    # 🎨 Step 2: 채도 높은 픽셀 우선 선택 (벽색 제거의 핵심!)
+    # 벽색은 채도가 낮음! 홀드 색상 먼저 선별하고 outlier 제거
     s_values_filtered = pixels_hsv[:, 1]
-    saturation_threshold = np.percentile(s_values_filtered, 70)  # 상위 30%
+    saturation_threshold = np.percentile(s_values_filtered, 60)  # 상위 40%
     
-    if saturation_threshold > 40:  # 채도가 충분히 높으면
+    if saturation_threshold > 50:  # 채도가 충분히 높으면
         high_saturation_mask = s_values_filtered >= saturation_threshold
         high_sat_pixels = pixels_hsv[high_saturation_mask]
         
-        if len(high_sat_pixels) > 10:
+        if len(high_sat_pixels) > max(10, original_count * 0.3):  # 최소 30%
             pixels_hsv = high_sat_pixels
-            print(f"   🎨 고채도 픽셀 선별: {len(pixels_hsv)}개 (채도≥{saturation_threshold:.0f})")
+            print(f"   🎨 고채도 픽셀 우선 선별: {len(pixels_hsv)}개 (채도≥{saturation_threshold:.0f})")
         else:
             print(f"   ⚠️ 고채도 픽셀 부족, 전체 사용")
     else:
-        print(f"   ℹ️ 전체 채도 낮음 (무채색 홀드), 중앙값 사용")
+        print(f"   ℹ️ 전체 채도 낮음 (채도 중앙값={np.median(s_values_filtered):.0f})")
+    
+    # 🧱 Step 3: 통계적 outlier 제거 (고채도 픽셀 내에서)
+    # 이제 대부분이 홀드 색상이므로 outlier = 노이즈
+    if len(pixels_hsv) >= 20:  # 충분한 픽셀이 있을 때만
+        h_median = np.median(pixels_hsv[:, 0])
+        s_median = np.median(pixels_hsv[:, 1])
+        v_median = np.median(pixels_hsv[:, 2])
+        
+        h_std = np.std(pixels_hsv[:, 0])
+        s_std = np.std(pixels_hsv[:, 1])
+        v_std = np.std(pixels_hsv[:, 2])
+        
+        # Outlier 판정 (H는 원형)
+        h_diff = np.abs(pixels_hsv[:, 0] - h_median)
+        h_diff_circular = np.minimum(h_diff, 180 - h_diff)
+        s_diff = np.abs(pixels_hsv[:, 1] - s_median)
+        v_diff = np.abs(pixels_hsv[:, 2] - v_median)
+        
+        inlier_mask = (
+            (h_diff_circular <= 2 * max(h_std, 15)) &
+            (s_diff <= 2 * max(s_std, 30)) &
+            (v_diff <= 2 * max(v_std, 30))
+        )
+        
+        inlier_pixels = pixels_hsv[inlier_mask]
+        outlier_removed = len(pixels_hsv) - len(inlier_pixels)
+        
+        if len(inlier_pixels) > len(pixels_hsv) * 0.5:  # 50% 이상 남으면
+            before_outlier = len(pixels_hsv)
+            pixels_hsv = inlier_pixels
+            if outlier_removed > 0:
+                print(f"   🧹 Outlier 미세 조정: {outlier_removed}개 제거 ({before_outlier} → {len(pixels_hsv)})")
+        else:
+            print(f"   ℹ️ Outlier 너무 많음, 스킵")
     
     # 🎯 Step 4: 중앙값 방식으로 대표 색상 추출
     h_med = np.median(pixels_hsv[:, 0])
