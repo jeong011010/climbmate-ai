@@ -5289,6 +5289,8 @@ def classify_color_simple_hsv(h, s, v):
         # Orange (H=8~18) & 일부 Yellow (H=18~20): 채도 낮으면 white!
         if h < 18 and s >= 60:
             return "orange", 0.90
+        elif s <= 63 and v >= 200:
+            return "white", 0.85  # 베이지도 흰색 허용 (HSV(16,63,201), HSV(17,62,212))
         elif s >= 51 and v >= 200:
             return "white", 0.85  # 채도 낮고 밝으면 → 흰색 (HSV(18,51,213), HSV(20,52,201))
         elif s <= 50 and v >= 200:
@@ -5422,6 +5424,8 @@ def classify_color_simple_hsv(h, s, v):
             return "pink", 0.90  # H≥176, S=100~132 → pink (HSV(176,132,171))
         elif h >= 174 and s >= 120 and v >= 170:
             return "red", 0.90  # H=174, S≥120 → red (HSV(174,122,172))
+        elif h >= 174 and s >= 198:
+            return "pink", 0.90  # H=174, S≥198 → 진한 pink (HSV(174,198,113))
         elif h >= 173 and s >= 220 and v < 140:
             return "pink", 0.90  # H=173, S≥220, V<140 → 진한 pink (HSV(173,220,127))
         elif h >= 173 and v < 140:
