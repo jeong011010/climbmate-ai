@@ -1130,7 +1130,7 @@ def validate_and_correct_color(color_hsv):
     return [h, s, v]
 
 def get_dominant_color(pixels_hsv, k=3):
-    """🎯 개선된 방식: 초크 제거 후 홀드 본연 색상 추출"""
+    """🎯 개선된 방식: 초크 공격적 제거 + 채도 기반 색상 추출"""
     if len(pixels_hsv) == 0:
         return [0, 0, 0]
     
@@ -1141,47 +1141,50 @@ def get_dominant_color(pixels_hsv, k=3):
                 int(np.median(pixels_hsv[:, 2]))]
     
     original_count = len(pixels_hsv)
-    
-    # 🧹 Step 1: 초크 제거 (V > 180 and S < 50)
     h_values = pixels_hsv[:, 0]
     s_values = pixels_hsv[:, 1]
     v_values = pixels_hsv[:, 2]
     
-    # 초크가 아닌 픽셀 선택 (밝고 채도 낮은 픽셀 제외)
-    chalk_mask = (v_values > 180) & (s_values < 50)
-    non_chalk_mask = ~chalk_mask
-    
-    # 초크 제거 후 픽셀 수 확인
-    non_chalk_pixels = pixels_hsv[non_chalk_mask]
+    # 🧹 Step 1: 초크 공격적 제거 (V > 160 and S < 60)
+    # 자주색 홀드에 묻은 하얀 초크를 더 강력하게 제거
+    chalk_mask = (v_values > 160) & (s_values < 60)
+    non_chalk_pixels = pixels_hsv[~chalk_mask]
     chalk_removed_count = np.sum(chalk_mask)
     
-    if len(non_chalk_pixels) > original_count * 0.3:  # 30% 이상 남아있으면 사용
+    # 초크 제거 후 충분한 픽셀이 남아있으면 사용
+    if len(non_chalk_pixels) > original_count * 0.25:  # 25% 이상 남으면 OK
         pixels_hsv = non_chalk_pixels
         if chalk_removed_count > 0:
             print(f"   🧹 초크 제거: {chalk_removed_count}개 픽셀 제거 ({original_count} → {len(pixels_hsv)})")
     else:
-        print(f"   ⚠️ 초크 제거하면 픽셀 부족 ({len(non_chalk_pixels)}/{original_count}), 전체 사용")
+        print(f"   ⚠️ 초크 제거하면 픽셀 부족 ({len(non_chalk_pixels)}/{original_count}), 완화된 필터 사용")
+        # 완화된 초크 필터 (V > 200 and S < 40)
+        chalk_mask_relaxed = (v_values > 200) & (s_values < 40)
+        non_chalk_pixels_relaxed = pixels_hsv[~chalk_mask_relaxed]
+        if len(non_chalk_pixels_relaxed) > original_count * 0.2:
+            pixels_hsv = non_chalk_pixels_relaxed
+            print(f"   🧹 완화 필터 적용: {np.sum(chalk_mask_relaxed)}개 제거")
     
-    # 🚀 Step 2: 상위 10% 가장 밝은 픽셀만 사용 (그림자/어두운 영역 제외)
-    brightness_scores = pixels_hsv[:, 2]  # V 채널
-    bright_threshold = np.percentile(brightness_scores, 90)  # 상위 10%
+    # 🎨 Step 2: 채도 높은 픽셀 우선 선택 (홀드 본래 색상)
+    # 밝기 대신 채도를 기준으로! (초크=낮은 채도)
+    s_values_filtered = pixels_hsv[:, 1]
     
-    bright_mask = brightness_scores >= bright_threshold
+    # 채도 상위 30% 선택 (홀드의 진짜 색상)
+    saturation_threshold = np.percentile(s_values_filtered, 70)  # 상위 30%
     
-    if np.sum(bright_mask) > 10:  # 충분한 밝은 픽셀이 있으면
-        pixels_hsv = pixels_hsv[bright_mask]
-        print(f"   ⭐ 최상위 밝기 픽셀 선별: {len(pixels_hsv)}개 (밝기≥{bright_threshold:.0f})")
-    else:
-        # 그래도 부족하면 상위 20%로 완화
-        bright_threshold = np.percentile(brightness_scores, 80)
-        bright_mask = brightness_scores >= bright_threshold
-        if np.sum(bright_mask) > 5:
-            pixels_hsv = pixels_hsv[bright_mask]
-            print(f"   ⚡ 상위 20% 픽셀 사용: {len(pixels_hsv)}개 (밝기≥{bright_threshold:.0f})")
+    if saturation_threshold > 40:  # 채도가 충분히 높으면
+        high_saturation_mask = s_values_filtered >= saturation_threshold
+        high_sat_pixels = pixels_hsv[high_saturation_mask]
+        
+        if len(high_sat_pixels) > 10:
+            pixels_hsv = high_sat_pixels
+            print(f"   🎨 고채도 픽셀 선별: {len(pixels_hsv)}개 (채도≥{saturation_threshold:.0f})")
         else:
-            print(f"   ⚠️ 밝은 픽셀 부족, 전체 사용: {len(pixels_hsv)}개")
+            print(f"   ⚠️ 고채도 픽셀 부족, 전체 사용")
+    else:
+        print(f"   ℹ️ 전체 채도 낮음 (무채색 홀드), 중앙값 사용")
     
-    # 🎯 Step 3: 중앙값 방식으로 대표 색상 추출 (outlier에 강함)
+    # 🎯 Step 3: 중앙값 방식으로 대표 색상 추출
     h_med = np.median(pixels_hsv[:, 0])
     s_med = np.median(pixels_hsv[:, 1])
     v_med = np.median(pixels_hsv[:, 2])
