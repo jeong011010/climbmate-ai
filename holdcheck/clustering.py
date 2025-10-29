@@ -5251,8 +5251,8 @@ def classify_color_simple_hsv(h, s, v):
     if v < 90:
         # 매우 어두움 → 검정 (채도 무관!)
         return "black", 0.95
-    elif v >= 200 and s <= 15:
-        # 매우 밝음 + 채도 극도로 낮음 → 흰색 (초엄격!)
+    elif v >= 210 and s <= 10:
+        # 매우 밝음 + 채도 극도로 낮음 → 흰색 (초초엄격!)
         return "white", 0.95
     elif v < 150 and s < 30:
         # 중간 명도 + 채도 매우 낮음 → 검정 (어두운 회색)
