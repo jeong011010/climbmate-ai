@@ -5457,17 +5457,18 @@ def classify_color_simple_hsv(h, s, v):
             return "pink", 0.90  # H=173, S≥220, V<140 → 진한 pink (먼저 체크!)
         elif h >= 169 and h < 174 and s >= 150:
             return "red", 0.90  # 높은 채도는 red/maroon
-        # 🔥 H=172, S>=50이면 pink! (HSV(172,52,247) 케이스)
-        elif h >= 172 and s >= 50 and v >= 200:
-            return "pink", 0.90  # 밝고 채도 중간이면 pink
         # Red 범위: H=174~177, S≥120
         # 🔥 H=177, S≥107은 red! pink가 아님 (HSV(177,107,215) 케이스) - 먼저 체크!
         elif h >= 177 and s >= 107:
             return "red", 0.90  # H≥177, S≥107 → red
+        # 🔥 H=172, S>=50이면 pink! (HSV(172,52,247) 케이스)
+        elif h >= 172 and h < 177 and s >= 50 and v >= 200:
+            return "pink", 0.90  # 밝고 채도 중간이면 pink (단, H≥177 제외)
+        # 🔥 H=176, S=100~132면 pink! (HSV(176,132,171) 케이스) - H=177보다 먼저 체크!
+        elif h == 176 and s >= 100 and s < 133:
+            return "pink", 0.90  # H=176, S=100~132 → pink
         elif h >= 176 and s >= 133:
             return "red", 0.90  # H≥176, S≥133 → red
-        elif h >= 176 and s >= 100 and s < 133 and s < 107:
-            return "pink", 0.90  # H≥176, S=100~132 (단, H≥177, S≥107 제외) → pink (HSV(176,132,171))
         elif h >= 174 and s >= 120 and v >= 170:
             return "red", 0.90  # H=174, S≥120 → red (HSV(174,122,172))
         elif h >= 174 and s >= 198:
@@ -5477,7 +5478,7 @@ def classify_color_simple_hsv(h, s, v):
         elif s >= 86 and v >= 190:
             return "pink", 0.90  # 채도 높고 밝음 → pink
         elif s >= 100 and v >= 180:
-            return "pink", 0.90  # 쨍한 핑크
+            return "pink", 0.90  # 쨍한 핑크 (단, H≥177 제외)
         elif s >= 70 and v >= 160:
             return "pink", 0.85  # 중간 핑크
         elif s >= 60 and v >= 140:
