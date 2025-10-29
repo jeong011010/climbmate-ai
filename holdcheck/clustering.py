@@ -5287,13 +5287,15 @@ def classify_color_simple_hsv(h, s, v):
     elif h >= 45 and h < 80:
         return "green", 0.90
     elif h >= 80 and h < 100:
-        # 민트: 채도 완화
-        if s >= 20 and v >= 90:
+        # 민트: 채도 체크 강화
+        if s >= 35 and v >= 90:
             return "mint", 0.85
+        elif s < 15 and v >= 170:
+            return "white", 0.80  # 채도 극히 낮고 밝으면 → 흰색 (S<15)
         elif v < 70:
             return "black", 0.80  # 매우 어두운 민트만 → 검정
         else:
-            return "mint", 0.75  # 나머지는 민트 (낮은 신뢰도)
+            return "mint", 0.70  # 나머지는 민트 (낮은 신뢰도)
     elif h >= 100 and h < 125:
         # 파랑: 채도/명도 체크로 검정 구분
         if s >= 50 and v >= 110:
