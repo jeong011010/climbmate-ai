@@ -196,7 +196,384 @@
       "description": "잘못 분류됨: YELLOW → WHITE (문제 #0, 홀드 #13)",
       "date_added": "2025-10-26 09:29:59",
       "fix_applied": "AI가 YELLOW로 예측했으나 실제는 WHITE"
+    },
+    {
+      "id": "code_comment_16",
+      "name": "베이지 3 - White",
+      "hsv": [
+        18,
+        51,
+        213
+      ],
+      "expected": "white",
+      "description": "채도 낮고 밝으면 흰색",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_17",
+      "name": "베이지 4 - White",
+      "hsv": [
+        20,
+        52,
+        201
+      ],
+      "expected": "white",
+      "description": "채도 낮고 밝으면 흰색",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_18",
+      "name": "Yellow 범위 White",
+      "hsv": [
+        22,
+        31,
+        219
+      ],
+      "expected": "white",
+      "description": "Yellow 범위에서 채도 낮고 밝으면 흰색",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_19",
+      "name": "Yellow 범위 Black",
+      "hsv": [
+        22,
+        37,
+        118
+      ],
+      "expected": "black",
+      "description": "Yellow 범위에서 채도 낮고 어두우면 검정",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_20",
+      "name": "Green 범위 White",
+      "hsv": [
+        60,
+        10,
+        168
+      ],
+      "expected": "white",
+      "description": "Green 범위에서 채도 극도로 낮고 밝으면 흰색",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_21",
+      "name": "Green 범위 Black",
+      "hsv": [
+        75,
+        36,
+        65
+      ],
+      "expected": "black",
+      "description": "Green 범위에서 채도 낮고 어두우면 검정",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_22",
+      "name": "Mint 경계 Black",
+      "hsv": [
+        79,
+        39,
+        135
+      ],
+      "expected": "black",
+      "description": "Mint 경계에서 채도 낮고 어두우면 검정",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_23",
+      "name": "Mint 중간",
+      "hsv": [
+        80,
+        27,
+        175
+      ],
+      "expected": "mint",
+      "description": "중간 민트",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_24",
+      "name": "Mint 진한색",
+      "hsv": [
+        84,
+        48,
+        143
+      ],
+      "expected": "mint",
+      "description": "진한 민트",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_25",
+      "name": "Mint 중간 2",
+      "hsv": [
+        87,
+        30,
+        173
+      ],
+      "expected": "mint",
+      "description": "중간 민트",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_26",
+      "name": "Mint 연한색",
+      "hsv": [
+        88,
+        20,
+        202
+      ],
+      "expected": "mint",
+      "description": "연한 민트",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_27",
+      "name": "Blue 범위 Black 1",
+      "hsv": [
+        104,
+        27,
+        156
+      ],
+      "expected": "black",
+      "description": "Blue 범위에서 채도 낮고 어두우면 검정",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_28",
+      "name": "Blue 범위 Black 2",
+      "hsv": [
+        104,
+        48,
+        148
+      ],
+      "expected": "black",
+      "description": "Blue 범위에서 채도 높지만 어두우면 검정",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_29",
+      "name": "Blue 진한색",
+      "hsv": [
+        105,
+        147,
+        148
+      ],
+      "expected": "blue",
+      "description": "채도 극도로 높음 → 파랑",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_30",
+      "name": "Blue 밝은색",
+      "hsv": [
+        106,
+        134,
+        160
+      ],
+      "expected": "blue",
+      "description": "채도 높고 밝음 → 파랑",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_31",
+      "name": "Blue 중간 밝기",
+      "hsv": [
+        106,
+        145,
+        158
+      ],
+      "expected": "blue",
+      "description": "채도 높고 중간 밝기 → 파랑",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_32",
+      "name": "Blue 범위 Black 3",
+      "hsv": [
+        108,
+        52,
+        202
+      ],
+      "expected": "black",
+      "description": "S=50~60, 밝지만 채도 애매 → 검정",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_33",
+      "name": "Blue 범위 Black 4",
+      "hsv": [
+        108,
+        64,
+        163
+      ],
+      "expected": "black",
+      "description": "채도 높지만 어두움 → 검정",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_34",
+      "name": "Purple 경계",
+      "hsv": [
+        115,
+        55,
+        217
+      ],
+      "expected": "purple",
+      "description": "H≥115, 밝으면 → purple",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_35",
+      "name": "Purple 진한색",
+      "hsv": [
+        123,
+        98,
+        174
+      ],
+      "expected": "purple",
+      "description": "채도 높으면 → 보라",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_36",
+      "name": "Pink 밝은색 1",
+      "hsv": [
+        157,
+        69,
+        216
+      ],
+      "expected": "pink",
+      "description": "매우 밝고 채도 중간 → pink",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_37",
+      "name": "Pink 밝은색 2",
+      "hsv": [
+        158,
+        77,
+        219
+      ],
+      "expected": "pink",
+      "description": "밝고 채도 중간 → pink",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_38",
+      "name": "Purple 어두운색",
+      "hsv": [
+        161,
+        63,
+        152
+      ],
+      "expected": "purple",
+      "description": "어둡거나 채도 낮음 → purple",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_39",
+      "name": "Purple 어두운색 2",
+      "hsv": [
+        173,
+        121,
+        137
+      ],
+      "expected": "purple",
+      "description": "어두움 → purple",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_40",
+      "name": "Pink 진한색 1",
+      "hsv": [
+        173,
+        220,
+        127
+      ],
+      "expected": "pink",
+      "description": "H=173, S≥220, V<140 → 진한 pink",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_41",
+      "name": "Red",
+      "hsv": [
+        174,
+        122,
+        172
+      ],
+      "expected": "red",
+      "description": "H=174, S≥120 → red",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_42",
+      "name": "Pink-Purple 경계",
+      "hsv": [
+        174,
+        173,
+        112
+      ],
+      "expected": "purple",
+      "description": "H=173~174, V<140 → purple",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_43",
+      "name": "Pink 2",
+      "hsv": [
+        176,
+        132,
+        171
+      ],
+      "expected": "pink",
+      "description": "H≥176, S=100~132 → pink",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "code_comment_44",
+      "name": "Red 2",
+      "hsv": [
+        177,
+        107,
+        215
+      ],
+      "expected": "red",
+      "description": "H≥177, S≥107 → red",
+      "date_added": "2025-10-30",
+      "fix_applied": "코드 주석에서 추출된 피드백 케이스"
     }
   ],
-  "last_updated": "2025-10-30 05:18:18"
+  "last_updated": "2025-10-30 05:33:37"
 }
