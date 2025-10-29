@@ -5302,6 +5302,8 @@ def classify_color_simple_hsv(h, s, v):
         # Green: 채도 체크
         if s >= 50:
             return "green", 0.90
+        elif s <= 10 and v >= 160:
+            return "white", 0.85  # 채도 극도로 낮고 밝으면 → 흰색 (HSV(60,10,168))
         elif s < 15 and v >= 220:
             return "white", 0.80  # 채도 낮고 밝으면 → 흰색
         else:
@@ -5328,8 +5330,14 @@ def classify_color_simple_hsv(h, s, v):
                 return "black", 0.85  # S=50~60, 밝지만 채도 애매 → 검정 (HSV(108,52,202))
             else:
                 return "blue", 0.90
-        elif s >= 60 and v < 205:
+        elif s >= 196:
+            return "blue", 0.90  # 채도 극도로 높음 → 파랑 (HSV(104,196,152))
+        elif s >= 138 and v >= 175:
+            return "blue", 0.90  # 채도 높고 밝음 → 파랑 (HSV(108,138,175))
+        elif s >= 60 and v < 170:
             return "black", 0.85  # 채도 높지만 어두움 → 검정 (HSV(108,64,163))
+        elif s >= 50 and s < 60 and v >= 185:
+            return "blue", 0.85  # S=50~60, V≥185 → 파랑 (HSV(106,51,185))
         elif s >= 50 and v >= 110:
             return "blue", 0.90
         elif s < 15 and v >= 220:
@@ -5350,8 +5358,8 @@ def classify_color_simple_hsv(h, s, v):
             return "blue", 0.85
         else:
             return "blue", 0.70
-    elif h >= 125 and h < 157:
-        # 보라: pink과 분리 (H<157)
+    elif h >= 125 and h < 166:
+        # 보라: pink과 분리 (H<166으로 확장!)
         if s >= 50 and v >= 90:
             return "purple", 0.90
         elif s >= 35 and v >= 140:
@@ -5360,16 +5368,19 @@ def classify_color_simple_hsv(h, s, v):
             return "black", 0.80  # 매우 어두운 보라만 → 검정
         else:
             return "purple", 0.70  # 나머지는 보라 (낮은 신뢰도)
-    elif h >= 157 and h < 180:
-        # Pink 전용 범위 (H=157~180)
-        if h == 174 and s >= 120 and v >= 170:
+    elif h >= 166 and h < 180:
+        # Pink 전용 범위 (H=166~180으로 축소!)
+        # Red 범위: H=176~177, S≥100
+        if h >= 176 and s >= 100:
+            return "red", 0.90  # H≥176, 채도 높음 → red
+        elif h == 174 and s >= 120 and v >= 170:
             return "red", 0.90  # H=174만 특수 케이스 → red (HSV(174,122,172))
         elif s >= 100 and v >= 180:
             return "pink", 0.90  # 쨍한 핑크
         elif s >= 70 and v >= 160:
             return "pink", 0.85  # 중간 핑크
         elif s >= 60 and v >= 140:
-            return "pink", 0.80  # 연한 핑크 (HSV(157,69,216))
+            return "pink", 0.80  # 연한 핑크
         else:
             return "purple", 0.75  # 어두운 핑크 → 보라
     else:
