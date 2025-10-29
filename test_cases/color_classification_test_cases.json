@@ -73,6 +73,33 @@
       "description": "H=169~173, S>=150이면 red/maroon (이전: PURPLE)",
       "date_added": "2024-01-XX",
       "fix_applied": "H=169~173, S>=150 조건 추가"
+    },
+    {
+      "id": "beige_1",
+      "name": "베이지 1 - White",
+      "hsv": [16, 63, 201],
+      "expected": "white",
+      "description": "베이지 색상도 White로 처리 (S<=63, V>=200)",
+      "date_added": "2024-01-XX",
+      "fix_applied": "베이지 White 확장: S<=63, V>=200 → white"
+    },
+    {
+      "id": "beige_2",
+      "name": "베이지 2 - White",
+      "hsv": [17, 62, 212],
+      "expected": "white",
+      "description": "베이지 색상도 White로 처리 (S<=63, V>=200)",
+      "date_added": "2024-01-XX",
+      "fix_applied": "베이지 White 확장: S<=63, V>=200 → white"
+    },
+    {
+      "id": "pink_dark",
+      "name": "진한 Pink",
+      "hsv": [174, 198, 113],
+      "expected": "pink",
+      "description": "진한 Pink 색상 (H>=174, S>=198)",
+      "date_added": "2024-01-XX",
+      "fix_applied": "Pink 진한색 수정: H>=174, S>=198 → pink"
     }
   ]
 }

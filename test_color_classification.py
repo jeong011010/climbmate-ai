@@ -35,14 +35,23 @@ def classify_color_simple_hsv(h, s, v):
             return "white", 0.85
     
     # 2단계: 유채색 범위에서도 무채색 판단 (우선)
+    # 🔥 단, 높은 채도(S>=100)는 어두워도 유채색으로 판단!
     if is_chromatic_range:
-        # 🔥 매우 어두우면 검정 (단, 채도가 매우 높으면 유채색!)
-        if v < 90 and s < 200:
-            return "black", 0.95  # V<90, S<200 → 검정
+        # 매우 어두우면 검정 (단, 채도가 매우 높으면 유채색!)
+        # Green, Orange 등 높은 채도 색상은 어두워도 색상 유지
+        if v < 90 and s < 100:
+            return "black", 0.95  # V<90, S<100 → 검정 (낮은 채도만)
         # 채도 낮고 밝으면 → 흰색 (민트/파랑 범위에서)
         # 단, mint 범위(H=80~100)는 S≤15로 더 엄격하게!
+        # 🔥 Blue 범위(H=100~120)는 S>=16이면 blue!
         if h >= 80 and h < 100:
             if s <= 15 and v >= 220:
+                return "white", 0.85
+        elif h >= 100 and h < 120:
+            # Blue 범위에서는 S>=16이면 blue (white 아님!)
+            if s >= 16:
+                pass  # 3단계에서 blue로 처리
+            elif s <= 15 and v >= 220:
                 return "white", 0.85
         elif s <= 30 and v >= 170:
             return "white", 0.85
@@ -155,7 +164,10 @@ def classify_color_simple_hsv(h, s, v):
             return "blue", 0.70
     elif h >= 120 and h < 125:
         # 파랑-보라 경계
-        if s >= 90 and v >= 170:
+        # 🔥 H=120, S>=16이면 blue (HSV(120,16,228) 케이스)
+        if s >= 16 and v >= 220:
+            return "blue", 0.80  # 낮은 채도지만 blue-tinted
+        elif s >= 90 and v >= 170:
             return "purple", 0.85
         elif s >= 70 and v >= 200:
             return "purple", 0.85
