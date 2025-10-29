@@ -5306,8 +5306,10 @@ def classify_color_simple_hsv(h, s, v):
         # 민트: 채도 체크 필수!
         if s >= 40 and v >= 140:
             return "mint", 0.90  # 진한 민트 (HSV(84,48,143))
-        elif s >= 30 and v >= 170:
-            return "mint", 0.85  # 중간 민트 (HSV(87,30,173))
+        elif s >= 25 and v >= 170:
+            return "mint", 0.85  # 중간 민트 (HSV(87,30,173), HSV(80,27,175))
+        elif s >= 18 and v >= 200:
+            return "mint", 0.80  # 연한 민트 (HSV(88,20,202))
         # 나머지는 2단계에서 처리됨 (white/black)
         elif v < 70:
             return "black", 0.80  # 매우 어두움 → 검정
