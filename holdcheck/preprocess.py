@@ -1130,7 +1130,7 @@ def validate_and_correct_color(color_hsv):
     return [h, s, v]
 
 def get_dominant_color(pixels_hsv, k=3):
-    """🎯 개선된 방식: 초크 + 벽색 제거 + 채도 기반 색상 추출"""
+    """🎯 스마트 방식: 흰색/검정 홀드는 초크 제거 스킵, 유채색만 초크 제거"""
     if len(pixels_hsv) == 0:
         return [0, 0, 0]
     
@@ -1145,39 +1145,87 @@ def get_dominant_color(pixels_hsv, k=3):
     s_values = pixels_hsv[:, 1]
     v_values = pixels_hsv[:, 2]
     
-    # 🧹 Step 1: 초크 공격적 제거 (V > 160 and S < 60)
-    chalk_mask = (v_values > 160) & (s_values < 60)
-    non_chalk_pixels = pixels_hsv[~chalk_mask]
-    chalk_removed_count = np.sum(chalk_mask)
+    # 🔍 Step 1: 빠른 사전 판단 (무채색 홀드인지 확인)
+    # 구멍 있는 홀드 대응: 상위 30% 픽셀로 판단 (밝은 부분 = 홀드)
+    v_top30 = np.percentile(v_values, 70)  # 상위 30% V값
+    s_top30_pixels = pixels_hsv[v_values >= v_top30]
     
-    if len(non_chalk_pixels) > original_count * 0.25:
-        pixels_hsv = non_chalk_pixels
-        if chalk_removed_count > 0:
-            print(f"   🧹 초크 제거: {chalk_removed_count}개 픽셀 제거 ({original_count} → {len(pixels_hsv)})")
+    if len(s_top30_pixels) > 10:
+        s_median_quick = np.median(s_top30_pixels[:, 1])
+        v_median_quick = np.median(s_top30_pixels[:, 2])
     else:
-        # 완화된 초크 필터
-        chalk_mask_relaxed = (v_values > 200) & (s_values < 40)
-        non_chalk_pixels_relaxed = pixels_hsv[~chalk_mask_relaxed]
-        if len(non_chalk_pixels_relaxed) > original_count * 0.2:
-            pixels_hsv = non_chalk_pixels_relaxed
-            print(f"   🧹 완화 필터 적용: {np.sum(chalk_mask_relaxed)}개 제거")
+        s_median_quick = np.median(s_values)
+        v_median_quick = np.median(v_values)
     
-    # 🎨 Step 2: 채도 높은 픽셀 우선 선택 (벽색 제거의 핵심!)
-    # 벽색은 채도가 낮음! 홀드 색상 먼저 선별하고 outlier 제거
-    s_values_filtered = pixels_hsv[:, 1]
-    saturation_threshold = np.percentile(s_values_filtered, 60)  # 상위 40%
+    is_white_hold = (v_median_quick > 170 and s_median_quick < 70)
+    is_black_hold = (v_median_quick < 90 and s_median_quick < 150)
     
-    if saturation_threshold > 50:  # 채도가 충분히 높으면
-        high_saturation_mask = s_values_filtered >= saturation_threshold
-        high_sat_pixels = pixels_hsv[high_saturation_mask]
+    if is_white_hold:
+        print(f"   ⚪ 흰색 홀드 감지 (V={v_median_quick:.0f}, S={s_median_quick:.0f}) → 초크 제거 스킵")
+        # 흰색 홀드는 초크 제거 안함! + 고채도 선별로 벽색 제거
+    elif is_black_hold:
+        print(f"   ⚫ 검정 홀드 감지 (V={v_median_quick:.0f}) → 초크 제거 스킵")
+        # 검정 홀드도 초크 제거 안함
+    else:
+        # 🧹 유채색 홀드만 초크 제거 적용!
+        print(f"   🎨 유채색 홀드 감지 (S={s_median_quick:.0f}) → 초크 제거 적용")
+        chalk_mask = (v_values > 160) & (s_values < 60)
+        non_chalk_pixels = pixels_hsv[~chalk_mask]
+        chalk_removed_count = np.sum(chalk_mask)
         
-        if len(high_sat_pixels) > max(10, original_count * 0.3):  # 최소 30%
-            pixels_hsv = high_sat_pixels
-            print(f"   🎨 고채도 픽셀 우선 선별: {len(pixels_hsv)}개 (채도≥{saturation_threshold:.0f})")
+        if len(non_chalk_pixels) > original_count * 0.25:
+            pixels_hsv = non_chalk_pixels
+            if chalk_removed_count > 0:
+                print(f"      🧹 초크 제거: {chalk_removed_count}개 픽셀 제거 ({original_count} → {len(pixels_hsv)})")
         else:
-            print(f"   ⚠️ 고채도 픽셀 부족, 전체 사용")
+            # 완화된 초크 필터
+            chalk_mask_relaxed = (v_values > 200) & (s_values < 40)
+            non_chalk_pixels_relaxed = pixels_hsv[~chalk_mask_relaxed]
+            if len(non_chalk_pixels_relaxed) > original_count * 0.2:
+                pixels_hsv = non_chalk_pixels_relaxed
+                print(f"      🧹 완화 필터 적용: {np.sum(chalk_mask_relaxed)}개 제거")
+    
+    # 🎨 Step 2: 홀드 타입별 픽셀 선별 (벽색 제거!)
+    s_values_filtered = pixels_hsv[:, 1]
+    v_values_filtered = pixels_hsv[:, 2]
+    
+    if is_white_hold:
+        # 흰색 홀드: 밝기 상위 40% 선택 (구멍 있어도 OK)
+        brightness_threshold = np.percentile(v_values_filtered, 60)
+        bright_mask = v_values_filtered >= brightness_threshold
+        bright_pixels = pixels_hsv[bright_mask]
+        
+        if len(bright_pixels) > max(10, original_count * 0.3):
+            pixels_hsv = bright_pixels
+            print(f"   💡 고명도 픽셀 선별: {len(pixels_hsv)}개 (명도≥{brightness_threshold:.0f})")
+        else:
+            print(f"   ⚠️ 밝은 픽셀 부족, 전체 사용")
+    elif not is_black_hold:
+        # 유채색 홀드: 채도 상위 40% 선택
+        saturation_threshold = np.percentile(s_values_filtered, 60)
+        
+        if saturation_threshold > 50:
+            high_saturation_mask = s_values_filtered >= saturation_threshold
+            high_sat_pixels = pixels_hsv[high_saturation_mask]
+            
+            if len(high_sat_pixels) > max(10, original_count * 0.3):
+                pixels_hsv = high_sat_pixels
+                print(f"   🎨 고채도 픽셀 선별: {len(pixels_hsv)}개 (채도≥{saturation_threshold:.0f})")
+            else:
+                print(f"   ⚠️ 고채도 픽셀 부족, 전체 사용")
+        else:
+            print(f"   ℹ️ 채도 낮음 (중앙값={np.median(s_values_filtered):.0f})")
     else:
-        print(f"   ℹ️ 전체 채도 낮음 (채도 중앙값={np.median(s_values_filtered):.0f})")
+        # 검정 홀드: 어두운 픽셀 선별
+        dark_threshold = np.percentile(v_values_filtered, 40)  # 하위 60%
+        dark_mask = v_values_filtered <= dark_threshold
+        dark_pixels = pixels_hsv[dark_mask]
+        
+        if len(dark_pixels) > max(10, original_count * 0.3):
+            pixels_hsv = dark_pixels
+            print(f"   ⚫ 저명도 픽셀 선별: {len(pixels_hsv)}개 (명도≤{dark_threshold:.0f})")
+        else:
+            print(f"   ℹ️ 검정 홀드, 전체 사용")
     
     # 🧱 Step 3: 통계적 outlier 제거 (고채도 픽셀 내에서)
     # 이제 대부분이 홀드 색상이므로 outlier = 노이즈
