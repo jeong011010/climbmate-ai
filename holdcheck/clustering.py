@@ -5310,7 +5310,7 @@ def classify_color_by_hsv(h, s, v, rgb, colors_config):
     
     # 🔥 먼저 상식적인 HSV 분류 시도
     color_name, confidence = classify_color_simple_hsv(h, s, v)
-    if confidence > 0.80:  # 신뢰도가 높으면 바로 반환
+    if confidence >= 0.70:  # 신뢰도 낮춰서 더 많이 매칭
         return color_name, confidence, f"Simple HSV: H={h}, S={s}, V={v}"
     
     # 기존 config 기반 분류 (백업)
@@ -5342,8 +5342,8 @@ def classify_color_by_hsv(h, s, v, rgb, colors_config):
                     confidence = 0.8  # RGB 조건은 약간 낮은 신뢰도
                     return color_name, confidence, f"RGB: {rgb}"
     
-    # 매칭 실패 - 가장 가까운 색상 찾기
-    return find_nearest_color_hsv(h, s, v, colors_config)
+    # 매칭 실패 - unknown 반환 (잘못된 색상 추측 방지)
+    return "unknown", 0.3, f"No match: H={h}, S={s}, V={v}"
 
 
 def classify_color_by_rgb(rgb, colors_config):
