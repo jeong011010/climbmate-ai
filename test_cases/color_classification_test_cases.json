@@ -4,16 +4,16 @@
   "test_cases": [
     {
       "id": "hold_51",
-      "name": "홀드 #51 - Orange",
+      "name": "홀드 #51 - Yellow (업데이트)",
       "hsv": [
         19,
         186,
         230
       ],
-      "expected": "orange",
-      "description": "높은 채도(S=186)는 무조건 orange여야 함 (이전: WHITE)",
+      "expected": "yellow",
+      "description": "H=19는 yellow 범위 (피드백 업데이트: ORANGE → YELLOW)",
       "date_added": "2024-01-XX",
-      "fix_applied": "S>=100이면 orange 처리 추가"
+      "fix_applied": "H=19는 yellow 범위로 수정"
     },
     {
       "id": "hold_44",
@@ -30,16 +30,16 @@
     },
     {
       "id": "hold_13",
-      "name": "홀드 #13 - Mint",
+      "name": "홀드 #13 - Green (업데이트)",
       "hsv": [
         73,
         75,
         208
       ],
-      "expected": "mint",
-      "description": "H=73, S>=70이면 mint (이전: MINT였으나 조건 개선)",
+      "expected": "green",
+      "description": "H=73는 green 범위 (피드백 업데이트: MINT → GREEN)",
       "date_added": "2024-01-XX",
-      "fix_applied": "H=73~75, S>=70 조건 추가"
+      "fix_applied": "H=73는 green 범위로 수정"
     },
     {
       "id": "hold_45",
@@ -82,29 +82,29 @@
     },
     {
       "id": "hold_14",
-      "name": "홀드 #14 - Red/Maroon",
+      "name": "홀드 #14 - Pink (업데이트)",
       "hsv": [
         169,
         157,
         111
       ],
-      "expected": "red",
-      "description": "H=155~173, S>=150이면 red/maroon (이전: PURPLE)",
+      "expected": "pink",
+      "description": "H=169, 높은 채도 → pink (피드백 업데이트: RED → PINK)",
       "date_added": "2024-01-XX",
-      "fix_applied": "H=155~173, S>=150 조건 추가"
+      "fix_applied": "H=169는 pink 범위로 수정"
     },
     {
       "id": "hold_29",
-      "name": "홀드 #29 - Red/Maroon",
+      "name": "홀드 #29 - Pink (업데이트)",
       "hsv": [
         170,
         169,
         99
       ],
-      "expected": "red",
-      "description": "H=169~173, S>=150이면 red/maroon (이전: PURPLE)",
+      "expected": "pink",
+      "description": "H=170, 높은 채도 → pink (피드백 업데이트: RED → PINK)",
       "date_added": "2024-01-XX",
-      "fix_applied": "H=169~173, S>=150 조건 추가"
+      "fix_applied": "H=170는 pink 범위로 수정"
     },
     {
       "id": "beige_1",
@@ -573,7 +573,268 @@
       "description": "H≥177, S≥107 → red",
       "date_added": "2025-10-30",
       "fix_applied": "코드 주석에서 추출된 피드백 케이스"
+    },
+    {
+      "id": "feedback_1_1",
+      "name": "Pink → Red 오분류 1",
+      "hsv": [171, 183, 249],
+      "expected": "pink",
+      "description": "H=171, 높은 채도 + 밝음 → pink (이전: RED)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Pink 범위 확장"
+    },
+    {
+      "id": "feedback_1_2",
+      "name": "Pink → Red 오분류 2",
+      "hsv": [170, 188, 254],
+      "expected": "pink",
+      "description": "H=170, 높은 채도 + 밝음 → pink (이전: RED)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Pink 범위 확장"
+    },
+    {
+      "id": "feedback_1_3",
+      "name": "Pink → Red 오분류 3",
+      "hsv": [172, 239, 151],
+      "expected": "pink",
+      "description": "H=172, 매우 높은 채도 → pink (이전: RED)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Pink 범위 확장"
+    },
+    {
+      "id": "feedback_1_4",
+      "name": "Pink → Red 오분류 4",
+      "hsv": [173, 195, 232],
+      "expected": "pink",
+      "description": "H=173, 높은 채도 + 밝음 → pink (이전: RED)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Pink 범위 확장"
+    },
+    {
+      "id": "feedback_1_5",
+      "name": "Pink → Red 오분류 5",
+      "hsv": [171, 253, 159],
+      "expected": "pink",
+      "description": "H=171, 매우 높은 채도 → pink (이전: RED)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Pink 범위 확장"
+    },
+    {
+      "id": "feedback_1_6",
+      "name": "Pink → Red 오분류 6",
+      "hsv": [171, 250, 160],
+      "expected": "pink",
+      "description": "H=171, 매우 높은 채도 → pink (이전: RED)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Pink 범위 확장"
+    },
+    {
+      "id": "feedback_2",
+      "name": "Mint → Black 오분류",
+      "hsv": [89, 81, 139],
+      "expected": "mint",
+      "description": "H=89, 높은 채도 + 중간 명도 → mint (이전: BLACK)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Mint 범위 확장, 높은 채도는 mint 처리"
+    },
+    {
+      "id": "feedback_3",
+      "name": "Purple → Black 오분류",
+      "hsv": [125, 88, 83],
+      "expected": "purple",
+      "description": "H=125, 높은 채도 + 어두움 → purple (이전: BLACK)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Purple 범위: 높은 채도는 어두워도 purple"
+    },
+    {
+      "id": "feedback_4_1",
+      "name": "Green → Mint 오분류 1",
+      "hsv": [74, 254, 188],
+      "expected": "green",
+      "description": "H=74, 매우 높은 채도 → green (이전: MINT)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Green 범위 확장: H=73~74는 green"
+    },
+    {
+      "id": "feedback_4_2",
+      "name": "Green → Mint 오분류 2",
+      "hsv": [73, 209, 246],
+      "expected": "green",
+      "description": "H=73, 매우 높은 채도 + 밝음 → green (이전: MINT)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Green 범위 확장: H=73, 매우 높은 채도는 green"
+    },
+    {
+      "id": "feedback_4_3",
+      "name": "Green → Mint 오분류 3",
+      "hsv": [73, 75, 208],
+      "expected": "green",
+      "description": "H=73, 중간 채도 → green (이전: MINT, 수정 필요)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Green 범위: H=73은 green 범위"
+    },
+    {
+      "id": "feedback_5_1",
+      "name": "어두운 Pink → Purple 오분류 1",
+      "hsv": [167, 163, 110],
+      "expected": "pink",
+      "description": "H=167, 높은 채도 + 어두움 → pink (이전: PURPLE)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Pink 범위: 높은 채도는 어두워도 pink"
+    },
+    {
+      "id": "feedback_5_2",
+      "name": "어두운 Pink → Purple 오분류 2",
+      "hsv": [168, 170, 138],
+      "expected": "pink",
+      "description": "H=168, 높은 채도 + 어두움 → pink (이전: PURPLE)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Pink 범위: 높은 채도는 어두워도 pink"
+    },
+    {
+      "id": "feedback_6_1",
+      "name": "Pink → Red 오분류 (H=156~170) 1",
+      "hsv": [156, 159, 254],
+      "expected": "pink",
+      "description": "H=156, 높은 채도 + 매우 밝음 → pink (이전: RED)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Pink 범위 확장: LB=155~170, 높은 채도 + 밝으면 pink"
+    },
+    {
+      "id": "feedback_6_2",
+      "name": "Pink → Red 오분류 (H=156~170) 2",
+      "hsv": [164, 152, 236],
+      "expected": "pink",
+      "description": "H=164, 높은 채도 + 밝음 → pink (이전: RED)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Pink 범위 확장"
+    },
+    {
+      "id": "feedback_6_3",
+      "name": "Pink → Red 오분류 (H=156~170) 3",
+      "hsv": [169, 157, 111],
+      "expected": "pink",
+      "description": "H=169, 높은 채도 → pink (이전: RED, 기존 테스트 케이스와 충돌 가능)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Pink 범위: H=169는 pink 범위 (S<150일 때)"
+    },
+    {
+      "id": "feedback_6_4",
+      "name": "Pink → Red 오분류 (H=156~170) 4",
+      "hsv": [170, 169, 99],
+      "expected": "pink",
+      "description": "H=170, 높은 채도 → pink (이전: RED, 기존 테스트 케이스와 충돌)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Pink 범위: H=170는 pink 범위 (S<150일 때)"
+    },
+    {
+      "id": "feedback_6_5",
+      "name": "Pink → Red 오분류 (H=156~170) 5",
+      "hsv": [165, 150, 241],
+      "expected": "pink",
+      "description": "H=165, 높은 채도 + 밝음 → pink (이전: RED)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Pink 범위 확장"
+    },
+    {
+      "id": "feedback_6_6",
+      "name": "Pink → Red 오분류 (H=156~170) 6",
+      "hsv": [170, 156, 129],
+      "expected": "pink",
+      "description": "H=170, 높은 채도 → pink (이전: RED)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Pink 범위: H=170는 pink 범위 (S<150일 때)"
+    },
+    {
+      "id": "feedback_7",
+      "name": "Purple → Blue 오분류",
+      "hsv": [117, 57, 193],
+      "expected": "purple",
+      "description": "H=117, 중간 채도 + 밝음 → purple (이전: BLUE)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Purple 범위 확장: H=115~120는 purple"
+    },
+    {
+      "id": "feedback_8_1",
+      "name": "Mint → Green 오분류 1",
+      "hsv": [77, 85, 129],
+      "expected": "mint",
+      "description": "H=77, 높은 채도 + 어두움 → mint (이전: GREEN)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Mint 범위 확장: H=77는 mint 범위"
+    },
+    {
+      "id": "feedback_8_2",
+      "name": "Mint → Green 오분류 2",
+      "hsv": [75, 83, 99],
+      "expected": "mint",
+      "description": "H=75, 높은 채도 + 어두움 → mint (이전: GREEN)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Mint 범위 확장: H=75는 mint 범위"
+    },
+    {
+      "id": "feedback_9_1",
+      "name": "White → Blue 오분류 1",
+      "hsv": [101, 36, 255],
+      "expected": "white",
+      "description": "H=101, 낮은 채도 + 매우 밝음 → white (이전: BLUE)",
+      "date_added": "2025-10-30",
+      "fix_applied": "White 범위: Blue 범위에서 낮은 채도 + 매우 밝으면 white"
+    },
+    {
+      "id": "feedback_9_2",
+      "name": "White → Blue 오분류 2",
+      "hsv": [100, 31, 254],
+      "expected": "white",
+      "description": "H=100, 낮은 채도 + 매우 밝음 → white (이전: BLUE)",
+      "date_added": "2025-10-30",
+      "fix_applied": "White 범위: Blue 범위에서 낮은 채도 + 매우 밝으면 white"
+    },
+    {
+      "id": "feedback_10",
+      "name": "Blue → Black 오분류",
+      "hsv": [110, 145, 156],
+      "expected": "blue",
+      "description": "H=110, 높은 채도 + 중간 명도 → blue (이전: BLACK)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Blue 범위: 높은 채도는 중간 명도여도 blue"
+    },
+    {
+      "id": "feedback_11",
+      "name": "Yellow → Orange 오분류",
+      "hsv": [19, 186, 230],
+      "expected": "yellow",
+      "description": "H=19, 높은 채도 → yellow (이전: ORANGE)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Yellow 범위 확장: H=19는 yellow 범위"
+    },
+    {
+      "id": "feedback_12_1",
+      "name": "Red → Pink 오분류 1",
+      "hsv": [177, 235, 130],
+      "expected": "red",
+      "description": "H=177, 매우 높은 채도 + 어두움 → red (이전: PINK)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Red 범위: H=177, 매우 높은 채도는 red"
+    },
+    {
+      "id": "feedback_12_2",
+      "name": "Red → Pink 오분류 2",
+      "hsv": [177, 241, 137],
+      "expected": "red",
+      "description": "H=177, 매우 높은 채도 → red (이전: PINK)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Red 범위: H=177, 매우 높은 채도는 red"
+    },
+    {
+      "id": "feedback_12_3",
+      "name": "Red → Pink 오분류 3",
+      "hsv": [177, 231, 115],
+      "expected": "red",
+      "description": "H=177, 매우 높은 채도 + 어두움 → red (이전: PINK)",
+      "date_added": "2025-10-30",
+      "fix_applied": "Red 범위: H=177, 매우 높은 채도는 red"
     }
   ],
-  "last_updated": "2025-10-30 05:33:37"
+  "last_updated": "2025-10-30"
 }
