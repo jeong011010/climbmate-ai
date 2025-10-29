@@ -723,57 +723,133 @@ if ML_AVAILABLE and DB_AVAILABLE:
     
     @app.post("/api/train-color-model")
     async def train_color_model_endpoint():
-        """🤖 ML 색상 분류 모델 학습"""
+        """🎨 규칙 기반 색상 범위 자동 조정 (피드백 기반)"""
         try:
-            import pickle
-            from database import get_color_training_data
-            from ml_trainer import train_color_model as train_color_ml
+            import sqlite3
+            import shutil
+            from datetime import datetime
             
-            # 모든 피드백 데이터 사용 (confirmed 상관없이)
-            training_data = get_color_training_data(min_samples=1, confirmed_only=False)
+            # 피드백 데이터 로드
+            db_path = os.path.join(os.path.dirname(__file__), 'climbmate.db')
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
             
-            print(f"📊 학습 데이터 로드: {len(training_data)}개")
+            cursor.execute("""
+                SELECT predicted_color, user_correct_color, hold_hsv
+                FROM color_feedback
+                WHERE user_correct_color IS NOT NULL AND user_correct_color != ''
+            """)
             
-            if len(training_data) < 30:
+            feedback_data = cursor.fetchall()
+            conn.close()
+            
+            print(f"📊 피드백 데이터 로드: {len(feedback_data)}개")
+            
+            if len(feedback_data) < 30:
                 raise HTTPException(
                     status_code=400,
-                    detail=f"훈련 데이터 부족: {len(training_data)}개 (최소 30개 필요)"
+                    detail=f"피드백 데이터 부족: {len(feedback_data)}개 (최소 30개 필요)"
                 )
             
-            # 모델 학습
-            test_accuracy, cv_accuracy = train_color_ml(training_data)
+            # HSV 데이터 파싱 및 색상별 분류
+            color_hsv_data = {}
+            for predicted, correct, hsv_str in feedback_data:
+                if not hsv_str:
+                    continue
+                
+                try:
+                    # "H,S,V" 형식 파싱
+                    h, s, v = map(int, hsv_str.split(','))
+                    
+                    if correct not in color_hsv_data:
+                        color_hsv_data[correct] = []
+                    color_hsv_data[correct].append((h, s, v))
+                except:
+                    continue
             
-            # 모델 메타데이터 저장
-            meta_path = os.path.join(os.path.dirname(__file__), 'models', 'color_model_meta.pkl')
-            with open(meta_path, 'wb') as f:
-                pickle.dump({
-                    'test_accuracy': test_accuracy,
-                    'cv_accuracy': cv_accuracy,
-                    'training_samples': len(training_data),
-                    'trained_at': __import__('datetime').datetime.now().isoformat()
-                }, f)
+            # color_ranges.json 로드
+            config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'holdcheck', 'color_ranges.json')
+            backup_path = config_path + '.backup'
             
-            # 🔄 ML 모델 캐시 초기화 (다음 분석부터 새 모델 사용)
+            # 백업 생성
+            shutil.copy(config_path, backup_path)
+            print(f"💾 백업 생성: {backup_path}")
+            
+            with open(config_path, 'r', encoding='utf-8') as f:
+                ranges_data = json.load(f)
+            
+            # 색상별 HSV 범위 자동 조정
+            updated_colors = []
+            for color_name, hsv_list in color_hsv_data.items():
+                if color_name not in ranges_data['colors']:
+                    continue
+                
+                if len(hsv_list) < 5:  # 최소 5개 데이터 필요
+                    continue
+                
+                # HSV 범위 계산 (평균 ± 표준편차)
+                h_values = [h for h, s, v in hsv_list]
+                s_values = [s for h, s, v in hsv_list]
+                v_values = [v for h, s, v in hsv_list]
+                
+                h_min = max(0, int(np.mean(h_values) - 1.5 * np.std(h_values)))
+                h_max = min(180, int(np.mean(h_values) + 1.5 * np.std(h_values)))
+                s_min = max(0, int(np.mean(s_values) - 1.5 * np.std(s_values)))
+                s_max = min(255, int(np.mean(s_values) + 1.5 * np.std(s_values)))
+                v_min = max(0, int(np.mean(v_values) - 1.5 * np.std(v_values)))
+                v_max = min(255, int(np.mean(v_values) + 1.5 * np.std(v_values)))
+                
+                # 범위가 너무 좁아지지 않도록 최소 폭 보장
+                if h_max - h_min < 10:
+                    h_min = max(0, int(np.mean(h_values)) - 5)
+                    h_max = min(180, int(np.mean(h_values)) + 5)
+                if s_max - s_min < 30:
+                    s_min = max(0, int(np.mean(s_values)) - 15)
+                    s_max = min(255, int(np.mean(s_values)) + 15)
+                if v_max - v_min < 40:
+                    v_min = max(0, int(np.mean(v_values)) - 20)
+                    v_max = min(255, int(np.mean(v_values)) + 20)
+                
+                # color_ranges.json 업데이트
+                if 'hsv_ranges' in ranges_data['colors'][color_name]:
+                    ranges_data['colors'][color_name]['hsv_ranges'][0]['h'] = [h_min, h_max]
+                    ranges_data['colors'][color_name]['hsv_ranges'][0]['s'] = [s_min, s_max]
+                    ranges_data['colors'][color_name]['hsv_ranges'][0]['v'] = [v_min, v_max]
+                    updated_colors.append(f"{color_name}: H[{h_min},{h_max}], S[{s_min},{s_max}], V[{v_min},{v_max}]")
+                    print(f"🔄 {color_name}: H[{h_min},{h_max}], S[{s_min},{s_max}], V[{v_min},{v_max}] ({len(hsv_list)}개 샘플)")
+            
+            # 업데이트된 설정 저장
+            ranges_data['last_updated'] = datetime.now().isoformat()
+            ranges_data['feedback_count'] = len(feedback_data)
+            
+            with open(config_path, 'w', encoding='utf-8') as f:
+                json.dump(ranges_data, f, indent=2, ensure_ascii=False)
+            
+            print(f"✅ color_ranges.json 업데이트 완료: {len(updated_colors)}개 색상")
+            
+            # 🔄 색상 범위 캐시 초기화 (즉시 적용)
             try:
-                from clustering import reset_ml_model_cache
-                reset_ml_model_cache()
-                print("✅ ML 모델 캐시 초기화 완료 - 다음 분석부터 새 모델 적용됩니다")
+                from clustering import reload_color_ranges
+                reload_color_ranges()
+                print("✅ 색상 범위 캐시 초기화 완료 - 즉시 적용됩니다")
             except Exception as e:
-                print(f"⚠️ 캐시 초기화 경고 (무시 가능): {e}")
+                print(f"⚠️ 캐시 초기화 경고: {e}")
             
             return JSONResponse(
                 status_code=200,
                 content={
-                    "message": "ML 색상 분류 모델 학습 완료 - 다음 분석부터 자동 적용됩니다",
-                    "test_accuracy": round(test_accuracy * 100, 1),
-                    "cv_accuracy": round(cv_accuracy * 100, 1),
-                    "training_samples": len(training_data)
+                    "message": f"규칙 기반 색상 범위 자동 조정 완료 - 즉시 적용됩니다 ({len(updated_colors)}개 색상 업데이트)",
+                    "updated_colors": updated_colors,
+                    "feedback_samples": len(feedback_data),
+                    "backup_path": backup_path
                 }
             )
         except HTTPException:
             raise
         except Exception as e:
-            print(f"❌ ML 학습 오류: {e}")
+            print(f"❌ 규칙 조정 오류: {e}")
+            import traceback
+            traceback.print_exc()
             raise HTTPException(status_code=500, detail=str(e))
 
 if ML_AVAILABLE and DB_AVAILABLE:

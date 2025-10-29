@@ -4977,6 +4977,13 @@ def save_color_ranges(ranges, config_path="holdcheck/color_ranges.json"):
     print(f"💾 색상 범위 저장: {config_path}")
 
 
+def reload_color_ranges():
+    """색상 범위 캐시 강제 리로드 (피드백 학습 후 즉시 적용)"""
+    global _color_ranges_cache
+    _color_ranges_cache = None
+    print("🔄 색상 범위 캐시 초기화 - 다음 분석부터 새 범위 적용")
+
+
 def get_default_color_ranges_data():
     """기본 색상 범위 데이터 (JSON 직렬화 가능)"""
     return {
