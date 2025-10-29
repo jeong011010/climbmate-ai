@@ -5285,27 +5285,37 @@ def classify_color_simple_hsv(h, s, v):
     elif h >= 30 and h < 45:
         return "lime", 0.90  # 연두
     elif h >= 45 and h < 80:
-        return "green", 0.90
-    elif h >= 80 and h < 100:
-        # 민트: 채도 체크 강화
-        if s >= 35 and v >= 90:
-            return "mint", 0.85
-        elif s < 15 and v >= 170:
-            return "white", 0.80  # 채도 극히 낮고 밝으면 → 흰색 (S<15)
-        elif v < 70:
-            return "black", 0.80  # 매우 어두운 민트만 → 검정
+        # Green: 채도 체크
+        if s >= 50:
+            return "green", 0.90
+        elif s < 15 and v >= 220:
+            return "white", 0.80  # 채도 낮고 밝으면 → 흰색
         else:
-            return "mint", 0.70  # 나머지는 민트 (낮은 신뢰도)
+            return "green", 0.75
+    elif h >= 80 and h < 100:
+        # 민트: 채도 체크 필수!
+        if s >= 40 and v >= 140:
+            return "mint", 0.90  # 진한 민트
+        elif s >= 25 and v >= 180:
+            return "mint", 0.85  # 연한 민트
+        elif s < 15 and v >= 220:
+            return "white", 0.85  # 채도 낮고 밝으면 → 흰색
+        elif v < 70:
+            return "black", 0.80  # 매우 어두움 → 검정
+        else:
+            return "unknown", 0.60  # 애매함
     elif h >= 100 and h < 125:
-        # 파랑: 채도/명도 체크로 검정 구분
+        # 파랑: 채도 체크 필수
         if s >= 50 and v >= 110:
             return "blue", 0.90
-        elif s < 20:
-            return "unknown", 0.60  # 채도 낮으면 무채색!
+        elif s < 15 and v >= 220:
+            return "white", 0.85  # 채도 낮고 밝으면 → 흰색
+        elif s < 20 and v >= 150:
+            return "unknown", 0.60  # 연한 회색톤
         elif v < 70:
-            return "black", 0.80  # 매우 어두운 파랑만 → 검정
+            return "black", 0.80  # 매우 어두움 → 검정
         else:
-            return "blue", 0.75  # 나머지는 파랑 (낮은 신뢰도)
+            return "blue", 0.70  # 애매함
     elif h >= 125 and h < 160:
         # 보라: 채도 완화
         if s >= 50 and v >= 90:
