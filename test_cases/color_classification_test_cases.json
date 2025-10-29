@@ -5,7 +5,11 @@
     {
       "id": "hold_51",
       "name": "홀드 #51 - Orange",
-      "hsv": [19, 186, 230],
+      "hsv": [
+        19,
+        186,
+        230
+      ],
       "expected": "orange",
       "description": "높은 채도(S=186)는 무조건 orange여야 함 (이전: WHITE)",
       "date_added": "2024-01-XX",
@@ -14,7 +18,11 @@
     {
       "id": "hold_44",
       "name": "홀드 #44 - Green",
-      "hsv": [64, 161, 78],
+      "hsv": [
+        64,
+        161,
+        78
+      ],
       "expected": "green",
       "description": "높은 채도(S=161)는 무조건 green이어야 함 (이전: BLACK)",
       "date_added": "2024-01-XX",
@@ -23,7 +31,11 @@
     {
       "id": "hold_13",
       "name": "홀드 #13 - Mint",
-      "hsv": [73, 75, 208],
+      "hsv": [
+        73,
+        75,
+        208
+      ],
       "expected": "mint",
       "description": "H=73, S>=70이면 mint (이전: MINT였으나 조건 개선)",
       "date_added": "2024-01-XX",
@@ -32,7 +44,11 @@
     {
       "id": "hold_45",
       "name": "홀드 #45 - Green",
-      "hsv": [69, 43, 199],
+      "hsv": [
+        69,
+        43,
+        199
+      ],
       "expected": "green",
       "description": "H=68~73은 green으로 처리 (이전: MINT)",
       "date_added": "2024-01-XX",
@@ -41,7 +57,11 @@
     {
       "id": "hold_4",
       "name": "홀드 #4 - Blue",
-      "hsv": [120, 16, 228],
+      "hsv": [
+        120,
+        16,
+        228
+      ],
       "expected": "blue",
       "description": "S>=16이면 blue-tinted (이전: WHITE)",
       "date_added": "2024-01-XX",
@@ -50,7 +70,11 @@
     {
       "id": "hold_33",
       "name": "홀드 #33 - Pink",
-      "hsv": [172, 52, 247],
+      "hsv": [
+        172,
+        52,
+        247
+      ],
       "expected": "pink",
       "description": "H=172, S>=50이면 pink (이전: PURPLE)",
       "date_added": "2024-01-XX",
@@ -59,7 +83,11 @@
     {
       "id": "hold_14",
       "name": "홀드 #14 - Red/Maroon",
-      "hsv": [169, 157, 111],
+      "hsv": [
+        169,
+        157,
+        111
+      ],
       "expected": "red",
       "description": "H=155~173, S>=150이면 red/maroon (이전: PURPLE)",
       "date_added": "2024-01-XX",
@@ -68,7 +96,11 @@
     {
       "id": "hold_29",
       "name": "홀드 #29 - Red/Maroon",
-      "hsv": [170, 169, 99],
+      "hsv": [
+        170,
+        169,
+        99
+      ],
       "expected": "red",
       "description": "H=169~173, S>=150이면 red/maroon (이전: PURPLE)",
       "date_added": "2024-01-XX",
@@ -77,7 +109,11 @@
     {
       "id": "beige_1",
       "name": "베이지 1 - White",
-      "hsv": [16, 63, 201],
+      "hsv": [
+        16,
+        63,
+        201
+      ],
       "expected": "white",
       "description": "베이지 색상도 White로 처리 (S<=63, V>=200)",
       "date_added": "2024-01-XX",
@@ -86,7 +122,11 @@
     {
       "id": "beige_2",
       "name": "베이지 2 - White",
-      "hsv": [17, 62, 212],
+      "hsv": [
+        17,
+        62,
+        212
+      ],
       "expected": "white",
       "description": "베이지 색상도 White로 처리 (S<=63, V>=200)",
       "date_added": "2024-01-XX",
@@ -95,12 +135,68 @@
     {
       "id": "pink_dark",
       "name": "진한 Pink",
-      "hsv": [174, 198, 113],
+      "hsv": [
+        174,
+        198,
+        113
+      ],
       "expected": "pink",
       "description": "진한 Pink 색상 (H>=174, S>=198)",
       "date_added": "2024-01-XX",
       "fix_applied": "Pink 진한색 수정: H>=174, S>=198 → pink"
+    },
+    {
+      "id": "db_4",
+      "name": "DB Feedback #4 - WHITE",
+      "hsv": [
+        48,
+        7,
+        180
+      ],
+      "expected": "white",
+      "description": "잘못 분류됨: GRAY → WHITE (문제 #0, 홀드 #2)",
+      "date_added": "2025-10-26 09:30:17",
+      "fix_applied": "AI가 GRAY로 예측했으나 실제는 WHITE"
+    },
+    {
+      "id": "db_3",
+      "name": "DB Feedback #3 - WHITE",
+      "hsv": [
+        22,
+        27,
+        155
+      ],
+      "expected": "white",
+      "description": "잘못 분류됨: GRAY → WHITE (문제 #0, 홀드 #6)",
+      "date_added": "2025-10-26 09:30:12",
+      "fix_applied": "AI가 GRAY로 예측했으나 실제는 WHITE"
+    },
+    {
+      "id": "db_2",
+      "name": "DB Feedback #2 - WHITE",
+      "hsv": [
+        19,
+        30,
+        152
+      ],
+      "expected": "white",
+      "description": "잘못 분류됨: YELLOW → WHITE (문제 #0, 홀드 #78475)",
+      "date_added": "2025-10-26 09:30:06",
+      "fix_applied": "AI가 YELLOW로 예측했으나 실제는 WHITE"
+    },
+    {
+      "id": "db_1",
+      "name": "DB Feedback #1 - WHITE",
+      "hsv": [
+        22,
+        31,
+        175
+      ],
+      "expected": "white",
+      "description": "잘못 분류됨: YELLOW → WHITE (문제 #0, 홀드 #13)",
+      "date_added": "2025-10-26 09:29:59",
+      "fix_applied": "AI가 YELLOW로 예측했으나 실제는 WHITE"
     }
-  ]
+  ],
+  "last_updated": "2025-10-30 05:18:18"
 }
-
