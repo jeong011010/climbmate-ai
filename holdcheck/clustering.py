@@ -5269,10 +5269,14 @@ def classify_color_simple_hsv(h, s, v):
     # 2단계: 유채색 범위에서도 무채색 판단 (우선)
     if is_chromatic_range:
         # 채도 낮고 밝으면 → 흰색 (민트/파랑 범위에서)
-        if s <= 30 and v >= 170:
+        # 단, mint 범위(H=80~100)는 S≤15로 더 엄격하게!
+        if h >= 80 and h < 100:
+            if s <= 15 and v >= 220:
+                return "white", 0.85
+        elif s <= 30 and v >= 170:
             return "white", 0.85
         # 채도 낮고 어두우면 → 검정
-        elif s <= 25 and v < 165:
+        if s <= 25 and v < 165:
             return "black", 0.85
     
     # 3단계: 유채색 판단 (OpenCV H는 0-180)
