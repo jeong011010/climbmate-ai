@@ -5247,21 +5247,31 @@ def rule_based_color_clustering(hold_data, vectors, config_path="holdcheck/color
 def classify_color_simple_hsv(h, s, v):
     """🎨 상식적인 HSV 기반 색상 분류 (명도 우선 판단)"""
     
-    # 🔥 1단계: 명도+채도 기반 무채색 판단
-    if v < 90:
-        # 매우 어두움 → 검정 (채도 무관!)
-        return "black", 0.95
-    elif v >= 200 and s <= 15:
-        # 매우 밝음 + 채도 낮음 → 흰색
-        return "white", 0.95
-    elif v >= 180 and s <= 20:
-        # 밝음 + 채도 낮음 → 흰색 (약한 흰색)
-        return "white", 0.85
-    elif v < 150 and s < 30:
-        # 중간 명도 + 채도 매우 낮음 → 검정 (어두운 회색)
+    # 🔥 1단계: 명도+채도 기반 무채색 판단 (초엄격!)
+    # 유채색 범위는 제외하고 판단
+    is_chromatic_range = (
+        (h >= 8 and h < 100) or  # yellow, lime, green, mint
+        (h >= 100 and h < 160)   # blue, purple
+    )
+    
+    if not is_chromatic_range:
+        # 무채색 범위에서만 black/white 판단
+        if v < 80:
+            # 매우 어두움 → 검정
+            return "black", 0.95
+        elif v >= 230 and s <= 10:
+            # 매우 밝음 + 채도 극도로 낮음 → 흰색
+            return "white", 0.95
+        elif v >= 220 and s <= 12:
+            # 밝음 + 채도 매우 낮음 → 흰색
+            return "white", 0.85
+    
+    # 2단계: 유채색 범위에서도 검정 판단 (우선)
+    if is_chromatic_range and v < 150 and s < 50:
+        # 유채색 범위이지만 명도 낮고 채도 낮음 → 검정
         return "black", 0.90
     
-    # 2단계: 유채색 판단 (OpenCV H는 0-180)
+    # 3단계: 유채색 판단 (OpenCV H는 0-180)
     if (h >= 0 and h < 8) or (h >= 175):
         return "red", 0.90
     elif h >= 8 and h < 18:
@@ -5277,31 +5287,31 @@ def classify_color_simple_hsv(h, s, v):
     elif h >= 45 and h < 80:
         return "green", 0.90
     elif h >= 80 and h < 100:
-        # 민트: 채도/명도 체크
-        if s >= 30 and v >= 90:
+        # 민트: 채도 완화
+        if s >= 20 and v >= 90:
             return "mint", 0.85
-        elif v < 90:
-            return "black", 0.85  # 어두운 민트 → 검정
+        elif v < 70:
+            return "black", 0.80  # 매우 어두운 민트만 → 검정
         else:
-            return "mint", 0.75  # 낮은 신뢰도
+            return "mint", 0.75  # 나머지는 민트 (낮은 신뢰도)
     elif h >= 100 and h < 125:
         # 파랑: 채도/명도 체크로 검정 구분
         if s >= 50 and v >= 110:
             return "blue", 0.90
         elif s < 20:
             return "unknown", 0.60  # 채도 낮으면 무채색!
-        elif v < 100:
-            return "black", 0.85  # 어두운 파랑 → 검정
+        elif v < 70:
+            return "black", 0.80  # 매우 어두운 파랑만 → 검정
         else:
-            return "blue", 0.75  # 낮은 신뢰도
+            return "blue", 0.75  # 나머지는 파랑 (낮은 신뢰도)
     elif h >= 125 and h < 160:
-        # 보라: 채도/명도 체크 (핑크와 분리)
-        if s >= 60 and v >= 100:
+        # 보라: 채도 완화
+        if s >= 50 and v >= 90:
             return "purple", 0.90
-        elif v < 100:
-            return "black", 0.85  # 어두운 보라 → 검정
+        elif v < 70:
+            return "black", 0.80  # 매우 어두운 보라만 → 검정
         else:
-            return "purple", 0.75  # 낮은 신뢰도
+            return "purple", 0.75  # 나머지는 보라 (낮은 신뢰도)
     elif h >= 160 and h < 175:
         # 핑크: 밝고 채도 높은 것만
         if s >= 80 and v >= 200:
