@@ -42,6 +42,8 @@ holdcheck/outputs/
 backend/outputs/
 backend/models/
 
+# Legacy code (5,945줄 레거시 보관용)
+holdcheck/legacy/
 
 # Node.js
 node_modules/
@@ -66,6 +68,3 @@ Thumbs.db
 *.tmp
 *.temp
 frontend/public/models/*.onnx*
-
-# Legacy code (archived)
-holdcheck/legacy/
