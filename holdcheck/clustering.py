@@ -6,6 +6,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import cv2
+import os
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 import torch
@@ -28,6 +29,9 @@ _color_feedback_data = []
 _ml_color_model = None
 _ml_color_encoder = None
 _ml_model_loaded = False
+
+# 🔇 Runtime verbosity control (set CLIMBMATE_VERBOSE=1 to enable)
+VERBOSE = os.getenv('CLIMBMATE_VERBOSE', '0') == '1'
 
 def hsv_to_rgb_fast(h, s, v):
     """⚡ 빠른 HSV → RGB 변환 (수학적 변환, cv2보다 빠름)"""
@@ -599,7 +603,8 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
                 # ML 모델이 높은 신뢰도로 예측 → 사용
                 color_name = ml_color
                 confidence = ml_confidence
-                print(f"   🤖 ML 예측: 홀드 {hold['id']} → {color_name} (신뢰도: {confidence:.2f})")
+                if VERBOSE:
+                    print(f"   🤖 ML 예측: 홀드 {hold['id']} → {color_name} (신뢰도: {confidence:.2f})")
             else:
                 # ML 모델 없거나 신뢰도 낮음 → CLIP AI 사용
                 best_idx = np.argmax(similarities[i])
@@ -616,10 +621,11 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
                     if color_name != "unknown":
                         break
                 
-                if ml_color:
-                    print(f"   ⚡ CLIP AI: 홀드 {hold['id']} → {color_name} (ML 신뢰도 낮음: {ml_confidence:.2f})")
-                else:
-                    print(f"   ⚡ CLIP AI: 홀드 {hold['id']} → {color_name} (ML 모델 없음)")
+                if VERBOSE:
+                    if ml_color:
+                        print(f"   ⚡ CLIP AI: 홀드 {hold['id']} → {color_name} (ML 신뢰도 낮음: {ml_confidence:.2f})")
+                    else:
+                        print(f"   ⚡ CLIP AI: 홀드 {hold['id']} → {color_name} (ML 모델 없음)")
             
             # 🎯 CLIP AI 결과 후처리 보정 (명확한 오류 수정 - 강화)
             rgb = hold.get("dominant_rgb", [128, 128, 128])
@@ -632,7 +638,8 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
                 
                 # 🚨 Unknown 색상 강제 분류 (RGB 기반 - 민트/연두 추가)
                 if color_name == "unknown":
-                    print(f"   ⚠️ 홀드 {hold['id']} RGB{tuple(rgb)} - unknown 감지, RGB 기반 재분류 시도")
+                    if VERBOSE:
+                        print(f"   ⚠️ 홀드 {hold['id']} RGB{tuple(rgb)} - unknown 감지, RGB 기반 재분류 시도")
                     
                     # 민트색 체크 (G > R, B > R, G ≈ B, 밝음)
                     if g > r + 30 and b > r + 30 and abs(g - b) < 30 and avg_brightness > 150:
@@ -704,7 +711,8 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
                 # 🖤 검정색 보정: 매우 어두운 색상 (RGB(43,54,72) 같은 케이스)
                 elif avg_brightness <= 70 and max_rgb <= 80:
                     if color_name != "black":
-                        print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - {color_name} → black (매우 어두움)")
+                        if VERBOSE:
+                            print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - {color_name} → black (매우 어두움)")
                         color_name = "black"
                         confidence = 0.99
                 
@@ -713,33 +721,38 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
                     # 밝은 흰색
                     if avg_brightness > 200:
                         if color_name not in ["white"]:
-                            print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - {color_name} → white (밝은 무채색)")
+                            if VERBOSE:
+                                print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - {color_name} → white (밝은 무채색)")
                             color_name = "white"
                             confidence = 0.99
                     # 중간 밝기 무채색 (RGB(194,199,198) 같은 케이스) → 흰색
                     elif avg_brightness > 80:
                         if color_name not in ["white"]:
-                            print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - {color_name} → white (무채색)")
+                            if VERBOSE:
+                                print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - {color_name} → white (무채색)")
                             color_name = "white"
                             confidence = 0.99
                     # 매우 어두운 검정
                     else:
                         if color_name not in ["black"]:
-                            print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - {color_name} → black (어두운 무채색)")
+                            if VERBOSE:
+                                print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - {color_name} → black (어두운 무채색)")
                             color_name = "black"
                             confidence = 0.98
                 
                 # ⚪ 흰색 보정: 매우 밝은 색상 (평균 밝기 > 200, 채널 차이 < 30)
                 elif avg_brightness > 200 and channel_diff < 30:
                     if color_name not in ["white"]:
-                        print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - {color_name} → white (매우 밝음)")
+                        if VERBOSE:
+                            print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - {color_name} → white (매우 밝음)")
                         color_name = "white"
                         confidence = 0.98
                 
                 # 🔵 밝은 파란색 보정: 파란색 채널이 높고 밝은 경우
                 elif avg_brightness > 180 and b > r + 15 and b > g + 10:
                     if color_name not in ["blue", "white"]:
-                        print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - {color_name} → blue (밝은 파란색)")
+                        if VERBOSE:
+                            print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - {color_name} → blue (밝은 파란색)")
                         color_name = "blue"
                         confidence = 0.95
                 
@@ -747,22 +760,26 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
                 elif color_name == "black" and avg_brightness > 150:
                     # 하늘색 체크 (RGB(184,223,237) 같은 케이스)
                     if b > r + 10 and b > g + 5:
-                        print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - black → blue (하늘색)")
+                        if VERBOSE:
+                            print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - black → blue (하늘색)")
                         color_name = "blue"
                         confidence = 0.95
                     # 밝은 회색/흰색 체크 (RGB(202,199,187) 같은 케이스)
                     elif channel_diff < 30:
                         if avg_brightness > 190:
-                            print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - black → white (밝은 흰색)")
+                            if VERBOSE:
+                                print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - black → white (밝은 흰색)")
                             color_name = "white"
                             confidence = 0.95
                         else:
-                            print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - black → white (밝은 무채색)")
+                            if VERBOSE:
+                                print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - black → white (밝은 무채색)")
                             color_name = "white"
                             confidence = 0.95
                     # 일반 밝은 색상
                     else:
-                        print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - black → white (밝은 색상)")
+                        if VERBOSE:
+                            print(f"   🔧 후처리 보정: 홀드 {hold['id']} RGB{tuple(rgb)} - black → white (밝은 색상)")
                         color_name = "white"
                         confidence = 0.95
             

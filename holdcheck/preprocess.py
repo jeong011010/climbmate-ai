@@ -7,6 +7,9 @@ import torch
 import clip
 from PIL import Image
 
+# 🔇 Runtime verbosity control (set CLIMBMATE_VERBOSE=1 to enable)
+VERBOSE = os.getenv('CLIMBMATE_VERBOSE', '0') == '1'
+
 def convert_to_json_safe(data):
     """🚀 JSON 직렬화 가능하도록 데이터 변환"""
     if isinstance(data, np.integer):
@@ -37,10 +40,12 @@ def get_yolo_model(model_path="/app/holdcheck/roboflow_weights/weights.pt"):
     global _yolo_model, _yolo_model_path
     
     if _yolo_model is None or _yolo_model_path != model_path:
-        print(f"🔍 YOLO 모델 로딩 중... ({model_path})")
+        if VERBOSE:
+            print(f"🔍 YOLO 모델 로딩 중... ({model_path})")
         _yolo_model = YOLO(model_path)
         _yolo_model_path = model_path
-        print(f"✅ YOLO 모델 로딩 완료!")
+        if VERBOSE:
+            print(f"✅ YOLO 모델 로딩 완료!")
     
     return _yolo_model
 
@@ -50,13 +55,16 @@ def get_clip_model():
     import clustering
     
     if clustering._clip_model is None:
-        print("🤖 CLIP 모델 로딩 중...")
+        if VERBOSE:
+            print("🤖 CLIP 모델 로딩 중...")
         clustering._clip_device = "cuda" if torch.cuda.is_available() else "cpu"
         model, preprocess = clip.load("ViT-B/32", device=clustering._clip_device)
         clustering._clip_model = (model, preprocess)
-        print(f"✅ CLIP 모델 로딩 완료 (Device: {clustering._clip_device})")
+        if VERBOSE:
+            print(f"✅ CLIP 모델 로딩 완료 (Device: {clustering._clip_device})")
     else:
-        print(f"✅ CLIP 모델 캐시 사용 (Device: {clustering._clip_device})")
+        if VERBOSE:
+            print(f"✅ CLIP 모델 캐시 사용 (Device: {clustering._clip_device})")
     
     model, preprocess = clustering._clip_model
     return model, preprocess, clustering._clip_device
@@ -225,7 +233,8 @@ def extract_color_with_clip_ai(image, mask):
             confidence = 0.90
             
         color_name = "black"
-        print(f"   ✅ 검정색으로 강제 분류 (개별 함수, 신뢰도: {black_confidence_level})")
+        if VERBOSE:
+            print(f"   ✅ 검정색으로 강제 분류 (개별 함수, 신뢰도: {black_confidence_level})")
     else:
         # 가장 유사한 색상 선택
         best_idx = np.argmax(similarities)
@@ -279,7 +288,8 @@ def extract_color_with_clip_ai(image, mask):
     # CLIP 특징 벡터 반환
     clip_features = image_features.squeeze().cpu().numpy()
     
-    print(f"   🎨 CLIP AI: {color_name} (신뢰도: {confidence:.3f})")
+    if VERBOSE:
+        print(f"   🎨 CLIP AI: {color_name} (신뢰도: {confidence:.3f})")
     
     return color_name, confidence, rgb.tolist(), hsv.tolist(), clip_features
 
@@ -538,7 +548,8 @@ def detect_background_color(image, masks):
         background_hsv = cv2.cvtColor(background_pixels.reshape(-1, 1, 3), cv2.COLOR_BGR2HSV)
         avg_background_hsv = np.mean(background_hsv, axis=0)[0]
         
-        print(f"🎨 배경색 감지: HSV({avg_background_hsv[0]:.1f}, {avg_background_hsv[1]:.1f}, {avg_background_hsv[2]:.1f})")
+        if VERBOSE:
+            print(f"🎨 배경색 감지: HSV({avg_background_hsv[0]:.1f}, {avg_background_hsv[1]:.1f}, {avg_background_hsv[2]:.1f})")
         return avg_background_hsv
     
     return None
@@ -828,7 +839,8 @@ def get_hybrid_dominant_color(pixels_hsv):
     median_s = np.median(pixels_array[:, 1])
     median_v = np.median(pixels_array[:, 2])
     
-    print(f"🎨 HSV 중앙값: H={median_h:.1f}, S={median_s:.1f}, V={median_v:.1f}")
+    if VERBOSE:
+        print(f"🎨 HSV 중앙값: H={median_h:.1f}, S={median_s:.1f}, V={median_v:.1f}")
     
     # 🔥 1단계: 명도 우선 판단 (검정/흰색은 채도 무관)
     if median_v < 90:
@@ -838,7 +850,8 @@ def get_hybrid_dominant_color(pixels_hsv):
     elif median_v > 200:
         # 매우 밝음 → 흰색 (채도가 낮으면)
         if median_s < 50:
-            print(f"   → ⚪ 흰색 (V={median_v:.1f} > 200, S={median_s:.1f} < 50)")
+            if VERBOSE:
+                print(f"   → ⚪ 흰색 (V={median_v:.1f} > 200, S={median_s:.1f} < 50)")
             return [0, 0, 255]
     
     # 🔥 2단계: 채도 기반 무채색 판단 (중간 명도)
@@ -1161,14 +1174,16 @@ def get_dominant_color(pixels_hsv, k=3):
     is_black_hold = (v_median_quick < 90 and s_median_quick < 150)
     
     if is_white_hold:
-        print(f"   ⚪ 흰색 홀드 감지 (V={v_median_quick:.0f}, S={s_median_quick:.0f}) → 초크 제거 스킵")
+        if VERBOSE:
+            print(f"   ⚪ 흰색 홀드 감지 (V={v_median_quick:.0f}, S={s_median_quick:.0f}) → 초크 제거 스킵")
         # 흰색 홀드는 초크 제거 안함! + 고채도 선별로 벽색 제거
     elif is_black_hold:
         print(f"   ⚫ 검정 홀드 감지 (V={v_median_quick:.0f}) → 초크 제거 스킵")
         # 검정 홀드도 초크 제거 안함
     else:
         # 🧹 유채색 홀드만 초크 제거 적용!
-        print(f"   🎨 유채색 홀드 감지 (S={s_median_quick:.0f}) → 초크 제거 적용")
+        if VERBOSE:
+            print(f"   🎨 유채색 홀드 감지 (S={s_median_quick:.0f}) → 초크 제거 적용")
         chalk_mask = (v_values > 160) & (s_values < 60)
         non_chalk_pixels = pixels_hsv[~chalk_mask]
         chalk_removed_count = np.sum(chalk_mask)
@@ -1176,14 +1191,16 @@ def get_dominant_color(pixels_hsv, k=3):
         if len(non_chalk_pixels) > original_count * 0.25:
             pixels_hsv = non_chalk_pixels
             if chalk_removed_count > 0:
-                print(f"      🧹 초크 제거: {chalk_removed_count}개 픽셀 제거 ({original_count} → {len(pixels_hsv)})")
+                if VERBOSE:
+                    print(f"      🧹 초크 제거: {chalk_removed_count}개 픽셀 제거 ({original_count} → {len(pixels_hsv)})")
         else:
             # 완화된 초크 필터
             chalk_mask_relaxed = (v_values > 200) & (s_values < 40)
             non_chalk_pixels_relaxed = pixels_hsv[~chalk_mask_relaxed]
             if len(non_chalk_pixels_relaxed) > original_count * 0.2:
                 pixels_hsv = non_chalk_pixels_relaxed
-                print(f"      🧹 완화 필터 적용: {np.sum(chalk_mask_relaxed)}개 제거")
+                if VERBOSE:
+                    print(f"      🧹 완화 필터 적용: {np.sum(chalk_mask_relaxed)}개 제거")
     
     # 🎨 Step 2: 홀드 타입별 픽셀 선별 (벽색 제거!)
     s_values_filtered = pixels_hsv[:, 1]
@@ -1197,7 +1214,8 @@ def get_dominant_color(pixels_hsv, k=3):
         
         if len(bright_pixels) > max(10, original_count * 0.3):
             pixels_hsv = bright_pixels
-            print(f"   💡 고명도 픽셀 선별: {len(pixels_hsv)}개 (명도≥{brightness_threshold:.0f})")
+            if VERBOSE:
+                print(f"   💡 고명도 픽셀 선별: {len(pixels_hsv)}개 (명도≥{brightness_threshold:.0f})")
         else:
             print(f"   ⚠️ 밝은 픽셀 부족, 전체 사용")
     elif not is_black_hold:
@@ -1210,7 +1228,8 @@ def get_dominant_color(pixels_hsv, k=3):
             
             if len(high_sat_pixels) > max(10, original_count * 0.3):
                 pixels_hsv = high_sat_pixels
-                print(f"   🎨 고채도 픽셀 선별: {len(pixels_hsv)}개 (채도≥{saturation_threshold:.0f})")
+                if VERBOSE:
+                    print(f"   🎨 고채도 픽셀 선별: {len(pixels_hsv)}개 (채도≥{saturation_threshold:.0f})")
             else:
                 print(f"   ⚠️ 고채도 픽셀 부족, 전체 사용")
         else:
@@ -1257,16 +1276,19 @@ def get_dominant_color(pixels_hsv, k=3):
             before_outlier = len(pixels_hsv)
             pixels_hsv = inlier_pixels
             if outlier_removed > 0:
-                print(f"   🧹 Outlier 미세 조정: {outlier_removed}개 제거 ({before_outlier} → {len(pixels_hsv)})")
+                if VERBOSE:
+                    print(f"   🧹 Outlier 미세 조정: {outlier_removed}개 제거 ({before_outlier} → {len(pixels_hsv)})")
         else:
-            print(f"   ℹ️ Outlier 너무 많음, 스킵")
+            if VERBOSE:
+                print(f"   ℹ️ Outlier 너무 많음, 스킵")
     
     # 🎯 Step 4: 중앙값 방식으로 대표 색상 추출
     h_med = np.median(pixels_hsv[:, 0])
     s_med = np.median(pixels_hsv[:, 1])
     v_med = np.median(pixels_hsv[:, 2])
     
-    print(f"   💎 최종 대표 색상: HSV({h_med:.1f}, {s_med:.1f}, {v_med:.1f})")
+    if VERBOSE:
+        print(f"   💎 최종 대표 색상: HSV({h_med:.1f}, {s_med:.1f}, {v_med:.1f})")
     
     return [int(h_med), int(s_med), int(v_med)]
 
@@ -1292,9 +1314,11 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
             eroded_mask = mask
             print("   ⚠️ 마스크가 너무 작아 erosion 스킵")
         else:
-            print(f"   ✂️ 마스크 경계 제거 (약함): {np.sum(mask > 0)} → {np.sum(eroded_mask > 0)} 픽셀")
+            if VERBOSE:
+                print(f"   ✂️ 마스크 경계 제거 (약함): {np.sum(mask > 0)} → {np.sum(eroded_mask > 0)} 픽셀")
     else:
-        print(f"   ✂️ 마스크 경계 제거 (강함): {np.sum(mask > 0)} → {np.sum(eroded_mask > 0)} 픽셀")
+        if VERBOSE:
+            print(f"   ✂️ 마스크 경계 제거 (강함): {np.sum(mask > 0)} → {np.sum(eroded_mask > 0)} 픽셀")
     
     # 🔥 명도 보정: 규칙 기반도 원본 이미지 사용 (CLIP과 동일)
     # 색상 왜곡 방지를 위해 명도 보정 비활성화
@@ -1337,7 +1361,8 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
         if hold_rank > 90:
             # 상위 10% 밝기 → 약간만 밝게
             target_mean = min(200, hold_l_mean + 20)
-            print(f"   ⚪ 지각적 판단: 매우 밝음 (상위 {hold_rank:.0f}%) → 약한 보정")
+            if VERBOSE:
+                print(f"   ⚪ 지각적 판단: 매우 밝음 (상위 {hold_rank:.0f}%) → 약한 보정")
         elif hold_rank < 10:
             # 하위 10% 밝기 → 약간만 어둡게
             target_mean = max(60, hold_l_mean - 20)
@@ -1361,7 +1386,8 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
         lab_corrected[:, :, 0] = l_channel_corrected
         image_normalized = cv2.cvtColor(lab_corrected, cv2.COLOR_Lab2BGR)
         
-        print(f"   ✅ 지각적 보정 완료: {hold_l_mean:.1f} → {target_mean:.1f}, 표준편차 {hold_l_std:.1f} → {target_std}")
+        if VERBOSE:
+            print(f"   ✅ 지각적 보정 완료: {hold_l_mean:.1f} → {target_mean:.1f}, 표준편차 {hold_l_std:.1f} → {target_std}")
     else:
         image_normalized = image
     
@@ -1378,7 +1404,8 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
     pixels_yuv = yuv_image[eroded_mask > 0.5]
     pixels_xyz = xyz_image[eroded_mask > 0.5]
     
-    print(f"   📊 추출된 원본 픽셀: {len(pixels_hsv)}개")
+    if VERBOSE:
+        print(f"   📊 추출된 원본 픽셀: {len(pixels_hsv)}개")
     
     # 🎨 색상 품질 필터링 적용
     if len(pixels_hsv) > 0:
@@ -1417,7 +1444,8 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
         print(f"🌞 명도 정규화 적용: 원본 HSV 샘플 {len(pixels_hsv)}개")
     else:
         dominant_hsv = get_dominant_color(pixels_hsv)
-        print(f"📊 기존 방식 적용: 원본 HSV 샘플 {len(pixels_hsv)}개")
+        if VERBOSE:
+            print(f"📊 기존 방식 적용: 원본 HSV 샘플 {len(pixels_hsv)}개")
     
     # 🚨 RGB는 dominant_hsv를 RGB로 직접 변환 (일관성 유지)
     # HSV → RGB 변환으로 통일
@@ -1432,7 +1460,8 @@ def calculate_color_stats(image, mask, brightness_normalization=False,
             
             # 🔥 검정색은 유지! (기존 로직 제거)
             # RGB(0,0,0)이 검정색 홀드의 정확한 색상일 수 있음
-            print(f"   ✅ HSV={dominant_hsv} → RGB={dominant_rgb}")
+            if VERBOSE:
+                print(f"   ✅ HSV={dominant_hsv} → RGB={dominant_rgb}")
             
         except Exception as e:
             print(f"⚠️ HSV→RGB 변환 오류: {e}, HSV={dominant_hsv}")
@@ -1565,7 +1594,8 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
 
     # 🚀 캐싱된 YOLO 모델 사용 (속도 대폭 향상)
     model = get_yolo_model(model_path)
-    results = model(padded_image, conf=conf)[0]
+    # ⚡ YOLO 추론 최적화: 입력 해상도 축소 + 로그 억제
+    results = model(padded_image, conf=conf, imgsz=512, verbose=False)[0]
 
     masks_raw = results.masks.data.cpu().numpy()
     masks = [restore_mask_to_original(m, (h_img, w_img), scale, pad_left, pad_top) for m in masks_raw]
@@ -1622,13 +1652,15 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
             valid_masks.append(mask_clean / 255.0)
             valid_indices.append(i)
         
-        print(f"✅ 마스크 전처리 완료 ({len(valid_indices)}개 유효)")
+        if VERBOSE:
+            print(f"✅ 마스크 전처리 완료 ({len(valid_indices)}개 유효)")
         
         # 🚀 배치 처리로 CLIP AI 색상 추출
         if valid_hold_images:
             print(f"🤖 CLIP AI 배치 처리 시작 ({len(valid_hold_images)}개 홀드)")
             batch_results = extract_colors_with_clip_ai_batch(valid_hold_images, valid_masks)
-            print(f"✅ CLIP AI 배치 처리 완료")
+            if VERBOSE:
+                print(f"✅ CLIP AI 배치 처리 완료")
         else:
             batch_results = []
         
