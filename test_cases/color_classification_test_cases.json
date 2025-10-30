@@ -3,6 +3,114 @@
   "version": "1.0.0",
   "test_cases": [
     {
+      "id": "fb_2025_10_30_white_1",
+      "name": "Blue 범위 저채도 고명도 → White 1",
+      "hsv": [104, 26, 237],
+      "expected": "white",
+      "description": "H=104, S<=30, V>=226은 white",
+      "date_added": "2025-10-30",
+      "fix_applied": "Blue 경계: S<=30 & V>=226 → white"
+    },
+    {
+      "id": "fb_2025_10_30_white_2",
+      "name": "Blue 범위 저채도 고명도 → White 2",
+      "hsv": [105, 27, 226],
+      "expected": "white",
+      "description": "H=105, S<=30, V>=226은 white",
+      "date_added": "2025-10-30",
+      "fix_applied": "Blue 경계: S<=30 & V>=226 → white"
+    },
+    {
+      "id": "fb_2025_10_30_white_3",
+      "name": "Blue 범위 저채도 고명도 → White 3",
+      "hsv": [105, 26, 230],
+      "expected": "white",
+      "description": "H=105, S<=30, V>=226은 white",
+      "date_added": "2025-10-30",
+      "fix_applied": "Blue 경계: S<=30 & V>=226 → white"
+    },
+    {
+      "id": "fb_2025_10_30_white_4",
+      "name": "Blue 범위 저채도 고명도 → White 4",
+      "hsv": [106, 17, 235],
+      "expected": "white",
+      "description": "H=106, S<=30, V>=226은 white",
+      "date_added": "2025-10-30",
+      "fix_applied": "Blue 경계: S<=30 & V>=226 → white"
+    },
+    {
+      "id": "fb_2025_10_30_red_176",
+      "name": "H=176 고채도 밝음 → Red",
+      "hsv": [176, 181, 216],
+      "expected": "red",
+      "description": "H=176, S>=133은 red가 우선",
+      "date_added": "2025-10-30",
+      "fix_applied": "Pink 조건보다 red 우선 체크"
+    },
+    {
+      "id": "fb_2025_10_30_orange_h19",
+      "name": "H=19 고채도 저명도 → Orange",
+      "hsv": [19, 203, 195],
+      "expected": "orange",
+      "description": "H=19 & V<200 & S>=100이면 orange",
+      "date_added": "2025-10-30",
+      "fix_applied": "H=19 특례: V<200이면 orange"
+    },
+    {
+      "id": "fb_2025_10_30_black_109",
+      "name": "Blue 범위 저명도 중저채도 → Black",
+      "hsv": [109, 55, 112],
+      "expected": "black",
+      "description": "V<130 & S<=60이면 black",
+      "date_added": "2025-10-30",
+      "fix_applied": "Blue 범위: V<130 & S<=60 → black"
+    },
+    {
+      "id": "fb_2025_10_30_green_not_mint_1",
+      "name": "Mint 경계(75~80) 고채도 → Green 1",
+      "hsv": [78, 196, 128],
+      "expected": "green",
+      "description": "H=75~80 & S>=100은 green",
+      "date_added": "2025-10-30",
+      "fix_applied": "경계 수정: 고채도는 green"
+    },
+    {
+      "id": "fb_2025_10_30_green_not_mint_2",
+      "name": "Mint 경계(75~80) 고채도 → Green 2",
+      "hsv": [77, 158, 155],
+      "expected": "green",
+      "description": "H=75~80 & S>=100은 green",
+      "date_added": "2025-10-30",
+      "fix_applied": "경계 수정: 고채도는 green"
+    },
+    {
+      "id": "fb_2025_10_30_green_not_mint_3",
+      "name": "Mint 경계(75~80) 고채도 → Green 3",
+      "hsv": [75, 103, 100],
+      "expected": "green",
+      "description": "H=75~80 & S>=100은 green",
+      "date_added": "2025-10-30",
+      "fix_applied": "경계 수정: 고채도는 green"
+    },
+    {
+      "id": "fb_2025_10_30_green_not_mint_4",
+      "name": "Mint 경계(75~80) 중고채도 밝음 → Green 4",
+      "hsv": [77, 116, 166],
+      "expected": "green",
+      "description": "H=75~80 & S>=80 & V>=120 → green",
+      "date_added": "2025-10-30",
+      "fix_applied": "경계 수정: 중고채도 밝음은 green"
+    },
+    {
+      "id": "fb_2025_10_30_green_not_mint_5",
+      "name": "H<90 저채도 고명도 → Green",
+      "hsv": [88, 48, 180],
+      "expected": "green",
+      "description": "H<90 & S<60 & V>=170 → green",
+      "date_added": "2025-10-30",
+      "fix_applied": "Mint 범위 예외: 낮은 채도는 green"
+    },
+    {
       "id": "hold_51",
       "name": "홀드 #51 - Yellow (업데이트)",
       "hsv": [
@@ -756,12 +864,12 @@
     },
     {
       "id": "feedback_8_1",
-      "name": "Mint → Green 오분류 1",
+      "name": "Mint → Green 오분류 1 (업데이트)",
       "hsv": [77, 85, 129],
-      "expected": "mint",
-      "description": "H=77, 높은 채도 + 어두움 → mint (이전: GREEN)",
+      "expected": "green",
+      "description": "최신 피드백: H=77, 고채도 어두움 → green",
       "date_added": "2025-10-30",
-      "fix_applied": "Mint 범위 확장: H=77는 mint 범위"
+      "fix_applied": "경계 보정: H=75~80 고채도는 green"
     },
     {
       "id": "feedback_8_2",
