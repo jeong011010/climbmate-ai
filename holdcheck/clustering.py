@@ -5603,14 +5603,9 @@ def classify_color_simple_hsv(h, s, v):
             return "brown", 0.80
         return "unknown", 0.50
 def classify_color_by_hsv(h, s, v, rgb, colors_config):
-    """HSV 범위 기반 색상 분류 (상식 기반 우선 사용)"""
+    """HSV 범위 기반 색상 분류 (color_ranges.json 우선 사용)"""
     
-    # 🔥 1️⃣ 먼저 상식적인 HSV 분류 시도
-    color_name, confidence = classify_color_simple_hsv(h, s, v)
-    if confidence >= 0.70:  # 신뢰도가 높으면 바로 반환
-        return color_name, confidence, f"Simple HSV: H={h}, S={s}, V={v}"
-    
-    # 2️⃣ color_ranges.json 기반 분류 (백업)
+    # 🔥 1️⃣ 먼저 color_ranges.json 기반 분류 시도
     sorted_colors = sorted(colors_config.items(), key=lambda x: x[1].get("priority", 999))
     
     for color_name, config in sorted_colors:
@@ -5630,14 +5625,19 @@ def classify_color_by_hsv(h, s, v, rgb, colors_config):
                 
                 if h_match and s_min <= s <= s_max and v_min <= v <= v_max:
                     confidence = calculate_confidence_hsv(h, s, v, hsv_range)
-                    return color_name, confidence, f"HSV: H={h}, S={s}, V={v}"
+                    return color_name, confidence, f"color_ranges.json: H={h}, S={s}, V={v}"
         
         # RGB 조건 체크 (보조)
         if "rgb_conditions" in config:
             for condition in config["rgb_conditions"]:
                 if check_rgb_condition(rgb, condition):
                     confidence = 0.8  # RGB 조건은 약간 낮은 신뢰도
-                    return color_name, confidence, f"RGB: {rgb}"
+                    return color_name, confidence, f"color_ranges.json RGB: {rgb}"
+    
+    # 2️⃣ color_ranges.json 매칭 실패 시, 상식적인 HSV 분류 시도 (백업)
+    color_name, confidence = classify_color_simple_hsv(h, s, v)
+    if confidence >= 0.70:  # 신뢰도가 높으면 반환
+        return color_name, confidence, f"Simple HSV (fallback): H={h}, S={s}, V={v}"
     
     # 매칭 실패 - unknown 반환 (잘못된 색상 추측 방지)
     return "unknown", 0.3, f"No match: H={h}, S={s}, V={v}"
