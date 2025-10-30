@@ -41,10 +41,36 @@ const ImageViewer = ({
             const rect = img.getBoundingClientRect()
             const coordW = result?.image_width || img.naturalWidth
             const coordH = result?.image_height || img.naturalHeight
+            
+            // 실제 렌더된 이미지 크기 계산 (object-contain 고려)
+            const imageAspect = coordW / coordH
+            const containerAspect = rect.width / rect.height
+            
+            let renderedWidth, renderedHeight, offsetX, offsetY
+            
+            if (imageAspect > containerAspect) {
+              // 이미지가 너비에 맞춰짐 (좌우 가득, 상하 여백)
+              renderedWidth = rect.width
+              renderedHeight = rect.width / imageAspect
+              offsetX = 0
+              offsetY = (rect.height - renderedHeight) / 2
+            } else {
+              // 이미지가 높이에 맞춰짐 (상하 가득, 좌우 여백)
+              renderedHeight = rect.height
+              renderedWidth = rect.height * imageAspect
+              offsetX = (rect.width - renderedWidth) / 2
+              offsetY = 0
+            }
+            
             return (
               <svg
-                className="absolute top-0 left-0 pointer-events-none"
-                style={{ width: rect.width + 'px', height: rect.height + 'px' }}
+                className="absolute pointer-events-none"
+                style={{ 
+                  width: renderedWidth + 'px', 
+                  height: renderedHeight + 'px',
+                  left: offsetX + 'px',
+                  top: offsetY + 'px'
+                }}
                 viewBox={`0 0 ${coordW} ${coordH}`}
                 preserveAspectRatio="xMidYMid meet"
               >
