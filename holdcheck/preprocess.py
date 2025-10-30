@@ -1241,24 +1241,41 @@ def get_dominant_color(pixels_hsv, k=3):
         else:
             print(f"   ⚠️ 밝은 픽셀 부족, 전체 사용")
     elif not is_black_hold:
-        # 유채색 홀드: 채도 상위 픽셀 우선 (초크 억제)
-        saturation_threshold = np.percentile(s_values_filtered, 60)
-        high_saturation_mask = s_values_filtered >= saturation_threshold
-        high_sat_pixels = pixels_hsv[high_saturation_mask]
+        # 🌟 유채색 홀드: 밝은 픽셀 우선 + 고채도 픽셀 선별 (어두운 조명 대응)
+        # 1단계: 밝기 상위 50% 픽셀 선택 (어두운 영역 제외)
+        brightness_threshold = np.percentile(v_values_filtered, 50)
+        bright_mask = v_values_filtered >= brightness_threshold
+        bright_pixels = pixels_hsv[bright_mask]
         
-        # 채도 전반이 낮으면 상위 20%로 보강 선별
-        if len(high_sat_pixels) < max(10, original_count * 0.3):
-            alt_thr = np.percentile(s_values_filtered, 80)
-            high_saturation_mask = s_values_filtered >= alt_thr
-            high_sat_pixels = pixels_hsv[high_saturation_mask]
-        
-        if len(high_sat_pixels) > max(10, original_count * 0.2):
-            pixels_hsv = high_sat_pixels
-            if VERBOSE:
-                print(f"   🎨 고채도 픽셀 선별: {len(pixels_hsv)}개 (적응형)")
+        # 2단계: 밝은 픽셀 중에서 고채도 픽셀 선택
+        if len(bright_pixels) >= 10:
+            s_values_bright = bright_pixels[:, 1]
+            saturation_threshold = np.percentile(s_values_bright, 50)  # 밝은 픽셀 중 채도 상위 50%
+            high_saturation_mask = s_values_bright >= saturation_threshold
+            selected_pixels = bright_pixels[high_saturation_mask]
+            
+            if len(selected_pixels) > max(10, original_count * 0.2):
+                pixels_hsv = selected_pixels
+                if VERBOSE:
+                    print(f"   🌟 밝고 고채도 픽셀 선별: {len(pixels_hsv)}개 (V≥{brightness_threshold:.0f}, S≥{saturation_threshold:.0f})")
+            else:
+                # 밝은 픽셀만이라도 사용
+                pixels_hsv = bright_pixels
+                if VERBOSE:
+                    print(f"   💡 밝은 픽셀 선별: {len(pixels_hsv)}개 (V≥{brightness_threshold:.0f})")
         else:
-            if VERBOSE:
-                print(f"   ⚠️ 고채도 픽셀 부족, 전체 사용")
+            # 밝은 픽셀도 부족하면 고채도 픽셀만이라도
+            saturation_threshold = np.percentile(s_values_filtered, 60)
+            high_saturation_mask = s_values_filtered >= saturation_threshold
+            high_sat_pixels = pixels_hsv[high_saturation_mask]
+            
+            if len(high_sat_pixels) > max(10, original_count * 0.2):
+                pixels_hsv = high_sat_pixels
+                if VERBOSE:
+                    print(f"   🎨 고채도 픽셀 선별 (백업): {len(pixels_hsv)}개")
+            else:
+                if VERBOSE:
+                    print(f"   ⚠️ 적절한 픽셀 부족, 전체 사용")
     else:
         # 검정 홀드: 어두운 픽셀 선별
         dark_threshold = np.percentile(v_values_filtered, 40)  # 하위 60%
