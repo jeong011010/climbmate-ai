@@ -1198,12 +1198,24 @@ def get_dominant_color(pixels_hsv, k=3):
     if is_white_hold:
         if VERBOSE:
             print(f"   ⚪ 흰색 홀드 감지 (V={v_median_quick:.0f}, S={s_median_quick:.0f}) → 초크 제거 스킵")
-        # 흰색 홀드는 초크 제거 안함! + 고채도 선별로 벽색 제거
+        # 흰색 홀드는 초크 제거 안함! (초크가 곧 홀드 색상)
     elif is_black_hold:
-        print(f"   ⚫ 검정 홀드 감지 (V={v_median_quick:.0f}) → 초크 제거 스킵")
-        # 검정 홀드도 초크 제거 안함
+        # 🔥 검정 홀드도 초크 제거 필요! (흰색 초크 때문에 회색으로 보일 수 있음)
+        print(f"   ⚫ 검정 홀드 감지 (V={v_median_quick:.0f}) → 초크 제거 적용")
+        chalk_mask = (v_values > 180) & (s_values < 50)  # 밝고 저채도 = 초크
+        non_chalk_pixels = pixels_hsv[~chalk_mask]
+        chalk_removed_count = np.sum(chalk_mask)
+        
+        if len(non_chalk_pixels) > original_count * 0.3:  # 70% 이상 남으면 사용
+            pixels_hsv = non_chalk_pixels
+            if chalk_removed_count > 0:
+                print(f"      🧹 초크 제거: {chalk_removed_count}개 픽셀 제거 ({original_count} → {len(pixels_hsv)})")
+        else:
+            # 초크가 너무 많아도 전체 사용 (검정이 맞을 가능성)
+            if VERBOSE:
+                print(f"      ⚠️ 초크 비율 높음, 전체 사용")
     else:
-        # 🧹 유채색 홀드만 초크 제거 적용!
+        # 🧹 유채색 홀드 초크 제거!
         if VERBOSE:
             print(f"   🎨 유채색 홀드 감지 (S={s_median_quick:.0f}) → 초크 제거 적용")
         chalk_mask = (v_values > 160) & (s_values < 60)
