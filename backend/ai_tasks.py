@@ -138,7 +138,7 @@ def analyze_image_async(self, image_base64, wall_angle=None):
             }
         )
         
-        from holdcheck.clustering import rule_based_color_clustering
+        from holdcheck.color_classifier import rule_based_color_clustering
         
         colored_holds = rule_based_color_clustering(
             holds,

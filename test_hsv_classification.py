@@ -9,7 +9,7 @@ import json
 # holdcheck 경로 추가
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'holdcheck'))
 
-from clustering import classify_color_by_hsv, load_color_ranges
+from color_classifier import classify_color_by_hsv, load_color_ranges
 
 def load_color_ranges_json(config_path="holdcheck/color_ranges.json"):
     """color_ranges.json 로드"""

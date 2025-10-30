@@ -24,7 +24,8 @@ backend_path = os.path.dirname(__file__)
 sys.path.insert(0, backend_path)
 
 from preprocess import preprocess
-from clustering import clip_ai_color_clustering, analyze_problem
+from color_classifier import rule_based_color_clustering
+from clustering import analyze_problem  # TODO: 이것도 나중에 분리
 
 # 데이터베이스 및 분석 모듈 (선택적 로드)
 try:
@@ -831,7 +832,7 @@ if ML_AVAILABLE and DB_AVAILABLE:
             
             # 🔄 색상 범위 캐시 초기화 (즉시 적용)
             try:
-                from clustering import reload_color_ranges
+                from color_classifier import reload_color_ranges
                 reload_color_ranges()
                 print("✅ 색상 범위 캐시 초기화 완료 - 즉시 적용됩니다")
             except Exception as e:
@@ -1559,7 +1560,7 @@ async def submit_color_feedback(request: ColorFeedbackRequest):
     3. ML 모델 학습 데이터 축적
     """
     try:
-        from clustering import save_user_feedback
+        # save_user_feedback는 database.py에 있음 (이미 import됨)
         
         feedbacks = request.feedbacks
         
@@ -1590,7 +1591,7 @@ async def get_color_ranges():
     현재 색상 범위 설정 조회
     """
     try:
-        from clustering import load_color_ranges
+        from color_classifier import load_color_ranges
         
         ranges_data = load_color_ranges()
         
@@ -1611,7 +1612,7 @@ async def get_feedback_stats():
     피드백 통계 조회
     """
     try:
-        from clustering import load_color_ranges
+        from color_classifier import load_color_ranges
         
         ranges_data = load_color_ranges()
         feedback_count = ranges_data.get("feedback_count", 0)
