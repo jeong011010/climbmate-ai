@@ -1,0 +1,146 @@
+{
+  "version": "3.0",
+  "last_updated": "2025-10-30",
+  "feedback_count": 107,
+  "source": "107개 TC 기반 수동 최적화",
+  "colors": {
+    "black": {
+      "name": "검정색",
+      "priority": 1,
+      "hsv_ranges": [
+        {
+          "h": [0, 180],
+          "s": [0, 60],
+          "v": [0, 120]
+        }
+      ],
+      "rgb_conditions": []
+    },
+    "white": {
+      "name": "흰색",
+      "priority": 2,
+      "hsv_ranges": [
+        {
+          "h": [0, 180],
+          "s": [0, 35],
+          "v": [130, 255]
+        }
+      ],
+      "rgb_conditions": []
+    },
+    "purple": {
+      "name": "보라색",
+      "priority": 3,
+      "hsv_ranges": [
+        {
+          "h": [110, 160],
+          "s": [40, 255],
+          "v": [45, 255]
+        }
+      ],
+      "rgb_conditions": []
+    },
+    "pink": {
+      "name": "분홍색",
+      "priority": 4,
+      "hsv_ranges": [
+        {
+          "h": [160, 170],
+          "s": [30, 150],
+          "v": [100, 255]
+        }
+      ],
+      "rgb_conditions": []
+    },
+    "red": {
+      "name": "빨간색",
+      "priority": 5,
+      "hsv_ranges": [
+        {
+          "h": [0, 10],
+          "s": [100, 255],
+          "v": [100, 255]
+        },
+        {
+          "h": [170, 180],
+          "s": [100, 255],
+          "v": [80, 255]
+        }
+      ],
+      "rgb_conditions": []
+    },
+    "orange": {
+      "name": "주황색",
+      "priority": 6,
+      "hsv_ranges": [
+        {
+          "h": [10, 18],
+          "s": [100, 255],
+          "v": [100, 255]
+        }
+      ],
+      "rgb_conditions": []
+    },
+    "yellow": {
+      "name": "노란색",
+      "priority": 7,
+      "hsv_ranges": [
+        {
+          "h": [18, 40],
+          "s": [100, 255],
+          "v": [120, 255]
+        }
+      ],
+      "rgb_conditions": []
+    },
+    "green": {
+      "name": "초록색",
+      "priority": 8,
+      "hsv_ranges": [
+        {
+          "h": [40, 75],
+          "s": [40, 255],
+          "v": [70, 255]
+        }
+      ],
+      "rgb_conditions": []
+    },
+    "mint": {
+      "name": "민트색",
+      "priority": 9,
+      "hsv_ranges": [
+        {
+          "h": [75, 100],
+          "s": [20, 255],
+          "v": [80, 255]
+        }
+      ],
+      "rgb_conditions": []
+    },
+    "blue": {
+      "name": "파란색",
+      "priority": 10,
+      "hsv_ranges": [
+        {
+          "h": [100, 125],
+          "s": [15, 255],
+          "v": [100, 255]
+        }
+      ],
+      "rgb_conditions": []
+    },
+    "brown": {
+      "name": "갈색",
+      "priority": 11,
+      "hsv_ranges": [
+        {
+          "h": [0, 20],
+          "s": [60, 200],
+          "v": [50, 120]
+        }
+      ],
+      "rgb_conditions": []
+    }
+  }
+}
+

@@ -1078,6 +1078,63 @@
       "description": "H=177, 매우 높은 채도 + 어두움 → red (이전: PINK)",
       "date_added": "2025-10-30",
       "fix_applied": "Red 범위: H=177, 매우 높은 채도는 red"
+    },
+    {
+      "id": "new_red_1_2025_10_30",
+      "name": "진한 빨강 → Pink 오분류 (초크)",
+      "hsv": [174, 124, 154],
+      "expected": "red",
+      "description": "검정 홀드 초크 테스트 중 발견 - H=174, 중간 채도 → red",
+      "date_added": "2025-10-30"
+    },
+    {
+      "id": "new_red_2_2025_10_30",
+      "name": "진한 빨강 → Pink 오분류 (초크) 2",
+      "hsv": [173, 131, 152],
+      "expected": "red",
+      "description": "검정 홀드 초크 테스트 중 발견 - H=173, 중간 채도 → red",
+      "date_added": "2025-10-30"
+    },
+    {
+      "id": "new_white_1_2025_10_30",
+      "name": "밝은 회색 → Black 오분류",
+      "hsv": [93, 14, 138],
+      "expected": "white",
+      "description": "Green 범위 저채도 중간명도 → white",
+      "date_added": "2025-10-30"
+    },
+    {
+      "id": "new_purple_1_2025_10_30",
+      "name": "보라 중간 채도",
+      "hsv": [162, 104, 198],
+      "expected": "purple",
+      "description": "H=162, S=104, V=198 → purple",
+      "date_added": "2025-10-30"
+    },
+    {
+      "id": "new_purple_2_2025_10_30",
+      "name": "보라 중간 채도 2",
+      "hsv": [159, 92, 200],
+      "expected": "purple",
+      "description": "H=159, S=92, V=200 → purple",
+      "date_added": "2025-10-30"
+    },
+    {
+      "id": "new_purple_3_2025_10_30",
+      "name": "보라 고채도 어두움 (H=166)",
+      "hsv": [166, 208, 145],
+      "expected": "purple",
+      "description": "H=166, S=208, V=145 → purple (고채도 어두움은 purple)",
+      "date_added": "2025-10-30"
+    },
+    {
+      "id": "new_black_chalk_1_2025_10_30",
+      "name": "검정 홀드 + 초크 → White 오분류",
+      "hsv": [0, 0, 255],
+      "expected": "black",
+      "description": "검정 홀드에 흰색 초크가 많이 묻은 경우 - 초크 제거 후 검정 추출 필요",
+      "date_added": "2025-10-30",
+      "note": "이미지 참조: 검정 홀드 중앙에 흰색 초크가 덕지덕지"
     }
   ],
   "last_updated": "2025-10-30"
