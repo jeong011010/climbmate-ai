@@ -315,7 +315,6 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
         else:
             print("   ⚡ 캐시된 텍스트 특징 사용")
             text_features = _clip_text_features
-        
         # 모든 홀드의 CLIP 특징 추출
         print(f"   🖼️ {len(hold_data)}개 홀드의 CLIP 특징 추출 중...")
         batch_size = 32
@@ -492,7 +491,7 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
             "a dark blue climbing hold",
             "a cobalt blue climbing hold",
             
-            # 🟢 초록색 (12개 - 노랑과 명확히 구분, 다양한 톤)
+            # 🟢 초록색 (12개 - 노랑/초록 중간)
             "a green climbing hold",
             "a pure green climbing hold",
             "a bright green climbing hold",
@@ -626,7 +625,6 @@ def clip_ai_color_clustering(hold_data, vectors, original_image, masks, eps=0.3,
                         print(f"   ⚡ CLIP AI: 홀드 {hold['id']} → {color_name} (ML 신뢰도 낮음: {ml_confidence:.2f})")
                     else:
                         print(f"   ⚡ CLIP AI: 홀드 {hold['id']} → {color_name} (ML 모델 없음)")
-            
             # 🎯 CLIP AI 결과 후처리 보정 (명확한 오류 수정 - 강화)
             rgb = hold.get("dominant_rgb", [128, 128, 128])
             if len(rgb) >= 3:
@@ -960,7 +958,6 @@ def create_clip_3d_visualization(hold_data, selected_hold_id=None, eps=None):
             hovertext=hover_texts,
             hoverinfo='text'
         ))
-    
     # 선택된 홀드 강조
     if selected_hold_id is not None:
         for i, hold in enumerate(hold_data):
@@ -1271,7 +1268,6 @@ def build_feature_vectors(hold_data, scaler_option="none", use_illumination_inva
         vectors = (vectors - np.min(vectors, axis=0)) / (np.ptp(vectors, axis=0) + 1e-8)
     
     return vectors, ids
-
 def color_specific_classification(hold_data):
     """🚨 색상별 특화 분류 시스템"""
     for hold in hold_data:
@@ -1606,7 +1602,6 @@ def ultra_simple_rgb_clustering(hold_data, vectors, eps=1.0, min_samples=1, n_cl
                 clustering = DBSCAN(eps=10.0, min_samples=min_samples, metric='euclidean')
                 best_labels = clustering.fit_predict(rgb_vectors)
                 eps = 10.0
-    
     # 🚨 최종 결과 출력
     if best_labels is not None and len(best_labels) > 0:
         final_clusters = len(set(best_labels)) - (1 if -1 in best_labels else 0)
@@ -1947,7 +1942,6 @@ def ensemble_clustering(hold_data, vectors, base_eps=0.01):
     final_labels = np.array([label_map[l] for l in final_labels])
     
     return final_labels
-
 def post_process_groups(hold_data, vectors):
     """🚀 강화된 후처리 규칙 - 다중 기준 적용"""
     # 1. 분리 규칙 강화
@@ -2187,7 +2181,7 @@ def merge_similar_groups_by_multiple_criteria(hold_data):
             
             # Hue 차이가 10도 이하면 병합 (단순화)
             if hue_diff <= 10:
-                # g2를 g1로 병합
+                # g2를 g1으로 병합
                 for hold in hold_data:
                     if hold["group"] == g2:
                         hold["group"] = g1
@@ -2295,7 +2289,6 @@ def assign_groups(hold_data, vectors, eps=0.01, min_samples=1, method="ensemble"
         hold_data = post_process_groups(hold_data, vectors)
     
     return hold_data
-
 def simple_dbscan_clustering(hold_data, vectors, eps=1.0):
     """🎯 순수 RGB 거리 기반 클러스터링 - 논리적 그룹핑"""
     import streamlit as st
@@ -2632,7 +2625,6 @@ def cylindrical_hsv_dbscan_clustering(hold_data, vectors, eps=30.0):
         hold["group"] = int(labels[i])
     
     return hold_data
-
 def custom_color_cube_dbscan_clustering(hold_data, vectors, eps=30.0):
     """🎨 커스텀 색상 큐브 DBSCAN: 주요 색상 간 거리 확장"""
     import streamlit as st
@@ -2956,7 +2948,6 @@ def create_clustering_visualizations(hold_data, vectors):
         specs=[[{"secondary_y": False}, {"secondary_y": False}],
                [{"secondary_y": False}, {"secondary_y": False}]]
     )
-    
     # t-SNE 2D 플롯 - 실제 홀드 색상으로 표시
     for i, hold in enumerate(hold_data):
         group = hold["group"] if hold["group"] is not None else -1
@@ -3258,7 +3249,6 @@ def create_group_similarity_heatmap(hold_data):
     )
     
     return fig
-
 def create_color_picker_style_palette(hold_data):
     """🎨 그라데이션 배경 색상 선택기 - 어두움→밝음(가로) × 색상(세로)"""
     if len(hold_data) == 0:
@@ -3581,7 +3571,6 @@ def create_pure_rgb_color_cube(hold_data):
     )
     
     return fig
-
 def create_lab_color_space_visualization(hold_data, selected_hold_id=None, eps=None):
     """🎨 Lab 색상 공간 시각화"""
     import plotly.graph_objects as go
@@ -3898,7 +3887,6 @@ def ciede2000_mds_dbscan_clustering(hold_data, vectors, eps=0.3):
     
     print(f"🎨 CIEDE2000+MDS 클러스터링 완료: {len(set(clustering.labels_))}개 그룹")
     return hold_data
-
 def create_mds_visualization(hold_data, selected_hold_id=None, eps=None):
     """🎨 MDS 2D 시각화 (균등한 거리 분포)"""
     import plotly.graph_objects as go
@@ -4240,7 +4228,6 @@ def create_color_category_statistics(hold_data):
         })
     
     return stats
-
 def create_group_statistics(hold_data):
     """📊 그룹별 통계 정보"""
     groups = [h["group"] for h in hold_data if h["group"] is not None and h["group"] >= 0]
@@ -4570,7 +4557,6 @@ def analyze_problem(hold_data, group_id=None, wall_angle=None):
         'climb_type': climb_type,
         'statistics': statistics
     }
-
 def analyze_difficulty(filtered_holds):
     """🎯 난이도 분석 (개선 버전)"""
     num_holds = len(filtered_holds)
@@ -4912,7 +4898,6 @@ def analyze_climbing_type(filtered_holds, wall_angle=None):
         hold_types.append("슬로퍼")
         characteristics['sloper'] = f"슬로퍼 홀드 {int(high_convexity_ratio*100)}%"
         confidence_factors.append("sloper")
-    
     # 🏔️ 5. 벽 각도별 특성
     wall_characteristics = {}
     if wall_angle:
@@ -5264,7 +5249,6 @@ def rule_based_color_clustering(hold_data, vectors, config_path="holdcheck/color
             "confidence": confidence,
             "rule": matched_rule
         })
-    
     # 그룹 ID 할당 (색상 이름 기준 정렬, gray 완전 제거)
     color_order = ["black", "white", "red", "orange", "yellow", 
                    "lime", "green", "mint", "blue", "purple", "pink", "brown", "unknown"]
@@ -5350,14 +5334,14 @@ def classify_color_simple_hsv(h, s, v):
         # 베이지: H=16~17, S<=63, V>=200 → white
         if (h == 16 or h == 17) and s <= 63 and v >= 200:
             return "white", 0.85  # 베이지도 흰색 허용
-        # 🔥 H=19~20은 yellow 범위! (HSV(19,186,230) 케이스)
-        elif h >= 19:
-            # 특례: H=19, 고채도지만 V<200이면 orange 우선
-            if h == 19 and v < 200 and s >= 100:
-                return "orange", 0.90
-            # H=19~20: 높은 채도는 yellow
+        # 🔥 H=18~20은 yellow 범위! (경계 포함)
+        elif h >= 18:
+            # H=18: 고채도는 yellow 우선
+            if h == 18 and s >= 120:
+                return "yellow", 0.90
+            # H=18~20: 높은 채도는 yellow
             if s >= 100:
-                return "yellow", 0.90  # H=19~20, 높은 채도는 yellow
+                return "yellow", 0.90
             elif s >= 53:
                 return "yellow", 0.90
             elif s >= 51 and v >= 200:
@@ -5440,6 +5424,8 @@ def classify_color_simple_hsv(h, s, v):
         # 예외: 특정 케이스 보정 (H=88, S<60, 매우 밝음 → green)
         if h == 88 and (40 <= s < 60) and v >= 170:
             return "green", 0.85
+        if s <= 25 and v >= 230:
+            return "white", 0.85
         if s >= 80 and v >= 139:  # 높은 채도는 어두워도 mint
             return "mint", 0.90
         elif s >= 40 and v >= 140:
@@ -5530,6 +5516,9 @@ def classify_color_simple_hsv(h, s, v):
             return "purple", 0.70
     elif h >= 155 and h < 167:
         # 보라-핑크 경계 (H=155~166): 채도+명도로 구분!
+        # 특례: H=166 중간 채도는 purple 우선 (아주 밝음 제외)
+        if h == 166 and s <= 145 and v < 210:
+            return "purple", 0.90
         # 🔥 H=155~166, 높은 채도 + 밝으면 pink! (HSV(156,159,254), HSV(164,152,236), HSV(165,150,241) 케이스)
         if s >= 150 and s < 160 and v >= 236:  # 높은 채도 + 밝으면 pink
             return "pink", 0.90
@@ -5546,6 +5535,8 @@ def classify_color_simple_hsv(h, s, v):
         elif s >= 35 and v >= 140:
             return "purple", 0.85
         elif v < 70:
+            if s >= 120:
+                return "purple", 0.85
             return "black", 0.80
         else:
             return "purple", 0.70
@@ -5555,9 +5546,9 @@ def classify_color_simple_hsv(h, s, v):
         # 🔥 H=177, 매우 높은 채도(S>=107)는 red! pink가 아님 (HSV(177,107,215), HSV(177,235,130), HSV(177,241,137), HSV(177,231,115) 케이스) - 가장 먼저 체크!
         if h >= 177 and s >= 107:
             return "red", 0.90  # H≥177, S≥107 → red
-        # H>=176, S>=133은 red가 우선
-        elif h >= 176 and s >= 133:
-            return "red", 0.90
+        # 고채도 + 중간 명도는 pink 우선 (H=166~169)
+        elif h >= 166 and h < 169 and s >= 190 and v >= 130:
+            return "pink", 0.90
         # 🔥 H=167~168, 높은 채도는 어두워도 pink! (HSV(167,163,110), HSV(168,170,138) 케이스)
         elif h >= 167 and h < 169 and s >= 160 and v >= 110:
             return "pink", 0.90  # 높은 채도는 어두워도 pink
@@ -5604,8 +5595,6 @@ def classify_color_simple_hsv(h, s, v):
         if s < 60 and v < 120:
             return "brown", 0.80
         return "unknown", 0.50
-
-
 def classify_color_by_hsv(h, s, v, rgb, colors_config):
     """HSV 범위 기반 색상 분류 (상식 기반 우선 사용)"""
     

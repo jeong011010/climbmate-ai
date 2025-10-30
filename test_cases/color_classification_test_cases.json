@@ -12,6 +12,142 @@
       "fix_applied": "Blue 경계: S<=30 & V>=226 → white"
     },
     {
+      "id": "fb2_pink_166_208_145",
+      "name": "H=166 고채도 중간명도 → Pink",
+      "hsv": [166, 208, 145],
+      "expected": "pink",
+      "description": "H=166, S>=190, V>=130은 pink",
+      "date_added": "2025-10-30"
+    },
+    {
+      "id": "fb2_purple_166_138_187",
+      "name": "H=166 중간채도 밝음 → Purple",
+      "hsv": [166, 138, 187],
+      "expected": "purple",
+      "description": "H=155~167, S<150 & V<190 → purple",
+      "date_added": "2025-10-30"
+    },
+    {
+      "id": "fb2_white_mint_boundary_88_20_238",
+      "name": "H=88 S20 V238 → White",
+      "hsv": [88, 20, 238],
+      "expected": "white",
+      "description": "민트 경계 저채도+매우밝음은 white",
+      "date_added": "2025-10-30"
+    },
+    {
+      "id": "fb2_white_mint_boundary_87_23_246",
+      "name": "H=87 S23 V246 → White",
+      "hsv": [87, 23, 246],
+      "expected": "white",
+      "description": "민트 경계 저채도+매우밝음은 white",
+      "date_added": "2025-10-30"
+    },
+    {
+      "id": "fb2_purple_dark_165_160_60",
+      "name": "H=165 매우 어두운 보라 → Purple 유지",
+      "hsv": [165, 160, 60],
+      "expected": "purple",
+      "description": "H=155~167, S>=150 & V<100 → purple",
+      "date_added": "2025-10-30"
+    },
+    {
+      "id": "fb2_yellow_19_204_177",
+      "name": "H=19 고채도 저명도 → Yellow",
+      "hsv": [19, 204, 177],
+      "expected": "yellow",
+      "description": "H=19은 yellow 우선",
+      "date_added": "2025-10-30"
+    },
+    {
+      "id": "fb2_yellow_18_219_146",
+      "name": "H=18 고채도 → Yellow",
+      "hsv": [18, 219, 146],
+      "expected": "yellow",
+      "description": "H=18, S>=120이면 yellow",
+      "date_added": "2025-10-30"
+    },
+    {
+      "id": "fb2_yellow_18_146_146",
+      "name": "H=18 중고채도 → Yellow",
+      "hsv": [18, 146, 146],
+      "expected": "yellow",
+      "description": "H=18, S>=120이면 yellow",
+      "date_added": "2025-10-30"
+    },
+    {
+      "id": "fb_2025_10_30_pink_166_208_145",
+      "name": "H=166 고채도 중간명도 → Pink",
+      "hsv": [166, 208, 145],
+      "expected": "pink",
+      "description": "H=166, S>=200, V>=140은 pink",
+      "date_added": "2025-10-30",
+      "fix_applied": "H=165~167 고채도는 pink 우선"
+    },
+    {
+      "id": "fb_2025_10_30_purple_166_138_187",
+      "name": "H=166 중간채도 밝음 → Purple",
+      "hsv": [166, 138, 187],
+      "expected": "purple",
+      "description": "H=166, S<=145은 purple 우선(아주 밝음 제외)",
+      "date_added": "2025-10-30",
+      "fix_applied": "H=166 purple 우선 가드"
+    },
+    {
+      "id": "fb_2025_10_30_white_mint_boundary_88_20_238",
+      "name": "민트 범위 저채도 고명도 → White 88",
+      "hsv": [88, 20, 238],
+      "expected": "white",
+      "description": "H<90, S<=25, V>=230은 white",
+      "date_added": "2025-10-30",
+      "fix_applied": "민트 범위 white 예외"
+    },
+    {
+      "id": "fb_2025_10_30_white_mint_boundary_87_23_246",
+      "name": "민트 범위 저채도 고명도 → White 87",
+      "hsv": [87, 23, 246],
+      "expected": "white",
+      "description": "H<90, S<=25, V>=230은 white",
+      "date_added": "2025-10-30",
+      "fix_applied": "민트 범위 white 예외"
+    },
+    {
+      "id": "fb_2025_10_30_purple_dark_165_160_60",
+      "name": "어두운 보라 고채도 → Purple",
+      "hsv": [165, 160, 60],
+      "expected": "purple",
+      "description": "H=165, S>=120, V<70은 black이 아닌 purple",
+      "date_added": "2025-10-30",
+      "fix_applied": "보라 경계 어두운 고채도 purple 유지"
+    },
+    {
+      "id": "fb_2025_10_30_yellow_19_204_177",
+      "name": "H=19 고채도 중명도 → Yellow",
+      "hsv": [19, 204, 177],
+      "expected": "yellow",
+      "description": "H=19은 orange 아님, yellow 우선",
+      "date_added": "2025-10-30",
+      "fix_applied": "H=19 특례 제거"
+    },
+    {
+      "id": "fb_2025_10_30_yellow_18_219_146",
+      "name": "H=18 고채도 → Yellow",
+      "hsv": [18, 219, 146],
+      "expected": "yellow",
+      "description": "H=18도 yellow로 처리",
+      "date_added": "2025-10-30",
+      "fix_applied": "Yellow 경계 H>=18"
+    },
+    {
+      "id": "fb_2025_10_30_yellow_18_146_146",
+      "name": "H=18 중간채도 중명도 → Yellow",
+      "hsv": [18, 146, 146],
+      "expected": "yellow",
+      "description": "H=18도 yellow",
+      "date_added": "2025-10-30",
+      "fix_applied": "Yellow 경계 H>=18"
+    },
+    {
       "id": "fb_2025_10_30_white_2",
       "name": "Blue 범위 저채도 고명도 → White 2",
       "hsv": [105, 27, 226],
@@ -49,10 +185,10 @@
     },
     {
       "id": "fb_2025_10_30_orange_h19",
-      "name": "H=19 고채도 저명도 → Orange",
+      "name": "H=19 고채도 저명도 → Yellow (업데이트)",
       "hsv": [19, 203, 195],
-      "expected": "orange",
-      "description": "H=19 & V<200 & S>=100이면 orange",
+      "expected": "yellow",
+      "description": "최신 피드백: H=19 사례는 yellow 처리",
       "date_added": "2025-10-30",
       "fix_applied": "H=19 특례: V<200이면 orange"
     },
