@@ -5398,6 +5398,9 @@ def classify_color_simple_hsv(h, s, v):
         else:
             return "yellow", 0.75
     elif h >= 30 and h < 45:
+        # 경계 보정: 아주 어두운 녹색 톤(H≈44, V<100, S>80)은 green 처리
+        if h >= 42 and v < 100 and s > 80:
+            return "green", 0.85
         return "lime", 0.90
     elif h >= 45 and h < 75:
         # Green: 채도 체크 (H<75로 확대, mint 경계 명확화)

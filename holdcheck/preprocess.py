@@ -1171,6 +1171,10 @@ def get_dominant_color(pixels_hsv, k=3):
         v_median_quick = np.median(v_values)
     
     is_white_hold = (v_median_quick > 170 and s_median_quick < 70)
+    # 🔧 초크 예외: 전체 픽셀 중 중고채도(S≥80) 비율이 ≥15%면 white 판단 보류
+    high_sat_ratio_all = (np.sum(s_values >= 80) / max(1, len(s_values)))
+    if is_white_hold and high_sat_ratio_all >= 0.15:
+        is_white_hold = False
     is_black_hold = (v_median_quick < 90 and s_median_quick < 150)
     
     if is_white_hold:
@@ -1219,21 +1223,24 @@ def get_dominant_color(pixels_hsv, k=3):
         else:
             print(f"   ⚠️ 밝은 픽셀 부족, 전체 사용")
     elif not is_black_hold:
-        # 유채색 홀드: 채도 상위 40% 선택
+        # 유채색 홀드: 채도 상위 픽셀 우선 (초크 억제)
         saturation_threshold = np.percentile(s_values_filtered, 60)
+        high_saturation_mask = s_values_filtered >= saturation_threshold
+        high_sat_pixels = pixels_hsv[high_saturation_mask]
         
-        if saturation_threshold > 50:
-            high_saturation_mask = s_values_filtered >= saturation_threshold
+        # 채도 전반이 낮으면 상위 20%로 보강 선별
+        if len(high_sat_pixels) < max(10, original_count * 0.3):
+            alt_thr = np.percentile(s_values_filtered, 80)
+            high_saturation_mask = s_values_filtered >= alt_thr
             high_sat_pixels = pixels_hsv[high_saturation_mask]
-            
-            if len(high_sat_pixels) > max(10, original_count * 0.3):
-                pixels_hsv = high_sat_pixels
-                if VERBOSE:
-                    print(f"   🎨 고채도 픽셀 선별: {len(pixels_hsv)}개 (채도≥{saturation_threshold:.0f})")
-            else:
-                print(f"   ⚠️ 고채도 픽셀 부족, 전체 사용")
+        
+        if len(high_sat_pixels) > max(10, original_count * 0.2):
+            pixels_hsv = high_sat_pixels
+            if VERBOSE:
+                print(f"   🎨 고채도 픽셀 선별: {len(pixels_hsv)}개 (적응형)")
         else:
-            print(f"   ℹ️ 채도 낮음 (중앙값={np.median(s_values_filtered):.0f})")
+            if VERBOSE:
+                print(f"   ⚠️ 고채도 픽셀 부족, 전체 사용")
     else:
         # 검정 홀드: 어두운 픽셀 선별
         dark_threshold = np.percentile(v_values_filtered, 40)  # 하위 60%
