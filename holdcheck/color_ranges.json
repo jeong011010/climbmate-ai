@@ -1,42 +1,12 @@
 {
-  "version": "1.0",
-  "last_updated": "2025-01-01",
-  "feedback_count": 0,
+  "version": "2.0",
+  "last_updated": "2025-10-30",
+  "feedback_count": 101,
+  "source": "test_cases/color_classification_test_cases.json",
   "colors": {
-    "black": {
-      "name": "검정색",
-      "priority": 1,
-      "hsv_ranges": [
-        {
-          "h": [
-            0,
-            180
-          ],
-          "s": [
-            0,
-            60
-          ],
-          "v": [
-            0,
-            150
-          ]
-        }
-      ],
-      "rgb_conditions": [
-        {
-          "type": "max_value",
-          "threshold": 80
-        },
-        {
-          "type": "achromatic",
-          "brightness_max": 150,
-          "channel_diff_max": 50
-        }
-      ]
-    },
     "white": {
       "name": "흰색",
-      "priority": 2,
+      "priority": 13,
       "hsv_ranges": [
         {
           "h": [
@@ -45,30 +15,82 @@
           ],
           "s": [
             0,
-            30
+            40
           ],
           "v": [
-            150,
+            180,
             255
           ]
         }
       ],
-      "rgb_conditions": [
+      "rgb_conditions": []
+    },
+    "purple": {
+      "name": "보라색",
+      "priority": 3,
+      "hsv_ranges": [
         {
-          "type": "min_value",
-          "threshold": 80
-        },
-        {
-          "type": "achromatic",
-          "brightness_min": 80,
-          "brightness_max": 255,
-          "channel_diff_max": 50
+          "h": [
+            110,
+            160
+          ],
+          "s": [
+            40,
+            255
+          ],
+          "v": [
+            45,
+            255
+          ]
         }
-      ]
+      ],
+      "rgb_conditions": []
+    },
+    "pink": {
+      "name": "분홍색",
+      "priority": 4,
+      "hsv_ranges": [
+        {
+          "h": [
+            160,
+            177
+          ],
+          "s": [
+            30,
+            255
+          ],
+          "v": [
+            80,
+            255
+          ]
+        }
+      ],
+      "rgb_conditions": []
+    },
+    "yellow": {
+      "name": "노란색",
+      "priority": 6,
+      "hsv_ranges": [
+        {
+          "h": [
+            13,
+            24
+          ],
+          "s": [
+            136,
+            229
+          ],
+          "v": [
+            136,
+            240
+          ]
+        }
+      ],
+      "rgb_conditions": []
     },
     "red": {
       "name": "빨간색",
-      "priority": 4,
+      "priority": 5,
       "hsv_ranges": [
         {
           "h": [
@@ -86,93 +108,41 @@
         },
         {
           "h": [
-            165,
+            177,
             180
           ],
           "s": [
-            120,
+            90,
             255
           ],
           "v": [
-            80,
+            100,
             255
           ]
         }
       ],
-      "rgb_conditions": [
-        {
-          "type": "dominant_channel",
-          "channel": "r",
-          "min_value": 150,
-          "diff_threshold": 50
-        }
-      ]
+      "rgb_conditions": []
     },
-    "orange": {
-      "name": "주황색",
-      "priority": 5,
+    "black": {
+      "name": "검정색",
+      "priority": 1,
       "hsv_ranges": [
         {
           "h": [
-            10,
-            25
+            14,
+            117
           ],
           "s": [
-            100,
-            255
+            17,
+            74
           ],
           "v": [
-            100,
-            255
+            52,
+            215
           ]
         }
       ],
-      "rgb_conditions": [
-        {
-          "type": "two_channel_high",
-          "channels": [
-            "r",
-            "g"
-          ],
-          "r_min": 150,
-          "g_min": 80,
-          "b_max": 120,
-          "r_over_g": true
-        }
-      ]
-    },
-    "yellow": {
-      "name": "노란색",
-      "priority": 6,
-      "hsv_ranges": [
-        {
-          "h": [
-            25,
-            40
-          ],
-          "s": [
-            100,
-            255
-          ],
-          "v": [
-            150,
-            255
-          ]
-        }
-      ],
-      "rgb_conditions": [
-        {
-          "type": "two_channel_high",
-          "channels": [
-            "r",
-            "g"
-          ],
-          "r_min": 150,
-          "g_min": 150,
-          "b_max": 150,
-          "similar": true
-        }
-      ]
+      "rgb_conditions": []
     },
     "green": {
       "name": "초록색",
@@ -180,59 +150,20 @@
       "hsv_ranges": [
         {
           "h": [
-            40,
-            75
+            59,
+            93
           ],
           "s": [
-            100,
+            22,
             255
           ],
           "v": [
-            100,
+            62,
             255
           ]
         }
       ],
-      "rgb_conditions": [
-        {
-          "type": "dominant_channel",
-          "channel": "g",
-          "min_value": 100,
-          "diff_threshold": 30
-        }
-      ]
-    },
-    "mint": {
-      "name": "민트색",
-      "priority": 8,
-      "hsv_ranges": [
-        {
-          "h": [
-            75,
-            100
-          ],
-          "s": [
-            30,
-            255
-          ],
-          "v": [
-            90,
-            255
-          ]
-        }
-      ],
-      "rgb_conditions": [
-        {
-          "type": "two_channel_high",
-          "channels": [
-            "g",
-            "b"
-          ],
-          "g_min": 150,
-          "b_min": 150,
-          "r_max": 150
-        }
-      ]
+      "rgb_conditions": []
     },
     "blue": {
       "name": "파란색",
@@ -244,113 +175,37 @@
             125
           ],
           "s": [
-            50,
-            255
-          ],
-          "v": [
-            110,
-            255
-          ]
-        }
-      ],
-      "rgb_conditions": [
-        {
-          "type": "dominant_channel",
-          "channel": "b",
-          "min_value": 100,
-          "diff_threshold": 30
-        }
-      ]
-    },
-    "purple": {
-      "name": "보라색",
-      "priority": 10,
-      "hsv_ranges": [
-        {
-          "h": [
-            125,
+            3,
             160
           ],
-          "s": [
-            60,
-            255
-          ],
           "v": [
-            100,
-            255
+            138,
+            238
           ]
         }
       ],
-      "rgb_conditions": [
-        {
-          "type": "two_channel_high",
-          "channels": [
-            "r",
-            "b"
-          ],
-          "r_min": 100,
-          "b_min": 100,
-          "g_diff": 20
-        }
-      ]
+      "rgb_conditions": []
     },
-    "pink": {
-      "name": "분홍색",
-      "priority": 11,
+    "mint": {
+      "name": "민트색",
+      "priority": 8,
       "hsv_ranges": [
         {
           "h": [
-            160,
-            170
+            70,
+            94
           ],
           "s": [
-            50,
-            120
+            10,
+            93
           ],
           "v": [
-            180,
-            255
+            89,
+            212
           ]
         }
       ],
-      "rgb_conditions": [
-        {
-          "type": "dominant_channel",
-          "channel": "r",
-          "min_value": 180,
-          "g_min": 100,
-          "b_min": 100
-        }
-      ]
-    },
-    "brown": {
-      "name": "갈색",
-      "priority": 12,
-      "hsv_ranges": [
-        {
-          "h": [
-            0,
-            10
-          ],
-          "s": [
-            80,
-            200
-          ],
-          "v": [
-            50,
-            150
-          ]
-        }
-      ],
-      "rgb_conditions": [
-        {
-          "type": "dominant_channel",
-          "channel": "r",
-          "min_value": 80,
-          "max_value": 150,
-          "dark": true
-        }
-      ]
+      "rgb_conditions": []
     }
   }
 }
