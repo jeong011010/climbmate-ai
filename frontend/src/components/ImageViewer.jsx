@@ -37,17 +37,10 @@ const ImageViewer = ({
           {/* SVG 오버레이 - 선택된 문제의 홀드들 강조 */}
           {result && selectedProblem && imageRef.current && imageLoaded && (() => {
             const img = imageRef.current
-            const rect = img.getBoundingClientRect()
-            const scaleX = rect.width / img.naturalWidth
-            const scaleY = rect.height / img.naturalHeight
-            
             return (
               <svg
                 className="absolute top-0 left-0 pointer-events-none"
-                style={{
-                  width: rect.width + 'px',
-                  height: rect.height + 'px'
-                }}
+                style={{ width: '100%', height: '100%' }}
                 viewBox={`0 0 ${img.naturalWidth} ${img.naturalHeight}`}
                 preserveAspectRatio="xMidYMid meet"
               >
