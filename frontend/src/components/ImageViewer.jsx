@@ -19,6 +19,7 @@ const ImageViewer = ({
       <div className="relative w-full flex justify-center">
         <div className="relative" style={{ display: 'inline-block' }}>
           <img 
+            key={annotatedImage ? 'annotated' : 'preview'}
             ref={imageRef}
             src={annotatedImage || preview} 
             alt="Climbing Wall" 
@@ -37,11 +38,13 @@ const ImageViewer = ({
           {/* SVG 오버레이 - 선택된 문제의 홀드들 강조 */}
           {result && selectedProblem && imageRef.current && imageLoaded && (() => {
             const img = imageRef.current
+            const coordW = result?.image_width || img.naturalWidth
+            const coordH = result?.image_height || img.naturalHeight
             return (
               <svg
                 className="absolute top-0 left-0 pointer-events-none"
                 style={{ width: '100%', height: '100%' }}
-                viewBox={`0 0 ${img.naturalWidth} ${img.naturalHeight}`}
+                viewBox={`0 0 ${coordW} ${coordH}`}
                 preserveAspectRatio="xMidYMid meet"
               >
                 {selectedProblem.holds?.map((hold, idx) => {
