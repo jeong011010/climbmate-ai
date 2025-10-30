@@ -497,9 +497,27 @@ def resize_with_padding(image, target_size=(640, 640), pad_color=(255, 255, 255)
 # -------------------------------
 # 📌 원본 크기 복원
 # -------------------------------
-def restore_mask_to_original(mask, original_shape, scale, pad_left, pad_top):
+def restore_mask_to_original(mask, original_shape, scale, pad_left, pad_top, padded_size=(640, 640)):
+    """
+    YOLO 마스크를 원본 이미지 크기로 복원
+    
+    Args:
+        mask: YOLO가 출력한 마스크 (YOLO 출력 크기)
+        original_shape: 원본 이미지 크기 (h, w)
+        scale: 리사이즈 스케일
+        pad_left, pad_top: 패딩 오프셋
+        padded_size: 패딩된 이미지 크기 (target_size)
+    """
     h_ori, w_ori = original_shape
-    unpadded = mask[pad_top:pad_top + int(h_ori * scale), pad_left:pad_left + int(w_ori * scale)]
+    
+    # 🔥 YOLO 출력 마스크를 먼저 padded_size로 복원
+    mask_resized = cv2.resize(mask, padded_size, interpolation=cv2.INTER_LINEAR)
+    
+    # 패딩 제거
+    scaled_h, scaled_w = int(h_ori * scale), int(w_ori * scale)
+    unpadded = mask_resized[pad_top:pad_top + scaled_h, pad_left:pad_left + scaled_w]
+    
+    # 원본 크기로 복원
     restored = cv2.resize(unpadded, (w_ori, h_ori), interpolation=cv2.INTER_NEAREST)
     return restored
 
@@ -1597,7 +1615,8 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
         original_image = image_input
 
     h_img, w_img = original_image.shape[:2]
-    padded_image, scale, pad_left, pad_top = resize_with_padding(original_image)
+    target_size = (640, 640)
+    padded_image, scale, pad_left, pad_top = resize_with_padding(original_image, target_size=target_size)
 
     # 🚀 캐싱된 YOLO 모델 사용 (속도 대폭 향상)
     model = get_yolo_model(model_path)
@@ -1605,7 +1624,8 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
     results = model(padded_image, conf=conf, imgsz=512, verbose=False)[0]
 
     masks_raw = results.masks.data.cpu().numpy()
-    masks = [restore_mask_to_original(m, (h_img, w_img), scale, pad_left, pad_top) for m in masks_raw]
+    # 🔥 YOLO 마스크 좌표 복원 시 padded_size 명시
+    masks = [restore_mask_to_original(m, (h_img, w_img), scale, pad_left, pad_top, padded_size=target_size) for m in masks_raw]
 
     hold_data = []
     overlay = original_image.copy()
