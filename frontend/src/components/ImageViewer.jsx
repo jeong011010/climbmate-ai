@@ -17,15 +17,16 @@ const ImageViewer = ({
   return (
     <div className="relative w-full">
       <div className="relative w-full flex justify-center">
-        <div className="relative" style={{ display: 'inline-block' }}>
+        <div className="relative flex justify-center items-center">
           <img 
             key={annotatedImage ? 'annotated' : 'preview'}
             ref={imageRef}
             src={annotatedImage || preview} 
             alt="Climbing Wall" 
-            className={`max-h-[400px] lg:max-h-[600px] w-full object-contain rounded-2xl shadow-2xl border border-white/20 ${
+            className={`max-h-[400px] lg:max-h-[600px] max-w-full object-contain rounded-2xl shadow-2xl border border-white/20 ${
               result ? 'cursor-pointer hover:opacity-90 transition-opacity' : ''
             }`}
+            style={{ display: 'block' }}
             onClick={result ? onImageClick : undefined}
             onTouchEnd={result ? onImageClick : undefined}
             onDoubleClick={result ? onImageDoubleClick : undefined}
@@ -42,34 +43,12 @@ const ImageViewer = ({
             const coordW = result?.image_width || img.naturalWidth
             const coordH = result?.image_height || img.naturalHeight
             
-            // 실제 렌더된 이미지 크기 계산 (object-contain 고려)
-            const imageAspect = coordW / coordH
-            const containerAspect = rect.width / rect.height
-            
-            let renderedWidth, renderedHeight, offsetX, offsetY
-            
-            if (imageAspect > containerAspect) {
-              // 이미지가 너비에 맞춰짐 (좌우 가득, 상하 여백)
-              renderedWidth = rect.width
-              renderedHeight = rect.width / imageAspect
-              offsetX = 0
-              offsetY = (rect.height - renderedHeight) / 2
-            } else {
-              // 이미지가 높이에 맞춰짐 (상하 가득, 좌우 여백)
-              renderedHeight = rect.height
-              renderedWidth = rect.height * imageAspect
-              offsetX = (rect.width - renderedWidth) / 2
-              offsetY = 0
-            }
-            
             return (
               <svg
-                className="absolute pointer-events-none"
+                className="absolute top-0 left-0 pointer-events-none"
                 style={{ 
-                  width: renderedWidth + 'px', 
-                  height: renderedHeight + 'px',
-                  left: offsetX + 'px',
-                  top: offsetY + 'px'
+                  width: '100%', 
+                  height: '100%'
                 }}
                 viewBox={`0 0 ${coordW} ${coordH}`}
                 preserveAspectRatio="xMidYMid meet"
