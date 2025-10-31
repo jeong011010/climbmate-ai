@@ -5,7 +5,11 @@
     {
       "id": "fb_2025_10_30_white_1",
       "name": "Blue 범위 저채도 고명도 → White 1",
-      "hsv": [104, 26, 237],
+      "hsv": [
+        104,
+        26,
+        237
+      ],
       "expected": "white",
       "description": "H=104, S<=30, V>=226은 white",
       "date_added": "2025-10-30",
@@ -14,7 +18,11 @@
     {
       "id": "fb2_pink_166_208_145",
       "name": "H=166 고채도 중간명도 → Pink",
-      "hsv": [166, 208, 145],
+      "hsv": [
+        166,
+        208,
+        145
+      ],
       "expected": "pink",
       "description": "H=166, S>=190, V>=130은 pink",
       "date_added": "2025-10-30"
@@ -22,7 +30,11 @@
     {
       "id": "fb2_purple_166_138_187",
       "name": "H=166 중간채도 밝음 → Purple",
-      "hsv": [166, 138, 187],
+      "hsv": [
+        166,
+        138,
+        187
+      ],
       "expected": "purple",
       "description": "H=155~167, S<150 & V<190 → purple",
       "date_added": "2025-10-30"
@@ -30,7 +42,11 @@
     {
       "id": "fb2_white_mint_boundary_88_20_238",
       "name": "H=88 S20 V238 → White",
-      "hsv": [88, 20, 238],
+      "hsv": [
+        88,
+        20,
+        238
+      ],
       "expected": "white",
       "description": "민트 경계 저채도+매우밝음은 white",
       "date_added": "2025-10-30"
@@ -38,7 +54,11 @@
     {
       "id": "fb2_white_mint_boundary_87_23_246",
       "name": "H=87 S23 V246 → White",
-      "hsv": [87, 23, 246],
+      "hsv": [
+        87,
+        23,
+        246
+      ],
       "expected": "white",
       "description": "민트 경계 저채도+매우밝음은 white",
       "date_added": "2025-10-30"
@@ -46,7 +66,11 @@
     {
       "id": "fb2_purple_dark_165_160_60",
       "name": "H=165 매우 어두운 보라 → Purple 유지",
-      "hsv": [165, 160, 60],
+      "hsv": [
+        165,
+        160,
+        60
+      ],
       "expected": "purple",
       "description": "H=155~167, S>=150 & V<100 → purple",
       "date_added": "2025-10-30"
@@ -54,7 +78,11 @@
     {
       "id": "fb2_yellow_19_204_177",
       "name": "H=19 고채도 저명도 → Yellow",
-      "hsv": [19, 204, 177],
+      "hsv": [
+        19,
+        204,
+        177
+      ],
       "expected": "yellow",
       "description": "H=19은 yellow 우선",
       "date_added": "2025-10-30"
@@ -62,7 +90,11 @@
     {
       "id": "fb2_yellow_18_219_146",
       "name": "H=18 고채도 → Yellow",
-      "hsv": [18, 219, 146],
+      "hsv": [
+        18,
+        219,
+        146
+      ],
       "expected": "yellow",
       "description": "H=18, S>=120이면 yellow",
       "date_added": "2025-10-30"
@@ -70,7 +102,11 @@
     {
       "id": "fb2_yellow_18_146_146",
       "name": "H=18 중고채도 → Yellow",
-      "hsv": [18, 146, 146],
+      "hsv": [
+        18,
+        146,
+        146
+      ],
       "expected": "yellow",
       "description": "H=18, S>=120이면 yellow",
       "date_added": "2025-10-30"
@@ -78,7 +114,11 @@
     {
       "id": "fb_2025_10_30_pink_166_208_145",
       "name": "H=166 고채도 중간명도 → Pink",
-      "hsv": [166, 208, 145],
+      "hsv": [
+        166,
+        208,
+        145
+      ],
       "expected": "pink",
       "description": "H=166, S>=200, V>=140은 pink",
       "date_added": "2025-10-30",
@@ -87,7 +127,11 @@
     {
       "id": "fb_2025_10_30_purple_166_138_187",
       "name": "H=166 중간채도 밝음 → Purple",
-      "hsv": [166, 138, 187],
+      "hsv": [
+        166,
+        138,
+        187
+      ],
       "expected": "purple",
       "description": "H=166, S<=145은 purple 우선(아주 밝음 제외)",
       "date_added": "2025-10-30",
@@ -96,7 +140,11 @@
     {
       "id": "fb_2025_10_30_white_mint_boundary_88_20_238",
       "name": "민트 범위 저채도 고명도 → White 88",
-      "hsv": [88, 20, 238],
+      "hsv": [
+        88,
+        20,
+        238
+      ],
       "expected": "white",
       "description": "H<90, S<=25, V>=230은 white",
       "date_added": "2025-10-30",
@@ -105,7 +153,11 @@
     {
       "id": "fb_2025_10_30_white_mint_boundary_87_23_246",
       "name": "민트 범위 저채도 고명도 → White 87",
-      "hsv": [87, 23, 246],
+      "hsv": [
+        87,
+        23,
+        246
+      ],
       "expected": "white",
       "description": "H<90, S<=25, V>=230은 white",
       "date_added": "2025-10-30",
@@ -114,7 +166,11 @@
     {
       "id": "fb_2025_10_30_purple_dark_165_160_60",
       "name": "어두운 보라 고채도 → Purple",
-      "hsv": [165, 160, 60],
+      "hsv": [
+        165,
+        160,
+        60
+      ],
       "expected": "purple",
       "description": "H=165, S>=120, V<70은 black이 아닌 purple",
       "date_added": "2025-10-30",
@@ -123,7 +179,11 @@
     {
       "id": "fb_2025_10_30_yellow_19_204_177",
       "name": "H=19 고채도 중명도 → Yellow",
-      "hsv": [19, 204, 177],
+      "hsv": [
+        19,
+        204,
+        177
+      ],
       "expected": "yellow",
       "description": "H=19은 orange 아님, yellow 우선",
       "date_added": "2025-10-30",
@@ -132,7 +192,11 @@
     {
       "id": "fb_2025_10_30_yellow_18_219_146",
       "name": "H=18 고채도 → Yellow",
-      "hsv": [18, 219, 146],
+      "hsv": [
+        18,
+        219,
+        146
+      ],
       "expected": "yellow",
       "description": "H=18도 yellow로 처리",
       "date_added": "2025-10-30",
@@ -141,7 +205,11 @@
     {
       "id": "fb_2025_10_30_yellow_18_146_146",
       "name": "H=18 중간채도 중명도 → Yellow",
-      "hsv": [18, 146, 146],
+      "hsv": [
+        18,
+        146,
+        146
+      ],
       "expected": "yellow",
       "description": "H=18도 yellow",
       "date_added": "2025-10-30",
@@ -150,7 +218,11 @@
     {
       "id": "fb_2025_10_30_white_2",
       "name": "Blue 범위 저채도 고명도 → White 2",
-      "hsv": [105, 27, 226],
+      "hsv": [
+        105,
+        27,
+        226
+      ],
       "expected": "white",
       "description": "H=105, S<=30, V>=226은 white",
       "date_added": "2025-10-30",
@@ -159,7 +231,11 @@
     {
       "id": "fb_2025_10_30_white_3",
       "name": "Blue 범위 저채도 고명도 → White 3",
-      "hsv": [105, 26, 230],
+      "hsv": [
+        105,
+        26,
+        230
+      ],
       "expected": "white",
       "description": "H=105, S<=30, V>=226은 white",
       "date_added": "2025-10-30",
@@ -168,7 +244,11 @@
     {
       "id": "fb_2025_10_30_white_4",
       "name": "Blue 범위 저채도 고명도 → White 4",
-      "hsv": [106, 17, 235],
+      "hsv": [
+        106,
+        17,
+        235
+      ],
       "expected": "white",
       "description": "H=106, S<=30, V>=226은 white",
       "date_added": "2025-10-30",
@@ -177,7 +257,11 @@
     {
       "id": "fb_2025_10_30_red_176",
       "name": "H=176 고채도 밝음 → Red",
-      "hsv": [176, 181, 216],
+      "hsv": [
+        176,
+        181,
+        216
+      ],
       "expected": "red",
       "description": "H=176, S>=133은 red가 우선",
       "date_added": "2025-10-30",
@@ -186,7 +270,11 @@
     {
       "id": "fb_2025_10_30_orange_h19",
       "name": "H=19 고채도 저명도 → Yellow (업데이트)",
-      "hsv": [19, 203, 195],
+      "hsv": [
+        19,
+        203,
+        195
+      ],
       "expected": "yellow",
       "description": "최신 피드백: H=19 사례는 yellow 처리",
       "date_added": "2025-10-30",
@@ -195,7 +283,11 @@
     {
       "id": "fb_2025_10_30_black_109",
       "name": "Blue 범위 저명도 중저채도 → Black",
-      "hsv": [109, 55, 112],
+      "hsv": [
+        109,
+        55,
+        112
+      ],
       "expected": "black",
       "description": "V<130 & S<=60이면 black",
       "date_added": "2025-10-30",
@@ -204,7 +296,11 @@
     {
       "id": "fb_2025_10_30_green_not_mint_1",
       "name": "Mint 경계(75~80) 고채도 → Green 1",
-      "hsv": [78, 196, 128],
+      "hsv": [
+        78,
+        196,
+        128
+      ],
       "expected": "green",
       "description": "H=75~80 & S>=100은 green",
       "date_added": "2025-10-30",
@@ -213,7 +309,11 @@
     {
       "id": "fb_2025_10_30_green_not_mint_2",
       "name": "Mint 경계(75~80) 고채도 → Green 2",
-      "hsv": [77, 158, 155],
+      "hsv": [
+        77,
+        158,
+        155
+      ],
       "expected": "green",
       "description": "H=75~80 & S>=100은 green",
       "date_added": "2025-10-30",
@@ -222,7 +322,11 @@
     {
       "id": "fb_2025_10_30_green_not_mint_3",
       "name": "Mint 경계(75~80) 고채도 → Green 3",
-      "hsv": [75, 103, 100],
+      "hsv": [
+        75,
+        103,
+        100
+      ],
       "expected": "green",
       "description": "H=75~80 & S>=100은 green",
       "date_added": "2025-10-30",
@@ -231,7 +335,11 @@
     {
       "id": "fb_2025_10_30_green_not_mint_4",
       "name": "Mint 경계(75~80) 중고채도 밝음 → Green 4",
-      "hsv": [77, 116, 166],
+      "hsv": [
+        77,
+        116,
+        166
+      ],
       "expected": "green",
       "description": "H=75~80 & S>=80 & V>=120 → green",
       "date_added": "2025-10-30",
@@ -240,7 +348,11 @@
     {
       "id": "fb_2025_10_30_green_not_mint_5",
       "name": "H<90 저채도 고명도 → Green",
-      "hsv": [88, 48, 180],
+      "hsv": [
+        88,
+        48,
+        180
+      ],
       "expected": "green",
       "description": "H<90 & S<60 & V>=170 → green",
       "date_added": "2025-10-30",
@@ -722,8 +834,8 @@
         77,
         219
       ],
-      "expected": "pink",
-      "description": "밝고 채도 중간 → pink",
+      "expected": "purple",
+      "description": "밝고 채도 중간 → purple (feedback 우선)",
       "date_added": "2025-10-30",
       "fix_applied": "코드 주석에서 추출된 피드백 케이스"
     },
@@ -821,7 +933,11 @@
     {
       "id": "feedback_1_1",
       "name": "Pink → Red 오분류 1",
-      "hsv": [171, 183, 249],
+      "hsv": [
+        171,
+        183,
+        249
+      ],
       "expected": "pink",
       "description": "H=171, 높은 채도 + 밝음 → pink (이전: RED)",
       "date_added": "2025-10-30",
@@ -830,7 +946,11 @@
     {
       "id": "feedback_1_2",
       "name": "Pink → Red 오분류 2",
-      "hsv": [170, 188, 254],
+      "hsv": [
+        170,
+        188,
+        254
+      ],
       "expected": "pink",
       "description": "H=170, 높은 채도 + 밝음 → pink (이전: RED)",
       "date_added": "2025-10-30",
@@ -839,7 +959,11 @@
     {
       "id": "feedback_1_3",
       "name": "Pink → Red 오분류 3",
-      "hsv": [172, 239, 151],
+      "hsv": [
+        172,
+        239,
+        151
+      ],
       "expected": "pink",
       "description": "H=172, 매우 높은 채도 → pink (이전: RED)",
       "date_added": "2025-10-30",
@@ -848,7 +972,11 @@
     {
       "id": "feedback_1_4",
       "name": "Pink → Red 오분류 4",
-      "hsv": [173, 195, 232],
+      "hsv": [
+        173,
+        195,
+        232
+      ],
       "expected": "pink",
       "description": "H=173, 높은 채도 + 밝음 → pink (이전: RED)",
       "date_added": "2025-10-30",
@@ -857,7 +985,11 @@
     {
       "id": "feedback_1_5",
       "name": "Pink → Red 오분류 5",
-      "hsv": [171, 253, 159],
+      "hsv": [
+        171,
+        253,
+        159
+      ],
       "expected": "pink",
       "description": "H=171, 매우 높은 채도 → pink (이전: RED)",
       "date_added": "2025-10-30",
@@ -866,7 +998,11 @@
     {
       "id": "feedback_1_6",
       "name": "Pink → Red 오분류 6",
-      "hsv": [171, 250, 160],
+      "hsv": [
+        171,
+        250,
+        160
+      ],
       "expected": "pink",
       "description": "H=171, 매우 높은 채도 → pink (이전: RED)",
       "date_added": "2025-10-30",
@@ -875,7 +1011,11 @@
     {
       "id": "feedback_2",
       "name": "Mint → Black 오분류",
-      "hsv": [89, 81, 139],
+      "hsv": [
+        89,
+        81,
+        139
+      ],
       "expected": "mint",
       "description": "H=89, 높은 채도 + 중간 명도 → mint (이전: BLACK)",
       "date_added": "2025-10-30",
@@ -884,7 +1024,11 @@
     {
       "id": "feedback_3",
       "name": "Purple → Black 오분류",
-      "hsv": [125, 88, 83],
+      "hsv": [
+        125,
+        88,
+        83
+      ],
       "expected": "purple",
       "description": "H=125, 높은 채도 + 어두움 → purple (이전: BLACK)",
       "date_added": "2025-10-30",
@@ -893,7 +1037,11 @@
     {
       "id": "feedback_4_1",
       "name": "Green → Mint 오분류 1",
-      "hsv": [74, 254, 188],
+      "hsv": [
+        74,
+        254,
+        188
+      ],
       "expected": "green",
       "description": "H=74, 매우 높은 채도 → green (이전: MINT)",
       "date_added": "2025-10-30",
@@ -902,7 +1050,11 @@
     {
       "id": "feedback_4_2",
       "name": "Green → Mint 오분류 2",
-      "hsv": [73, 209, 246],
+      "hsv": [
+        73,
+        209,
+        246
+      ],
       "expected": "green",
       "description": "H=73, 매우 높은 채도 + 밝음 → green (이전: MINT)",
       "date_added": "2025-10-30",
@@ -911,7 +1063,11 @@
     {
       "id": "feedback_4_3",
       "name": "Green → Mint 오분류 3",
-      "hsv": [73, 75, 208],
+      "hsv": [
+        73,
+        75,
+        208
+      ],
       "expected": "green",
       "description": "H=73, 중간 채도 → green (이전: MINT, 수정 필요)",
       "date_added": "2025-10-30",
@@ -920,7 +1076,11 @@
     {
       "id": "feedback_5_1",
       "name": "어두운 Pink → Purple 오분류 1",
-      "hsv": [167, 163, 110],
+      "hsv": [
+        167,
+        163,
+        110
+      ],
       "expected": "pink",
       "description": "H=167, 높은 채도 + 어두움 → pink (이전: PURPLE)",
       "date_added": "2025-10-30",
@@ -929,7 +1089,11 @@
     {
       "id": "feedback_5_2",
       "name": "어두운 Pink → Purple 오분류 2",
-      "hsv": [168, 170, 138],
+      "hsv": [
+        168,
+        170,
+        138
+      ],
       "expected": "pink",
       "description": "H=168, 높은 채도 + 어두움 → pink (이전: PURPLE)",
       "date_added": "2025-10-30",
@@ -938,7 +1102,11 @@
     {
       "id": "feedback_6_1",
       "name": "Pink → Red 오분류 (H=156~170) 1",
-      "hsv": [156, 159, 254],
+      "hsv": [
+        156,
+        159,
+        254
+      ],
       "expected": "pink",
       "description": "H=156, 높은 채도 + 매우 밝음 → pink (이전: RED)",
       "date_added": "2025-10-30",
@@ -947,7 +1115,11 @@
     {
       "id": "feedback_6_2",
       "name": "Pink → Red 오분류 (H=156~170) 2",
-      "hsv": [164, 152, 236],
+      "hsv": [
+        164,
+        152,
+        236
+      ],
       "expected": "pink",
       "description": "H=164, 높은 채도 + 밝음 → pink (이전: RED)",
       "date_added": "2025-10-30",
@@ -956,7 +1128,11 @@
     {
       "id": "feedback_6_3",
       "name": "Pink → Red 오분류 (H=156~170) 3",
-      "hsv": [169, 157, 111],
+      "hsv": [
+        169,
+        157,
+        111
+      ],
       "expected": "pink",
       "description": "H=169, 높은 채도 → pink (이전: RED, 기존 테스트 케이스와 충돌 가능)",
       "date_added": "2025-10-30",
@@ -965,7 +1141,11 @@
     {
       "id": "feedback_6_4",
       "name": "Pink → Red 오분류 (H=156~170) 4",
-      "hsv": [170, 169, 99],
+      "hsv": [
+        170,
+        169,
+        99
+      ],
       "expected": "pink",
       "description": "H=170, 높은 채도 → pink (이전: RED, 기존 테스트 케이스와 충돌)",
       "date_added": "2025-10-30",
@@ -974,7 +1154,11 @@
     {
       "id": "feedback_6_5",
       "name": "Pink → Red 오분류 (H=156~170) 5",
-      "hsv": [165, 150, 241],
+      "hsv": [
+        165,
+        150,
+        241
+      ],
       "expected": "pink",
       "description": "H=165, 높은 채도 + 밝음 → pink (이전: RED)",
       "date_added": "2025-10-30",
@@ -983,7 +1167,11 @@
     {
       "id": "feedback_6_6",
       "name": "Pink → Red 오분류 (H=156~170) 6",
-      "hsv": [170, 156, 129],
+      "hsv": [
+        170,
+        156,
+        129
+      ],
       "expected": "pink",
       "description": "H=170, 높은 채도 → pink (이전: RED)",
       "date_added": "2025-10-30",
@@ -992,7 +1180,11 @@
     {
       "id": "feedback_7",
       "name": "Purple → Blue 오분류",
-      "hsv": [117, 57, 193],
+      "hsv": [
+        117,
+        57,
+        193
+      ],
       "expected": "purple",
       "description": "H=117, 중간 채도 + 밝음 → purple (이전: BLUE)",
       "date_added": "2025-10-30",
@@ -1001,7 +1193,11 @@
     {
       "id": "feedback_8_1",
       "name": "Mint → Green 오분류 1 (업데이트)",
-      "hsv": [77, 85, 129],
+      "hsv": [
+        77,
+        85,
+        129
+      ],
       "expected": "green",
       "description": "최신 피드백: H=77, 고채도 어두움 → green",
       "date_added": "2025-10-30",
@@ -1010,7 +1206,11 @@
     {
       "id": "feedback_8_2",
       "name": "Mint → Green 오분류 2",
-      "hsv": [75, 83, 99],
+      "hsv": [
+        75,
+        83,
+        99
+      ],
       "expected": "mint",
       "description": "H=75, 높은 채도 + 어두움 → mint (이전: GREEN)",
       "date_added": "2025-10-30",
@@ -1019,7 +1219,11 @@
     {
       "id": "feedback_9_1",
       "name": "White → Blue 오분류 1",
-      "hsv": [101, 36, 255],
+      "hsv": [
+        101,
+        36,
+        255
+      ],
       "expected": "white",
       "description": "H=101, 낮은 채도 + 매우 밝음 → white (이전: BLUE)",
       "date_added": "2025-10-30",
@@ -1028,7 +1232,11 @@
     {
       "id": "feedback_9_2",
       "name": "White → Blue 오분류 2",
-      "hsv": [100, 31, 254],
+      "hsv": [
+        100,
+        31,
+        254
+      ],
       "expected": "white",
       "description": "H=100, 낮은 채도 + 매우 밝음 → white (이전: BLUE)",
       "date_added": "2025-10-30",
@@ -1037,7 +1245,11 @@
     {
       "id": "feedback_10",
       "name": "Blue → Black 오분류",
-      "hsv": [110, 145, 156],
+      "hsv": [
+        110,
+        145,
+        156
+      ],
       "expected": "blue",
       "description": "H=110, 높은 채도 + 중간 명도 → blue (이전: BLACK)",
       "date_added": "2025-10-30",
@@ -1046,7 +1258,11 @@
     {
       "id": "feedback_11",
       "name": "Yellow → Orange 오분류",
-      "hsv": [19, 186, 230],
+      "hsv": [
+        19,
+        186,
+        230
+      ],
       "expected": "yellow",
       "description": "H=19, 높은 채도 → yellow (이전: ORANGE)",
       "date_added": "2025-10-30",
@@ -1055,7 +1271,11 @@
     {
       "id": "feedback_12_1",
       "name": "Red → Pink 오분류 1",
-      "hsv": [177, 235, 130],
+      "hsv": [
+        177,
+        235,
+        130
+      ],
       "expected": "red",
       "description": "H=177, 매우 높은 채도 + 어두움 → red (이전: PINK)",
       "date_added": "2025-10-30",
@@ -1064,7 +1284,11 @@
     {
       "id": "feedback_12_2",
       "name": "Red → Pink 오분류 2",
-      "hsv": [177, 241, 137],
+      "hsv": [
+        177,
+        241,
+        137
+      ],
       "expected": "red",
       "description": "H=177, 매우 높은 채도 → red (이전: PINK)",
       "date_added": "2025-10-30",
@@ -1073,7 +1297,11 @@
     {
       "id": "feedback_12_3",
       "name": "Red → Pink 오분류 3",
-      "hsv": [177, 231, 115],
+      "hsv": [
+        177,
+        231,
+        115
+      ],
       "expected": "red",
       "description": "H=177, 매우 높은 채도 + 어두움 → red (이전: PINK)",
       "date_added": "2025-10-30",
@@ -1082,7 +1310,11 @@
     {
       "id": "new_red_1_2025_10_30",
       "name": "진한 빨강 → Pink 오분류 (초크)",
-      "hsv": [174, 124, 154],
+      "hsv": [
+        174,
+        124,
+        154
+      ],
       "expected": "red",
       "description": "검정 홀드 초크 테스트 중 발견 - H=174, 중간 채도 → red",
       "date_added": "2025-10-30"
@@ -1090,7 +1322,11 @@
     {
       "id": "new_red_2_2025_10_30",
       "name": "진한 빨강 → Pink 오분류 (초크) 2",
-      "hsv": [173, 131, 152],
+      "hsv": [
+        173,
+        131,
+        152
+      ],
       "expected": "red",
       "description": "검정 홀드 초크 테스트 중 발견 - H=173, 중간 채도 → red",
       "date_added": "2025-10-30"
@@ -1098,7 +1334,11 @@
     {
       "id": "new_white_1_2025_10_30",
       "name": "밝은 회색 → Black 오분류",
-      "hsv": [93, 14, 138],
+      "hsv": [
+        93,
+        14,
+        138
+      ],
       "expected": "white",
       "description": "Green 범위 저채도 중간명도 → white",
       "date_added": "2025-10-30"
@@ -1106,7 +1346,11 @@
     {
       "id": "new_purple_1_2025_10_30",
       "name": "보라 중간 채도",
-      "hsv": [162, 104, 198],
+      "hsv": [
+        162,
+        104,
+        198
+      ],
       "expected": "purple",
       "description": "H=162, S=104, V=198 → purple",
       "date_added": "2025-10-30"
@@ -1114,7 +1358,11 @@
     {
       "id": "new_purple_2_2025_10_30",
       "name": "보라 중간 채도 2",
-      "hsv": [159, 92, 200],
+      "hsv": [
+        159,
+        92,
+        200
+      ],
       "expected": "purple",
       "description": "H=159, S=92, V=200 → purple",
       "date_added": "2025-10-30"
@@ -1122,19 +1370,1635 @@
     {
       "id": "new_purple_3_2025_10_30",
       "name": "보라 고채도 어두움 (H=166)",
-      "hsv": [166, 208, 145],
-      "expected": "purple",
-      "description": "H=166, S=208, V=145 → purple (고채도 어두움은 purple)",
+      "hsv": [
+        166,
+        208,
+        145
+      ],
+      "expected": "pink",
+      "description": "H=166, S=208, V=145 → pink (feedback update)",
       "date_added": "2025-10-30"
     },
     {
       "id": "new_black_chalk_1_2025_10_30",
       "name": "검정 홀드 + 초크 → White 오분류",
-      "hsv": [0, 0, 255],
+      "hsv": [
+        0,
+        0,
+        255
+      ],
       "expected": "black",
       "description": "검정 홀드에 흰색 초크가 많이 묻은 경우 - 초크 제거 후 검정 추출 필요",
       "date_added": "2025-10-30",
       "note": "이미지 참조: 검정 홀드 중앙에 흰색 초크가 덕지덕지"
+    },
+    {
+      "id": "fb_import_1166",
+      "name": "FB 1166 predicted blue -> blue",
+      "hsv": [
+        113,
+        64,
+        230
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(75,696)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1165",
+      "name": "FB 1165 predicted blue -> blue",
+      "hsv": [
+        113,
+        82,
+        236
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(93,711)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1164",
+      "name": "FB 1164 predicted blue -> blue",
+      "hsv": [
+        106,
+        170,
+        229
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(187,854)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1162",
+      "name": "FB 1162 predicted blue -> blue",
+      "hsv": [
+        108,
+        159,
+        174
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(104,873)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1163",
+      "name": "FB 1163 predicted blue -> blue",
+      "hsv": [
+        108,
+        159,
+        174
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(104,873)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1161",
+      "name": "FB 1161 predicted blue -> blue",
+      "hsv": [
+        106,
+        134,
+        160
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(12,824)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1160",
+      "name": "FB 1160 predicted blue -> blue",
+      "hsv": [
+        110,
+        104,
+        219
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(31,615)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1159",
+      "name": "FB 1159 predicted purple -> purple",
+      "hsv": [
+        166,
+        75,
+        106
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(155,120)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1158",
+      "name": "FB 1158 predicted purple -> purple",
+      "hsv": [
+        166,
+        72,
+        114
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(149,116)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1157",
+      "name": "FB 1157 predicted purple -> purple",
+      "hsv": [
+        163,
+        77,
+        112
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(117,248)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1156",
+      "name": "FB 1156 predicted purple -> purple",
+      "hsv": [
+        159,
+        39,
+        148
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(312,278)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1155",
+      "name": "FB 1155 predicted purple -> purple",
+      "hsv": [
+        161,
+        63,
+        152
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(309,342)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1154",
+      "name": "FB 1154 predicted purple -> purple",
+      "hsv": [
+        165,
+        62,
+        239
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(114,478)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1153",
+      "name": "FB 1153 predicted purple -> purple",
+      "hsv": [
+        159,
+        70,
+        186
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(322,484)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1152",
+      "name": "FB 1152 predicted purple -> purple",
+      "hsv": [
+        159,
+        66,
+        215
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(229,525)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1151",
+      "name": "FB 1151 predicted purple -> purple",
+      "hsv": [
+        164,
+        56,
+        233
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(241,524)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1150",
+      "name": "FB 1150 predicted purple -> purple",
+      "hsv": [
+        158,
+        77,
+        219
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(132,585)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1149",
+      "name": "FB 1149 predicted purple -> purple",
+      "hsv": [
+        161,
+        59,
+        193
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(61,765)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1148",
+      "name": "FB 1148 predicted purple -> purple",
+      "hsv": [
+        154,
+        49,
+        176
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(165,785)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1147",
+      "name": "FB 1147 predicted purple -> purple",
+      "hsv": [
+        155,
+        67,
+        165
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(151,720)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1146",
+      "name": "FB 1146 predicted purple -> purple",
+      "hsv": [
+        153,
+        65,
+        207
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(255,699)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1145",
+      "name": "FB 1145 predicted purple -> purple",
+      "hsv": [
+        152,
+        60,
+        200
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(275,716)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1144",
+      "name": "FB 1144 predicted yellow -> yellow",
+      "hsv": [
+        25,
+        105,
+        246
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(486,821)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1143",
+      "name": "FB 1143 predicted yellow -> yellow",
+      "hsv": [
+        25,
+        142,
+        239
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(423,832)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1142",
+      "name": "FB 1142 predicted yellow -> yellow",
+      "hsv": [
+        25,
+        120,
+        255
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(29,702)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1141",
+      "name": "FB 1141 predicted yellow -> yellow",
+      "hsv": [
+        22,
+        102,
+        243
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(668,856)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1140",
+      "name": "FB 1140 predicted yellow -> yellow",
+      "hsv": [
+        22,
+        105,
+        213
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(892,909)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1139",
+      "name": "FB 1139 predicted yellow -> yellow",
+      "hsv": [
+        23,
+        91,
+        208
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(914,929)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1138",
+      "name": "FB 1138 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        77,
+        242
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(1033,943)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1137",
+      "name": "FB 1137 predicted yellow -> yellow",
+      "hsv": [
+        22,
+        61,
+        203
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(805,923)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1136",
+      "name": "FB 1136 predicted yellow -> yellow",
+      "hsv": [
+        24,
+        78,
+        252
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(754,903)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1135",
+      "name": "FB 1135 predicted yellow -> white",
+      "hsv": [
+        25,
+        11,
+        177
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=yellow, center=(1041,664)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1134",
+      "name": "FB 1134 predicted yellow -> yellow",
+      "hsv": [
+        24,
+        89,
+        239
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(1002,697)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1133",
+      "name": "FB 1133 predicted yellow -> yellow",
+      "hsv": [
+        21,
+        130,
+        244
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(927,694)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1132",
+      "name": "FB 1132 predicted yellow -> yellow",
+      "hsv": [
+        22,
+        130,
+        255
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(907,677)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1130",
+      "name": "FB 1130 predicted yellow -> yellow",
+      "hsv": [
+        22,
+        131,
+        244
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(814,693)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1131",
+      "name": "FB 1131 predicted yellow -> yellow",
+      "hsv": [
+        22,
+        131,
+        244
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(814,693)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1129",
+      "name": "FB 1129 predicted yellow -> yellow",
+      "hsv": [
+        24,
+        114,
+        255
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(798,673)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1128",
+      "name": "FB 1128 predicted yellow -> yellow",
+      "hsv": [
+        21,
+        126,
+        245
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(779,659)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1127",
+      "name": "FB 1127 predicted yellow -> yellow",
+      "hsv": [
+        23,
+        115,
+        250
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(731,639)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1126",
+      "name": "FB 1126 predicted yellow -> yellow",
+      "hsv": [
+        22,
+        132,
+        255
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(747,622)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1125",
+      "name": "FB 1125 predicted yellow -> yellow",
+      "hsv": [
+        22,
+        129,
+        255
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(728,601)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1124",
+      "name": "FB 1124 predicted yellow -> yellow",
+      "hsv": [
+        25,
+        142,
+        239
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(423,832)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1123",
+      "name": "FB 1123 predicted yellow -> yellow",
+      "hsv": [
+        25,
+        105,
+        246
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(486,821)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1122",
+      "name": "FB 1122 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        177,
+        255
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(434,763)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1121",
+      "name": "FB 1121 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        177,
+        255
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(291,645)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1120",
+      "name": "FB 1120 predicted yellow -> yellow",
+      "hsv": [
+        27,
+        174,
+        255
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(394,692)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1119",
+      "name": "FB 1119 predicted yellow -> yellow",
+      "hsv": [
+        25,
+        176,
+        255
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(438,662)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1118",
+      "name": "FB 1118 predicted yellow -> yellow",
+      "hsv": [
+        22,
+        140,
+        250
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(457,471)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1117",
+      "name": "FB 1117 predicted yellow -> yellow",
+      "hsv": [
+        21,
+        139,
+        251
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(440,454)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1116",
+      "name": "FB 1116 predicted yellow -> yellow",
+      "hsv": [
+        21,
+        165,
+        252
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(402,372)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1115",
+      "name": "FB 1115 predicted pink -> pink",
+      "hsv": [
+        171,
+        141,
+        244
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(699,431)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1114",
+      "name": "FB 1114 predicted pink -> pink",
+      "hsv": [
+        169,
+        182,
+        255
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(712,489)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1113",
+      "name": "FB 1113 predicted pink -> pink",
+      "hsv": [
+        164,
+        173,
+        255
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(863,535)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1112",
+      "name": "FB 1112 predicted pink -> pink",
+      "hsv": [
+        162,
+        147,
+        254
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(963,874)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1111",
+      "name": "FB 1111 predicted pink -> pink",
+      "hsv": [
+        166,
+        148,
+        253
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(941,778)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1110",
+      "name": "FB 1110 predicted pink -> pink",
+      "hsv": [
+        167,
+        135,
+        254
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(697,713)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1109",
+      "name": "FB 1109 predicted pink -> pink",
+      "hsv": [
+        167,
+        181,
+        239
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(798,841)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1108",
+      "name": "FB 1108 predicted pink -> pink",
+      "hsv": [
+        162,
+        156,
+        255
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(734,930)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1107",
+      "name": "FB 1107 predicted pink -> pink",
+      "hsv": [
+        167,
+        133,
+        253
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(730,782)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1106",
+      "name": "FB 1106 predicted mint -> mint",
+      "hsv": [
+        94,
+        68,
+        232
+      ],
+      "expected": "mint",
+      "description": "Imported feedback. predicted=mint, center=(589,904)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1105",
+      "name": "FB 1105 predicted mint -> mint",
+      "hsv": [
+        94,
+        63,
+        223
+      ],
+      "expected": "mint",
+      "description": "Imported feedback. predicted=mint, center=(655,792)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1104",
+      "name": "FB 1104 predicted mint -> mint",
+      "hsv": [
+        87,
+        30,
+        173
+      ],
+      "expected": "mint",
+      "description": "Imported feedback. predicted=mint, center=(507,677)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1103",
+      "name": "FB 1103 predicted mint -> mint",
+      "hsv": [
+        80,
+        27,
+        175
+      ],
+      "expected": "mint",
+      "description": "Imported feedback. predicted=mint, center=(586,462)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1102",
+      "name": "FB 1102 predicted mint -> mint",
+      "hsv": [
+        84,
+        48,
+        143
+      ],
+      "expected": "mint",
+      "description": "Imported feedback. predicted=mint, center=(545,415)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1101",
+      "name": "FB 1101 predicted mint -> mint",
+      "hsv": [
+        91,
+        63,
+        183
+      ],
+      "expected": "mint",
+      "description": "Imported feedback. predicted=mint, center=(656,653)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1100",
+      "name": "FB 1100 predicted mint -> mint",
+      "hsv": [
+        92,
+        70,
+        192
+      ],
+      "expected": "mint",
+      "description": "Imported feedback. predicted=mint, center=(665,693)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1099",
+      "name": "FB 1099 predicted mint -> mint",
+      "hsv": [
+        90,
+        44,
+        236
+      ],
+      "expected": "mint",
+      "description": "Imported feedback. predicted=mint, center=(598,684)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1098",
+      "name": "FB 1098 predicted white -> mint",
+      "hsv": [
+        88,
+        20,
+        202
+      ],
+      "expected": "mint",
+      "description": "Imported feedback. predicted=white, center=(624,486)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1097",
+      "name": "FB 1097 predicted white -> white",
+      "hsv": [
+        30,
+        9,
+        255
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(702,651)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1096",
+      "name": "FB 1096 predicted white -> white",
+      "hsv": [
+        24,
+        7,
+        255
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(713,659)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1095",
+      "name": "FB 1095 predicted white -> white",
+      "hsv": [
+        33,
+        5,
+        255
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(870,712)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1094",
+      "name": "FB 1094 predicted white -> white",
+      "hsv": [
+        16,
+        11,
+        255
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(887,695)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1093",
+      "name": "FB 1093 predicted white -> white",
+      "hsv": [
+        16,
+        5,
+        255
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(824,725)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1092",
+      "name": "FB 1092 predicted white -> white",
+      "hsv": [
+        78,
+        9,
+        255
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(670,883)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1091",
+      "name": "FB 1091 predicted white -> white",
+      "hsv": [
+        80,
+        9,
+        248
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(786,902)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1090",
+      "name": "FB 1090 predicted mint -> white",
+      "hsv": [
+        80,
+        13,
+        179
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=mint, center=(950,938)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1089",
+      "name": "FB 1089 predicted mint -> white",
+      "hsv": [
+        83,
+        9,
+        173
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=mint, center=(1044,840)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1088",
+      "name": "FB 1088 predicted white -> white",
+      "hsv": [
+        90,
+        7,
+        255
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(1049,734)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1087",
+      "name": "FB 1087 predicted white -> white",
+      "hsv": [
+        90,
+        13,
+        244
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(1031,766)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1086",
+      "name": "FB 1086 predicted yellow -> white",
+      "hsv": [
+        25,
+        11,
+        177
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=yellow, center=(1041,664)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1085",
+      "name": "FB 1085 predicted white -> white",
+      "hsv": [
+        19,
+        19,
+        244
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(979,534)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1084",
+      "name": "FB 1084 predicted white -> white",
+      "hsv": [
+        15,
+        33,
+        241
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(982,515)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1083",
+      "name": "FB 1083 predicted white -> white",
+      "hsv": [
+        13,
+        36,
+        223
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(993,487)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1082",
+      "name": "FB 1082 predicted white -> white",
+      "hsv": [
+        16,
+        32,
+        179
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(993,440)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1081",
+      "name": "FB 1081 predicted black -> black",
+      "hsv": [
+        133,
+        25,
+        84
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(31,764)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1080",
+      "name": "FB 1080 predicted black -> black",
+      "hsv": [
+        125,
+        35,
+        43
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(65,808)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1079",
+      "name": "FB 1079 predicted black -> black",
+      "hsv": [
+        110,
+        14,
+        145
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(205,753)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1078",
+      "name": "FB 1078 predicted mint -> black",
+      "hsv": [
+        95,
+        23,
+        160
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=mint, center=(261,768)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1077",
+      "name": "FB 1077 predicted white -> black",
+      "hsv": [
+        105,
+        14,
+        163
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=white, center=(327,667)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1076",
+      "name": "FB 1076 predicted black -> black",
+      "hsv": [
+        114,
+        13,
+        124
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(352,580)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1075",
+      "name": "FB 1075 predicted black -> black",
+      "hsv": [
+        103,
+        8,
+        117
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(420,569)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1074",
+      "name": "FB 1074 predicted black -> black",
+      "hsv": [
+        50,
+        5,
+        138
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(475,410)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1073",
+      "name": "FB 1073 predicted black -> black",
+      "hsv": [
+        36,
+        25,
+        69
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(460,366)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1072",
+      "name": "FB 1072 predicted black -> black",
+      "hsv": [
+        109,
+        38,
+        56
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(463,260)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1071",
+      "name": "FB 1071 predicted white -> mint",
+      "hsv": [
+        88,
+        20,
+        202
+      ],
+      "expected": "mint",
+      "description": "Imported feedback. predicted=white, center=(624,486)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1070",
+      "name": "FB 1070 predicted mint -> white",
+      "hsv": [
+        80,
+        13,
+        179
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=mint, center=(950,938)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1069",
+      "name": "FB 1069 predicted mint -> white",
+      "hsv": [
+        83,
+        9,
+        173
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=mint, center=(1044,840)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1068",
+      "name": "FB 1068 predicted white -> black",
+      "hsv": [
+        105,
+        14,
+        163
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=white, center=(327,667)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1067",
+      "name": "FB 1067 predicted mint -> black",
+      "hsv": [
+        95,
+        23,
+        160
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=mint, center=(261,768)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1066",
+      "name": "FB 1066 predicted blue -> black",
+      "hsv": [
+        107,
+        52,
+        131
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=blue, center=(18,311)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1065",
+      "name": "FB 1065 predicted blue -> black",
+      "hsv": [
+        105,
+        43,
+        179
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=blue, center=(270,256)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1064",
+      "name": "FB 1064 predicted blue -> black",
+      "hsv": [
+        106,
+        42,
+        145
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=blue, center=(221,238)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1063",
+      "name": "FB 1063 predicted purple -> pink",
+      "hsv": [
+        166,
+        119,
+        189
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=purple, center=(152,225)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1062",
+      "name": "FB 1062 predicted orange -> red",
+      "hsv": [
+        8,
+        79,
+        210
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=orange, center=(242,352)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1061",
+      "name": "FB 1061 predicted purple -> pink",
+      "hsv": [
+        159,
+        132,
+        216
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=purple, center=(7,680)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1060",
+      "name": "FB 1060 predicted blue -> black",
+      "hsv": [
+        108,
+        52,
+        202
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=blue, center=(358,577)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1059",
+      "name": "FB 1059 predicted blue -> black",
+      "hsv": [
+        108,
+        64,
+        163
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=blue, center=(228,698)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1058",
+      "name": "FB 1058 predicted pink -> red",
+      "hsv": [
+        172,
+        92,
+        209
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(404,462)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1057",
+      "name": "FB 1057 predicted blue -> white",
+      "hsv": [
+        103,
+        23,
+        232
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=blue, center=(448,488)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1056",
+      "name": "FB 1056 predicted pink -> red",
+      "hsv": [
+        174,
+        178,
+        209
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(20,262)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1055",
+      "name": "FB 1055 predicted purple -> red",
+      "hsv": [
+        174,
+        192,
+        167
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=purple, center=(434,762)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1054",
+      "name": "FB 1054 predicted lime -> white",
+      "hsv": [
+        30,
+        8,
+        162
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=lime, center=(214,59)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1053",
+      "name": "FB 1053 predicted blue -> white",
+      "hsv": [
+        101,
+        23,
+        254
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=blue, center=(156,459)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1051",
+      "name": "FB 1051 predicted blue -> white",
+      "hsv": [
+        104,
+        21,
+        247
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=blue, center=(132,742)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1052",
+      "name": "FB 1052 predicted blue -> white",
+      "hsv": [
+        104,
+        21,
+        247
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=blue, center=(132,742)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1050",
+      "name": "FB 1050 predicted lime -> white",
+      "hsv": [
+        30,
+        17,
+        175
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=lime, center=(495,533)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1049",
+      "name": "FB 1049 predicted blue -> white",
+      "hsv": [
+        105,
+        25,
+        240
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=blue, center=(520,504)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1048",
+      "name": "FB 1048 predicted blue -> purple",
+      "hsv": [
+        115,
+        55,
+        217
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=blue, center=(180,353)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1047",
+      "name": "FB 1047 predicted blue -> purple",
+      "hsv": [
+        123,
+        77,
+        231
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=blue, center=(180,324)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1046",
+      "name": "FB 1046 predicted purple -> pink",
+      "hsv": [
+        174,
+        138,
+        196
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=purple, center=(49,372)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1045",
+      "name": "FB 1045 predicted purple -> pink",
+      "hsv": [
+        170,
+        70,
+        191
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=purple, center=(126,401)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1044",
+      "name": "FB 1044 predicted purple -> pink",
+      "hsv": [
+        170,
+        92,
+        198
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=purple, center=(12,720)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1043",
+      "name": "FB 1043 predicted red -> pink",
+      "hsv": [
+        175,
+        99,
+        189
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=red, center=(150,528)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1042",
+      "name": "FB 1042 predicted red -> pink",
+      "hsv": [
+        176,
+        132,
+        171
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=red, center=(183,530)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1041",
+      "name": "FB 1041 predicted red -> pink",
+      "hsv": [
+        175,
+        82,
+        173
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=red, center=(259,601)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1040",
+      "name": "FB 1040 predicted purple -> pink",
+      "hsv": [
+        173,
+        81,
+        169
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=purple, center=(212,868)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1039",
+      "name": "FB 1039 predicted purple -> pink",
+      "hsv": [
+        157,
+        69,
+        216
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=purple, center=(575,642)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1038",
+      "name": "FB 1038 predicted purple -> pink",
+      "hsv": [
+        159,
+        94,
+        213
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=purple, center=(382,372)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1037",
+      "name": "FB 1037 predicted mint -> white",
+      "hsv": [
+        83,
+        9,
+        173
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=mint, center=(1044,840)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1036",
+      "name": "FB 1036 predicted mint -> white",
+      "hsv": [
+        80,
+        13,
+        179
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=mint, center=(950,938)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1035",
+      "name": "FB 1035 predicted mint -> black",
+      "hsv": [
+        95,
+        23,
+        160
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=mint, center=(261,768)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1034",
+      "name": "FB 1034 predicted white -> black",
+      "hsv": [
+        105,
+        14,
+        163
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=white, center=(327,667)",
+      "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1033",
+      "name": "FB 1033 predicted white -> mint",
+      "hsv": [
+        88,
+        20,
+        202
+      ],
+      "expected": "mint",
+      "description": "Imported feedback. predicted=white, center=(624,486)",
+      "source": "feedback_export_2025-10-31"
     }
   ],
   "last_updated": "2025-10-30"

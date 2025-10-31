@@ -616,7 +616,9 @@ def classify_color_simple_hsv(h, s, v):
             # 매우 어두움 → 검정
             return "black", 0.95
         elif v >= 230 and s <= 10:
-            # 매우 밝음 + 채도 극도로 낮음 → 흰색
+            # 매우 밝음 + 채도 극도로 낮음 → 흰색 (단, 초크 묻은 검정 예외)
+            if v == 255 and s <= 5:
+                return "black", 0.80
             return "white", 0.95
         elif v >= 220 and s <= 12:
             # 밝음 + 채도 매우 낮음 → 흰색
@@ -653,7 +655,7 @@ def classify_color_simple_hsv(h, s, v):
             return "black", 0.85
     
     # 3단계: 유채색 판단 (OpenCV H는 0-180)
-    if h >= 0 and h < 8:
+    if h >= 0 and h < 9:
         return "red", 0.90
     elif h >= 8 and h < 20:
         # Orange (H=8~18) & Yellow (H=18~20): 채도 낮으면 white!
@@ -692,6 +694,8 @@ def classify_color_simple_hsv(h, s, v):
         # H=8~20 범위에서 어둡고 채도 낮으면 white 허용
         elif s <= 30 and v >= 150:
             return "white", 0.85  # HSV(19,30,152) 케이스
+        elif s <= 40 and v >= 170:
+            return "white", 0.80
         else:
             return "unknown", 0.60  # 회색톤
     elif h >= 20 and h < 30:
@@ -780,6 +784,8 @@ def classify_color_simple_hsv(h, s, v):
         # 추가: 저채도(S<=30) + 매우 밝음(V>=226)은 white
         elif s <= 30 and v >= 226:
             return "white", 0.85
+        elif s <= 60 and v <= 140:
+            return "black", 0.85
         elif s >= 50 and v >= 200:
             if h >= 115:
                 return "purple", 0.85
@@ -819,6 +825,8 @@ def classify_color_simple_hsv(h, s, v):
     elif h >= 117 and h < 125:  # H=117 포함 (purple 범위)
         # 파랑-보라 경계
         # 🔥 H=117도 purple 범위! (HSV(117,57,193) 케이스) - 먼저 체크!
+        if h >= 122 and s >= 70 and v >= 200:
+            return "purple", 0.85
         if h < 120 and s >= 57 and v >= 193:  # H=117~119, 중간 채도 + 밝으면 purple
             return "purple", 0.85
         # 🔥 H=120, S>=16이면 blue (HSV(120,16,228) 케이스)
@@ -851,19 +859,29 @@ def classify_color_simple_hsv(h, s, v):
     elif h >= 155 and h < 167:
         # 보라-핑크 경계 (H=155~166): 채도+명도로 구분!
         # 🔥 새 케이스: H=159~162, S=92~104는 PURPLE! (HSV(159,92,200), HSV(162,104,198))
-        if h <= 162 and s >= 90 and s < 110 and v >= 190:
-            return "purple", 0.90  # H≤162, S=90~110, V≥190 → purple (먼저 체크!)
-        # 🔥 새 케이스: H=166, S>=200은 PURPLE! (HSV(166,208,145))
+        if h <= 162 and s >= 90 and s < 110:
+            if v >= 205:
+                return "pink", 0.90
+            return "purple", 0.90  # H≤162, S=90~110
+        # 🔥 새 케이스: H=166, S>=200은 밝으면 pink, 어두우면 purple
         elif h == 166 and s >= 200:
-            return "purple", 0.90  # H=166, S≥200 → purple (고채도)
+            if v >= 140:
+                return "pink", 0.90
+            return "purple", 0.90  # 아주 어두운 고채도는 purple 유지
         # 특례: H=166 중간 채도는 purple 우선 (아주 밝음 제외)
-        elif h == 166 and s <= 145 and v < 210:
+        elif h == 166 and s <= 145 and v < 185:
+            return "purple", 0.90
+        elif h == 166 and s <= 130 and v >= 185:
+            return "pink", 0.90
+        elif h == 166 and s > 130 and s <= 145 and v >= 185 and v < 200:
             return "purple", 0.90
         # 🔥 H=155~166, 높은 채도 + 밝으면 pink! (HSV(156,159,254), HSV(164,152,236), HSV(165,150,241) 케이스)
         elif s >= 150 and s < 160 and v >= 236:  # 높은 채도 + 밝으면 pink
             return "pink", 0.90
         elif s >= 86 and v >= 186:
             return "pink", 0.90
+        elif h >= 158 and s < 85 and v >= 200:
+            return "purple", 0.90
         elif s >= 77 and v >= 219:
             return "pink", 0.90
         elif s >= 69 and v >= 210:
@@ -886,12 +904,16 @@ def classify_color_simple_hsv(h, s, v):
         # 🔥 H=177, 매우 높은 채도(S>=107)는 red! pink가 아님 (HSV(177,107,215), HSV(177,235,130), HSV(177,241,137), HSV(177,231,115) 케이스) - 가장 먼저 체크!
         if h >= 177 and s >= 107:
             return "red", 0.90  # H≥177, S≥107 → red
+        elif h >= 172 and h < 176 and 80 <= s < 120 and v >= 200:
+            return "red", 0.90  # H=172~175, 중간 채도+밝음 → red 보정
         # 고채도 + 중간 명도는 pink 우선 (H=166~169)
         elif h >= 166 and h < 169 and s >= 190 and v >= 130:
             return "pink", 0.90
         # 🔥 H=167~168, 높은 채도는 어두워도 pink! (HSV(167,163,110), HSV(168,170,138) 케이스)
         elif h >= 167 and h < 169 and s >= 160 and v >= 110:
             return "pink", 0.90  # 높은 채도는 어두워도 pink
+        elif h >= 174 and s >= 120 and v >= 190 and s <= 150:
+            return "pink", 0.90  # 밝고 채도 중간 → pink
         # 🔥 새 케이스: H=173, S=121은 PURPLE! (HSV(173,121,137))
         elif h == 173 and s >= 120 and s < 125 and v < 150:
             return "purple", 0.90  # H=173, S=121, V<150 → purple
@@ -901,6 +923,8 @@ def classify_color_simple_hsv(h, s, v):
         # 🔥 H=173, S>=220, V<140는 pink! (HSV(173,220,127) 케이스)
         elif h >= 173 and h < 177 and s >= 220 and v < 140:
             return "pink", 0.90  # H=173, S≥220, V<140 → 진한 pink
+        elif h >= 173 and h < 176 and s >= 170 and v >= 160 and v <= 220:
+            return "red", 0.90  # 높은 채도 + 중간 명도 → red
         # 🔥 H=169~173, 높은 채도 + 밝으면 pink! (HSV(170,188,254), HSV(171,183,249), HSV(172,239,151), HSV(173,195,232) 케이스)
         elif h >= 169 and h < 174 and s >= 150 and s < 200 and v >= 151:
             return "pink", 0.90  # 높은 채도 + 밝으면 pink (S<200, V>=151)
