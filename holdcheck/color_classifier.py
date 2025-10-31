@@ -725,6 +725,9 @@ def classify_color_simple_hsv(h, s, v):
                 return "white", 0.85
             elif s <= 22 and v >= 170:
                 return "white", 0.85
+            # 추가: 매우 저채도(S<=25) + 중고명도(V>=170)는 white
+            elif s <= 25 and v >= 170:
+                return "white", 0.85
             # 그 외는 S>=16이면 blue로 위임
             if s >= 16:
                 pass  # 3단계에서 blue 처리
@@ -801,6 +804,15 @@ def classify_color_simple_hsv(h, s, v):
         if h >= 42 and v < 100 and s > 80:
             return "green", 0.85
         return "lime", 0.90
+    elif h >= 45 and h < 75:
+        # 어두운 녹색 보강: 높은 채도이면서 명도가 낮으면 green
+        if s >= 120 and v <= 110:
+            return "green", 0.85
+        # 기본 녹색 성향
+        if s >= 80 and v >= 90:
+            return "green", 0.80
+        else:
+            return "green", 0.70
     elif h >= 70 and h < 75:
         # Green↔Mint 경계 보강
         if s >= 90:
@@ -999,6 +1011,9 @@ def classify_color_simple_hsv(h, s, v):
             return "red", 0.90
         # H=176, S 130~165 & V 140~180 → red (red→pink 방지)
         elif h == 176 and s >= 130 and s <= 165 and v >= 140 and v <= 180:
+            return "red", 0.90
+        # H=176, S≥166 & V≥180 → red (밝은 고채도 176 보정)
+        elif h == 176 and s >= 166 and v >= 180:
             return "red", 0.90
         # 핑크 예외 완화: H≤172만 우선, H=173은 더 밝을 때만
         elif h <= 172 and s >= 145 and v >= 185:
