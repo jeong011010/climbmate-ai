@@ -1630,9 +1630,13 @@ def calculate_advanced_features(pixels_hsv, pixels_lab, pixels_rgb):
 # -------------------------------
 # 📌 Preprocess Pipeline
 # -------------------------------
+def _round_to_multiple(x, m=32):
+    return int(max(m, (int(x + m/2) // m) * m))
+
 def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.pt", conf=0.4, brightness_normalization=False, 
                brightness_filter=False, min_brightness=0, max_brightness=100, 
-               saturation_filter=False, min_saturation=0, mask_refinement=5, use_clip_ai=False):
+               saturation_filter=False, min_saturation=0, mask_refinement=5, use_clip_ai=False,
+               upscale_factor: float = 1.0, max_side: int = 1536):
     # image_input이 문자열(파일 경로)인지 numpy 배열인지 확인
     if isinstance(image_input, str):
         # 파일 경로인 경우
@@ -1644,15 +1648,21 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
         original_image = image_input
 
     h_img, w_img = original_image.shape[:2]
-    target_size = (640, 640)
+    # 🔥 작은 홀드 보강: 입력을 크게 리사이즈해서 YOLO가 더 조밀하게 보게 함
+    upscale_factor = max(1.0, float(upscale_factor))
+    base_side = 640
+    base_imgsz = 512
+    target_side = min(_round_to_multiple(base_side * upscale_factor), max_side)
+    yolo_imgsz = min(_round_to_multiple(base_imgsz * upscale_factor), max_side)
+    target_size = (target_side, target_side)
     padded_image, scale, pad_left, pad_top = resize_with_padding(original_image, target_size=target_size)
 
     # 🚀 캐싱된 YOLO 모델 사용 (속도 대폭 향상)
     model = get_yolo_model(model_path)
     # ⚡ YOLO 추론 최적화: 입력 해상도 축소 + 로그 억제
-    results = model(padded_image, conf=conf, imgsz=512, verbose=False)[0]
+    results = model(padded_image, conf=conf, imgsz=yolo_imgsz, verbose=False)[0]
 
-    masks_raw = results.masks.data.cpu().numpy()
+    masks_raw = results.masks.data.cpu().numpy() if results.masks is not None else []
     # 🔥 YOLO 마스크 좌표 복원 시 padded_size 명시
     masks = [restore_mask_to_original(m, (h_img, w_img), scale, pad_left, pad_top, padded_size=target_size) for m in masks_raw]
 

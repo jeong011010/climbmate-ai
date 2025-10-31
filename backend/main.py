@@ -14,6 +14,7 @@ import base64
 # 🎯 YOLO 모델 선택 (환경 변수로 설정 가능)
 # 'roboflow' 또는 'alternative'
 YOLO_MODEL = os.getenv('YOLO_MODEL', 'roboflow')
+UPSCALE_FACTOR = float(os.getenv('CLIMBMATE_UPSCALE', '2.0'))  # 멀리서 찍힌 작은 홀드 보강
 
 # holdcheck 모듈 경로 추가
 holdcheck_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'holdcheck')
@@ -144,7 +145,8 @@ async def analyze_image(
             model_path=model_path,
             mask_refinement=0,  # 마스크 정제 최소화 (속도 우선)
             conf=0.5,  # 더 확실한 홀드만 (노이즈 감소)
-            use_clip_ai=True
+            use_clip_ai=True,
+            upscale_factor=UPSCALE_FACTOR
         )
         
         if not hold_data_raw:
@@ -1129,7 +1131,8 @@ async def analyze_image_sync(
                 model_path=model_path,
                 mask_refinement=1,  # 속도 우선
                 conf=0.4,  # 확실한 홀드만
-                use_clip_ai=True
+                use_clip_ai=True,
+                upscale_factor=UPSCALE_FACTOR
             )
             
             if not hold_data_raw:

@@ -19,6 +19,7 @@ services:
       - CLIP_MODEL=ViT-B/32
       - REDIS_URL=redis://redis:6379/0
       - YOLO_MODEL=${YOLO_MODEL:-roboflow}
+      - CLIMBMATE_UPSCALE=${CLIMBMATE_UPSCALE:-2.0}
     depends_on:
       - redis
     volumes:
@@ -74,6 +75,7 @@ services:
       - CLIP_MODEL=ViT-B/32
       - REDIS_URL=redis://redis:6379/0
       - YOLO_MODEL=${YOLO_MODEL:-roboflow}
+      - CLIMBMATE_UPSCALE=${CLIMBMATE_UPSCALE:-2.0}
     volumes:
       - ./backend/climbmate.db:/app/backend/climbmate.db
       - ./backend/models:/app/backend/models
