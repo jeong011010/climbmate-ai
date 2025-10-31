@@ -350,6 +350,84 @@ def _best_candidate_score(h: int, s: int, v: int, candidates, colors_config):
     return best_color, best_conf
 
 
+def _rgb_to_lab_signed(rgb):
+    """RGB(0-255) → LAB, a/b는 -128~127로 변환"""
+    try:
+        arr = np.uint8([[[rgb[0], rgb[1], rgb[2]]]])
+        lab = cv2.cvtColor(arr, cv2.COLOR_RGB2LAB)[0][0].tolist()
+    except Exception:
+        lab = [0, 128, 128]
+    L, a, b = lab
+    return float(L), float(a) - 128.0, float(b) - 128.0
+
+
+def _lab_hint_score(color_name: str, L: float, a: float, b: float) -> float:
+    """LAB 힌트 점수 [0,1]. 경계 타이브레이커용 가벼운 휴리스틱."""
+    # 무채색 우선
+    if color_name == 'white':
+        return 1.0 if (L >= 220 and abs(a) < 10 and abs(b) < 10) else 0.4
+    if color_name == 'black':
+        return 1.0 if (L <= 35) else 0.4
+
+    score = 0.4  # 기본
+    # 두 축 규칙
+    if color_name == 'red':
+        score = max(score, min(1.0, (a - 20) / 40))  # a 높을수록 적색
+        score = max(score, min(1.0, (b + 10) / 60))   # b가 너무 음수면 감점
+    elif color_name == 'pink':
+        # 밝은 red 계열
+        score = max(score, min(1.0, (a - 18) / 35))
+        score = max(score, min(1.0, (L - 150) / 80))
+    elif color_name == 'orange':
+        # a+, b+ 강함
+        score = max(score, min(1.0, (a - 10) / 35))
+        score = max(score, min(1.0, (b - 10) / 35))
+    elif color_name == 'yellow':
+        score = max(score, min(1.0, (b - 20) / 40))
+        score = max(score, min(1.0, (a + 10) / 30))
+    elif color_name == 'lime':
+        # a 약간 음수, b 양수
+        score = max(score, min(1.0, (-a - 5) / 30))
+        score = max(score, min(1.0, (b - 15) / 35))
+    elif color_name == 'green':
+        # a 음수
+        score = max(score, min(1.0, (-a - 5) / 40))
+        score = max(score, min(1.0, (30 - abs(b)) / 30))
+    elif color_name == 'mint':
+        # a 음수, b 근처 0, 밝기 높음
+        score = max(score, min(1.0, (-a - 5) / 35))
+        score = max(score, min(1.0, (20 - abs(b)) / 20))
+        score = max(score, min(1.0, (L - 120) / 100))
+    elif color_name == 'blue':
+        # b 음수
+        score = max(score, min(1.0, (-b - 10) / 40))
+        score = max(score, min(1.0, (20 - abs(a)) / 20))
+    elif color_name == 'purple':
+        # a 양수 + b 음수
+        score = max(score, min(1.0, (a - 10) / 35))
+        score = max(score, min(1.0, (-b - 5) / 35))
+    elif color_name == 'brown':
+        score = max(score, min(1.0, (a - 5) / 40))
+        score = max(score, min(1.0, (L - 40) / 80))
+    return max(0.0, min(1.0, score))
+
+
+def _best_candidate_score_hsv_lab(h: int, s: int, v: int, rgb, candidates, colors_config):
+    """HSV 중심도(0.7) + LAB 힌트(0.3) 결합 점수로 후보 선택"""
+    L, a, b = _rgb_to_lab_signed(rgb)
+    best_color, best_score = None, 0.0
+    for color_name in candidates:
+        # HSV 신뢰도(최댓값)
+        hsv_conf_best = 0.5
+        for hsv_range in colors_config.get(color_name, {}).get("hsv_ranges", []):
+            hsv_conf_best = max(hsv_conf_best, calculate_confidence_hsv(h, s, v, hsv_range))
+        lab_score = _lab_hint_score(color_name, L, a, b)
+        score = 0.7 * hsv_conf_best + 0.3 * lab_score
+        if score > best_score:
+            best_color, best_score = color_name, score
+    return best_color, best_score
+
+
 def classify_color_by_hsv(h, s, v, rgb, colors_config):
     """HSV 분류 (coarse→refine→ML). ranges로 후보를 좁히고, 룰로 정밀화, 경계에서만 ML."""
 
@@ -392,7 +470,7 @@ def classify_color_by_hsv(h, s, v, rgb, colors_config):
 
     # 1-보정) 후보 집합을 벗어나면 후보 쪽으로 스냅(단, 앵커/무후보 제외)
     if candidates and base_color not in candidates and base_color not in {"black", "white"} and base_conf < 0.80:
-        cand_color, cand_conf = _best_candidate_score(h, s, v, candidates, colors_config)
+        cand_color, cand_conf = _best_candidate_score_hsv_lab(h, s, v, rgb, candidates, colors_config)
         if cand_color:
             # 후보 쪽 신뢰가 높거나 베이스 신뢰가 낮으면 후보 채택
             if cand_conf >= max(base_conf, 0.78):
