@@ -2999,6 +2999,5322 @@
       "expected": "mint",
       "description": "Imported feedback. predicted=white, center=(624,486)",
       "source": "feedback_export_2025-10-31"
+    },
+    {
+      "id": "fb_import_1609",
+      "name": "FB 1609 predicted blue -> blue",
+      "hsv": [
+        106,
+        232,
+        192
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(320,225)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1608",
+      "name": "FB 1608 predicted blue -> blue",
+      "hsv": [
+        106,
+        221,
+        202
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(330,295)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1607",
+      "name": "FB 1607 predicted black -> black",
+      "hsv": [
+        105,
+        89,
+        106
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(124,307)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1606",
+      "name": "FB 1606 predicted black -> black",
+      "hsv": [
+        105,
+        67,
+        90
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(70,299)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1605",
+      "name": "FB 1605 predicted black -> purple",
+      "hsv": [
+        123,
+        76,
+        88
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=black, center=(128,87)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1604",
+      "name": "FB 1604 predicted purple -> purple",
+      "hsv": [
+        119,
+        100,
+        178
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(194,268)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1603",
+      "name": "FB 1603 predicted purple -> purple",
+      "hsv": [
+        120,
+        106,
+        193
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(244,267)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1602",
+      "name": "FB 1602 predicted blue -> purple",
+      "hsv": [
+        124,
+        124,
+        115
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=blue, center=(328,47)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1601",
+      "name": "FB 1601 predicted blue -> blue",
+      "hsv": [
+        104,
+        250,
+        116
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(334,424)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1600",
+      "name": "FB 1600 predicted blue -> blue",
+      "hsv": [
+        105,
+        247,
+        149
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(326,416)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1599",
+      "name": "FB 1599 predicted blue -> blue",
+      "hsv": [
+        106,
+        252,
+        205
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(85,584)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1598",
+      "name": "FB 1598 predicted green -> green",
+      "hsv": [
+        78,
+        240,
+        94
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(287,762)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1597",
+      "name": "FB 1597 predicted green -> green",
+      "hsv": [
+        78,
+        182,
+        109
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(322,528)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1596",
+      "name": "FB 1596 predicted green -> green",
+      "hsv": [
+        78,
+        244,
+        97
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(278,517)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1595",
+      "name": "FB 1595 predicted green -> green",
+      "hsv": [
+        79,
+        252,
+        145
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(254,377)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1594",
+      "name": "FB 1594 predicted green -> green",
+      "hsv": [
+        77,
+        252,
+        143
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(195,462)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1593",
+      "name": "FB 1593 predicted mint -> green",
+      "hsv": [
+        80,
+        251,
+        195
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=mint, center=(23,429)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1592",
+      "name": "FB 1592 predicted mint -> green",
+      "hsv": [
+        83,
+        197,
+        187
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=mint, center=(157,260)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1591",
+      "name": "FB 1591 predicted mint -> green",
+      "hsv": [
+        82,
+        250,
+        176
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=mint, center=(85,221)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1590",
+      "name": "FB 1590 predicted mint -> green",
+      "hsv": [
+        83,
+        218,
+        172
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=mint, center=(55,199)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1589",
+      "name": "FB 1589 predicted mint -> green",
+      "hsv": [
+        80,
+        252,
+        172
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=mint, center=(34,82)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1588",
+      "name": "FB 1588 predicted pink -> red",
+      "hsv": [
+        174,
+        175,
+        162
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(39,563)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1587",
+      "name": "FB 1587 predicted pink -> red",
+      "hsv": [
+        175,
+        193,
+        156
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(51,550)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1586",
+      "name": "FB 1586 predicted red -> red",
+      "hsv": [
+        174,
+        141,
+        147
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(229,363)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1585",
+      "name": "FB 1585 predicted red -> red",
+      "hsv": [
+        175,
+        123,
+        179
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(137,428)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1584",
+      "name": "FB 1584 predicted pink -> red",
+      "hsv": [
+        173,
+        179,
+        176
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(117,451)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1583",
+      "name": "FB 1583 predicted red -> red",
+      "hsv": [
+        175,
+        211,
+        191
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(127,159)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1582",
+      "name": "FB 1582 predicted pink -> red",
+      "hsv": [
+        175,
+        198,
+        234
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(143,120)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1581",
+      "name": "FB 1581 predicted pink -> red",
+      "hsv": [
+        175,
+        195,
+        219
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(228,42)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1580",
+      "name": "FB 1580 predicted red -> red",
+      "hsv": [
+        176,
+        189,
+        148
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(39,560)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1579",
+      "name": "FB 1579 predicted pink -> red",
+      "hsv": [
+        175,
+        187,
+        156
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(50,526)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1578",
+      "name": "FB 1578 predicted red -> red",
+      "hsv": [
+        176,
+        201,
+        128
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(151,524)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1577",
+      "name": "FB 1577 predicted red -> red",
+      "hsv": [
+        177,
+        199,
+        136
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(154,488)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1576",
+      "name": "FB 1576 predicted red -> red",
+      "hsv": [
+        176,
+        197,
+        161
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(179,387)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1575",
+      "name": "FB 1575 predicted red -> red",
+      "hsv": [
+        175,
+        180,
+        180
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(167,314)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1574",
+      "name": "FB 1574 predicted black -> black",
+      "hsv": [
+        101,
+        71,
+        26
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(398,355)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1573",
+      "name": "FB 1573 predicted black -> black",
+      "hsv": [
+        106,
+        105,
+        62
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(400,333)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1572",
+      "name": "FB 1572 predicted black -> black",
+      "hsv": [
+        105,
+        77,
+        69
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(103,579)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1571",
+      "name": "FB 1571 predicted black -> black",
+      "hsv": [
+        105,
+        66,
+        104
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(110,544)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1570",
+      "name": "FB 1570 predicted black -> black",
+      "hsv": [
+        105,
+        97,
+        88
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(15,191)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1569",
+      "name": "FB 1569 predicted black -> black",
+      "hsv": [
+        104,
+        83,
+        106
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(14,451)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1568",
+      "name": "FB 1568 predicted green -> green",
+      "hsv": [
+        71,
+        252,
+        98
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(283,370)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1567",
+      "name": "FB 1567 predicted mint -> green",
+      "hsv": [
+        81,
+        249,
+        158
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=mint, center=(143,280)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1566",
+      "name": "FB 1566 predicted mint -> green",
+      "hsv": [
+        81,
+        250,
+        156
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=mint, center=(183,225)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1565",
+      "name": "FB 1565 predicted mint -> green",
+      "hsv": [
+        81,
+        246,
+        171
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=mint, center=(96,200)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1564",
+      "name": "FB 1564 predicted blue -> blue",
+      "hsv": [
+        105,
+        210,
+        186
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(190,32)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1563",
+      "name": "FB 1563 predicted blue -> blue",
+      "hsv": [
+        105,
+        253,
+        218
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(260,236)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1562",
+      "name": "FB 1562 predicted orange -> orange",
+      "hsv": [
+        15,
+        178,
+        224
+      ],
+      "expected": "orange",
+      "description": "Imported feedback. predicted=orange, center=(52,468)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1561",
+      "name": "FB 1561 predicted orange -> orange",
+      "hsv": [
+        14,
+        151,
+        236
+      ],
+      "expected": "orange",
+      "description": "Imported feedback. predicted=orange, center=(26,419)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1560",
+      "name": "FB 1560 predicted orange -> orange",
+      "hsv": [
+        14,
+        164,
+        241
+      ],
+      "expected": "orange",
+      "description": "Imported feedback. predicted=orange, center=(27,380)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1559",
+      "name": "FB 1559 predicted yellow -> yellow",
+      "hsv": [
+        24,
+        254,
+        197
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(245,521)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1558",
+      "name": "FB 1558 predicted yellow -> yellow",
+      "hsv": [
+        23,
+        254,
+        216
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(361,460)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1557",
+      "name": "FB 1557 predicted yellow -> yellow",
+      "hsv": [
+        25,
+        253,
+        225
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(344,223)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1556",
+      "name": "FB 1556 predicted yellow -> yellow",
+      "hsv": [
+        24,
+        254,
+        216
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(198,108)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1555",
+      "name": "FB 1555 predicted black -> white",
+      "hsv": [
+        103,
+        20,
+        173
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=black, center=(41,555)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1554",
+      "name": "FB 1554 predicted blue -> blue",
+      "hsv": [
+        106,
+        240,
+        86
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(19,389)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1553",
+      "name": "FB 1553 predicted blue -> blue",
+      "hsv": [
+        105,
+        243,
+        118
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(61,472)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1552",
+      "name": "FB 1552 predicted blue -> blue",
+      "hsv": [
+        106,
+        244,
+        122
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(82,566)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1551",
+      "name": "FB 1551 predicted blue -> blue",
+      "hsv": [
+        106,
+        250,
+        207
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(312,445)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1550",
+      "name": "FB 1550 predicted blue -> blue",
+      "hsv": [
+        106,
+        254,
+        205
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(328,455)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1549",
+      "name": "FB 1549 predicted blue -> blue",
+      "hsv": [
+        106,
+        236,
+        240
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(356,417)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1548",
+      "name": "FB 1548 predicted blue -> blue",
+      "hsv": [
+        105,
+        254,
+        216
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(320,82)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1547",
+      "name": "FB 1547 predicted mint -> green",
+      "hsv": [
+        76,
+        72,
+        169
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=mint, center=(337,585)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1546",
+      "name": "FB 1546 predicted lime -> green",
+      "hsv": [
+        35,
+        76,
+        138
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=lime, center=(189,589)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1545",
+      "name": "FB 1545 predicted green -> green",
+      "hsv": [
+        80,
+        232,
+        117
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(50,304)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1544",
+      "name": "FB 1544 predicted green -> green",
+      "hsv": [
+        69,
+        253,
+        103
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(21,261)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1543",
+      "name": "FB 1543 predicted green -> green",
+      "hsv": [
+        73,
+        252,
+        136
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(80,195)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1542",
+      "name": "FB 1542 predicted green -> green",
+      "hsv": [
+        75,
+        243,
+        80
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(116,584)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1541",
+      "name": "FB 1541 predicted green -> green",
+      "hsv": [
+        77,
+        247,
+        70
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(251,654)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1540",
+      "name": "FB 1540 predicted green -> green",
+      "hsv": [
+        70,
+        253,
+        148
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(210,275)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1539",
+      "name": "FB 1539 predicted pink -> pink",
+      "hsv": [
+        173,
+        210,
+        188
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(378,714)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1538",
+      "name": "FB 1538 predicted pink -> pink",
+      "hsv": [
+        171,
+        214,
+        242
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(379,632)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1537",
+      "name": "FB 1537 predicted pink -> pink",
+      "hsv": [
+        171,
+        192,
+        238
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(356,299)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1536",
+      "name": "FB 1536 predicted pink -> pink",
+      "hsv": [
+        171,
+        192,
+        228
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(354,229)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1535",
+      "name": "FB 1535 predicted pink -> pink",
+      "hsv": [
+        170,
+        194,
+        251
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(354,149)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1534",
+      "name": "FB 1534 predicted pink -> pink",
+      "hsv": [
+        171,
+        178,
+        252
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(202,53)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1533",
+      "name": "FB 1533 predicted pink -> pink",
+      "hsv": [
+        171,
+        188,
+        253
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(214,14)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1532",
+      "name": "FB 1532 predicted green -> green",
+      "hsv": [
+        78,
+        178,
+        140
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(477,101)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1531",
+      "name": "FB 1531 predicted black -> blue",
+      "hsv": [
+        107,
+        87,
+        122
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=black, center=(406,417)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1530",
+      "name": "FB 1530 predicted pink -> pink",
+      "hsv": [
+        170,
+        141,
+        187
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(22,89)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1529",
+      "name": "FB 1529 predicted pink -> pink",
+      "hsv": [
+        172,
+        240,
+        202
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(13,443)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1528",
+      "name": "FB 1528 predicted pink -> pink",
+      "hsv": [
+        172,
+        199,
+        245
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(23,361)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1527",
+      "name": "FB 1527 predicted red -> red",
+      "hsv": [
+        179,
+        249,
+        83
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(313,351)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1526",
+      "name": "FB 1526 predicted purple -> red",
+      "hsv": [
+        171,
+        153,
+        119
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=purple, center=(439,350)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1525",
+      "name": "FB 1525 predicted red -> red",
+      "hsv": [
+        177,
+        168,
+        114
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(387,122)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1524",
+      "name": "FB 1524 predicted pink -> red",
+      "hsv": [
+        174,
+        109,
+        179
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(402,149)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1523",
+      "name": "FB 1523 predicted pink -> red",
+      "hsv": [
+        174,
+        191,
+        165
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(511,109)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1522",
+      "name": "FB 1522 predicted pink -> red",
+      "hsv": [
+        175,
+        190,
+        160
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(518,77)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1521",
+      "name": "FB 1521 predicted yellow -> yellow",
+      "hsv": [
+        22,
+        108,
+        126
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(203,335)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1520",
+      "name": "FB 1520 predicted yellow -> yellow",
+      "hsv": [
+        25,
+        119,
+        198
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(222,262)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1519",
+      "name": "FB 1519 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        177,
+        187
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(177,179)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1518",
+      "name": "FB 1518 predicted yellow -> yellow",
+      "hsv": [
+        27,
+        227,
+        215
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(141,108)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1516",
+      "name": "FB 1516 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        245,
+        154
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(258,7)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1517",
+      "name": "FB 1517 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        245,
+        154
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(258,7)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1515",
+      "name": "FB 1515 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        245,
+        154
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(258,7)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1514",
+      "name": "FB 1514 predicted purple -> purple",
+      "hsv": [
+        149,
+        145,
+        84
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(42,485)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1513",
+      "name": "FB 1513 predicted purple -> purple",
+      "hsv": [
+        147,
+        172,
+        120
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(43,193)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1512",
+      "name": "FB 1512 predicted purple -> purple",
+      "hsv": [
+        148,
+        170,
+        107
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(251,141)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1511",
+      "name": "FB 1511 predicted purple -> purple",
+      "hsv": [
+        145,
+        125,
+        126
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(70,62)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1510",
+      "name": "FB 1510 predicted orange -> orange",
+      "hsv": [
+        16,
+        233,
+        202
+      ],
+      "expected": "orange",
+      "description": "Imported feedback. predicted=orange, center=(328,184)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1509",
+      "name": "FB 1509 predicted orange -> orange",
+      "hsv": [
+        13,
+        171,
+        224
+      ],
+      "expected": "orange",
+      "description": "Imported feedback. predicted=orange, center=(516,27)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1508",
+      "name": "FB 1508 predicted black -> black",
+      "hsv": [
+        107,
+        76,
+        123
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(484,12)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1507",
+      "name": "FB 1507 predicted blue -> blue",
+      "hsv": [
+        106,
+        252,
+        190
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(460,250)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1506",
+      "name": "FB 1506 predicted blue -> blue",
+      "hsv": [
+        106,
+        254,
+        186
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(417,37)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1505",
+      "name": "FB 1505 predicted blue -> blue",
+      "hsv": [
+        106,
+        160,
+        167
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(333,123)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1504",
+      "name": "FB 1504 predicted blue -> blue",
+      "hsv": [
+        105,
+        253,
+        207
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(88,286)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1503",
+      "name": "FB 1503 predicted blue -> blue",
+      "hsv": [
+        104,
+        254,
+        226
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(146,241)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1502",
+      "name": "FB 1502 predicted blue -> blue",
+      "hsv": [
+        104,
+        225,
+        221
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(105,195)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1501",
+      "name": "FB 1501 predicted blue -> blue",
+      "hsv": [
+        108,
+        194,
+        201
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(35,70)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1500",
+      "name": "FB 1500 predicted blue -> blue",
+      "hsv": [
+        104,
+        234,
+        189
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(37,25)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1499",
+      "name": "FB 1499 predicted blue -> blue",
+      "hsv": [
+        105,
+        180,
+        236
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(66,16)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1498",
+      "name": "FB 1498 predicted black -> black",
+      "hsv": [
+        108,
+        69,
+        58
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(336,562)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1497",
+      "name": "FB 1497 predicted black -> black",
+      "hsv": [
+        20,
+        65,
+        89
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(412,565)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1496",
+      "name": "FB 1496 predicted yellow -> yellow",
+      "hsv": [
+        27,
+        220,
+        204
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(376,513)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1494",
+      "name": "FB 1494 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        227,
+        222
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(409,426)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1495",
+      "name": "FB 1495 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        227,
+        222
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(409,426)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1493",
+      "name": "FB 1493 predicted yellow -> yellow",
+      "hsv": [
+        27,
+        236,
+        217
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(262,554)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1492",
+      "name": "FB 1492 predicted yellow -> yellow",
+      "hsv": [
+        25,
+        85,
+        173
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(267,541)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1491",
+      "name": "FB 1491 predicted yellow -> yellow",
+      "hsv": [
+        24,
+        148,
+        167
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(293,552)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1490",
+      "name": "FB 1490 predicted yellow -> orange",
+      "hsv": [
+        18,
+        229,
+        254
+      ],
+      "expected": "orange",
+      "description": "Imported feedback. predicted=yellow, center=(326,402)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1489",
+      "name": "FB 1489 predicted orange -> orange",
+      "hsv": [
+        15,
+        172,
+        248
+      ],
+      "expected": "orange",
+      "description": "Imported feedback. predicted=orange, center=(425,468)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1488",
+      "name": "FB 1488 predicted orange -> orange",
+      "hsv": [
+        12,
+        142,
+        249
+      ],
+      "expected": "orange",
+      "description": "Imported feedback. predicted=orange, center=(526,564)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1487",
+      "name": "FB 1487 predicted orange -> orange",
+      "hsv": [
+        14,
+        154,
+        243
+      ],
+      "expected": "orange",
+      "description": "Imported feedback. predicted=orange, center=(529,537)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1486",
+      "name": "FB 1486 predicted blue -> blue",
+      "hsv": [
+        106,
+        253,
+        223
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(29,516)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1485",
+      "name": "FB 1485 predicted blue -> blue",
+      "hsv": [
+        106,
+        251,
+        199
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(38,438)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1484",
+      "name": "FB 1484 predicted blue -> blue",
+      "hsv": [
+        106,
+        254,
+        223
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(441,540)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1483",
+      "name": "FB 1483 predicted blue -> blue",
+      "hsv": [
+        106,
+        254,
+        225
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(478,494)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1482",
+      "name": "FB 1482 predicted black -> black",
+      "hsv": [
+        107,
+        89,
+        96
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(448,371)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1481",
+      "name": "FB 1481 predicted black -> black",
+      "hsv": [
+        107,
+        93,
+        74
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(295,163)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1480",
+      "name": "FB 1480 predicted blue -> black",
+      "hsv": [
+        112,
+        175,
+        31
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=blue, center=(365,262)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1479",
+      "name": "FB 1479 predicted blue -> blue",
+      "hsv": [
+        106,
+        254,
+        223
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(441,540)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1478",
+      "name": "FB 1478 predicted blue -> blue",
+      "hsv": [
+        106,
+        254,
+        225
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(478,494)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1477",
+      "name": "FB 1477 predicted blue -> blue",
+      "hsv": [
+        106,
+        253,
+        223
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(29,516)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1476",
+      "name": "FB 1476 predicted blue -> blue",
+      "hsv": [
+        106,
+        251,
+        199
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(38,438)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1475",
+      "name": "FB 1475 predicted purple -> purple",
+      "hsv": [
+        145,
+        146,
+        147
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(151,504)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1474",
+      "name": "FB 1474 predicted purple -> purple",
+      "hsv": [
+        144,
+        131,
+        182
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(241,393)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1473",
+      "name": "FB 1473 predicted purple -> purple",
+      "hsv": [
+        142,
+        127,
+        191
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(314,315)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1472",
+      "name": "FB 1472 predicted purple -> purple",
+      "hsv": [
+        143,
+        112,
+        153
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(246,204)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1471",
+      "name": "FB 1471 predicted purple -> purple",
+      "hsv": [
+        147,
+        145,
+        141
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(160,197)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1470",
+      "name": "FB 1470 predicted black -> purple",
+      "hsv": [
+        152,
+        160,
+        69
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=black, center=(96,74)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1469",
+      "name": "FB 1469 predicted white -> white",
+      "hsv": [
+        80,
+        9,
+        222
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(255,440)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1468",
+      "name": "FB 1468 predicted white -> yellow",
+      "hsv": [
+        32,
+        21,
+        211
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=white, center=(162,475)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1467",
+      "name": "FB 1467 predicted purple -> purple",
+      "hsv": [
+        162,
+        82,
+        118
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(138,844)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1466",
+      "name": "FB 1466 predicted purple -> purple",
+      "hsv": [
+        158,
+        90,
+        98
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(98,576)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1465",
+      "name": "FB 1465 predicted purple -> purple",
+      "hsv": [
+        130,
+        97,
+        164
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(97,468)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1464",
+      "name": "FB 1464 predicted purple -> purple",
+      "hsv": [
+        144,
+        92,
+        175
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(65,383)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1463",
+      "name": "FB 1463 predicted blue -> blue",
+      "hsv": [
+        103,
+        237,
+        117
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(71,699)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1462",
+      "name": "FB 1462 predicted blue -> blue",
+      "hsv": [
+        104,
+        233,
+        149
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(147,755)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1461",
+      "name": "FB 1461 predicted blue -> blue",
+      "hsv": [
+        104,
+        252,
+        178
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(130,686)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1460",
+      "name": "FB 1460 predicted blue -> blue",
+      "hsv": [
+        106,
+        188,
+        81
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(202,587)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1459",
+      "name": "FB 1459 predicted blue -> blue",
+      "hsv": [
+        105,
+        188,
+        193
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(274,468)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1458",
+      "name": "FB 1458 predicted blue -> blue",
+      "hsv": [
+        104,
+        249,
+        221
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(27,551)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1457",
+      "name": "FB 1457 predicted blue -> blue",
+      "hsv": [
+        105,
+        244,
+        230
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(43,316)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1456",
+      "name": "FB 1456 predicted blue -> blue",
+      "hsv": [
+        105,
+        252,
+        240
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(81,332)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1455",
+      "name": "FB 1455 predicted blue -> blue",
+      "hsv": [
+        104,
+        254,
+        217
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(79,138)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1454",
+      "name": "FB 1454 predicted blue -> black",
+      "hsv": [
+        105,
+        59,
+        149
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=blue, center=(244,565)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1453",
+      "name": "FB 1453 predicted black -> black",
+      "hsv": [
+        110,
+        48,
+        16
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(246,592)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1452",
+      "name": "FB 1452 predicted black -> black",
+      "hsv": [
+        106,
+        57,
+        48
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(196,221)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1451",
+      "name": "FB 1451 predicted yellow -> yellow",
+      "hsv": [
+        27,
+        253,
+        215
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(182,396)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1450",
+      "name": "FB 1450 predicted black -> black",
+      "hsv": [
+        101,
+        68,
+        90
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(248,309)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1449",
+      "name": "FB 1449 predicted yellow -> yellow",
+      "hsv": [
+        24,
+        255,
+        209
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(255,126)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1448",
+      "name": "FB 1448 predicted blue -> blue",
+      "hsv": [
+        104,
+        246,
+        216
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(174,658)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1447",
+      "name": "FB 1447 predicted blue -> blue",
+      "hsv": [
+        105,
+        212,
+        206
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(231,589)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1446",
+      "name": "FB 1446 predicted black -> black",
+      "hsv": [
+        75,
+        23,
+        32
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(50,801)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1445",
+      "name": "FB 1445 predicted black -> black",
+      "hsv": [
+        120,
+        34,
+        15
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(7,790)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1444",
+      "name": "FB 1444 predicted black -> black",
+      "hsv": [
+        75,
+        55,
+        15
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(176,876)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1443",
+      "name": "FB 1443 predicted black -> black",
+      "hsv": [
+        109,
+        64,
+        21
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(180,931)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1442",
+      "name": "FB 1442 predicted black -> black",
+      "hsv": [
+        106,
+        90,
+        37
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(104,456)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1441",
+      "name": "FB 1441 predicted black -> black",
+      "hsv": [
+        106,
+        98,
+        41
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(190,475)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1440",
+      "name": "FB 1440 predicted green -> green",
+      "hsv": [
+        78,
+        153,
+        121
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(412,561)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1439",
+      "name": "FB 1439 predicted green -> green",
+      "hsv": [
+        80,
+        172,
+        127
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(399,414)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1438",
+      "name": "FB 1438 predicted green -> green",
+      "hsv": [
+        80,
+        172,
+        127
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(399,414)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1437",
+      "name": "FB 1437 predicted green -> green",
+      "hsv": [
+        70,
+        253,
+        105
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(331,510)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1436",
+      "name": "FB 1436 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        161,
+        186
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(21,393)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1435",
+      "name": "FB 1435 predicted yellow -> yellow",
+      "hsv": [
+        25,
+        254,
+        225
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(61,236)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1434",
+      "name": "FB 1434 predicted yellow -> yellow",
+      "hsv": [
+        25,
+        246,
+        197
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(80,167)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1433",
+      "name": "FB 1433 predicted blue -> blue",
+      "hsv": [
+        104,
+        239,
+        102
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(353,673)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1432",
+      "name": "FB 1432 predicted blue -> blue",
+      "hsv": [
+        105,
+        212,
+        206
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(231,589)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1431",
+      "name": "FB 1431 predicted blue -> blue",
+      "hsv": [
+        104,
+        246,
+        216
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(174,658)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1430",
+      "name": "FB 1430 predicted blue -> blue",
+      "hsv": [
+        104,
+        197,
+        142
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(408,896)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1429",
+      "name": "FB 1429 predicted blue -> white",
+      "hsv": [
+        106,
+        22,
+        197
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=blue, center=(140,676)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1428",
+      "name": "FB 1428 predicted blue -> blue",
+      "hsv": [
+        104,
+        178,
+        120
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(404,778)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1427",
+      "name": "FB 1427 predicted blue -> white",
+      "hsv": [
+        111,
+        10,
+        194
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=blue, center=(344,879)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1426",
+      "name": "FB 1426 predicted white -> white",
+      "hsv": [
+        90,
+        7,
+        193
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(92,950)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1425",
+      "name": "FB 1425 predicted blue -> white",
+      "hsv": [
+        101,
+        27,
+        219
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=blue, center=(70,673)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1424",
+      "name": "FB 1424 predicted blue -> white",
+      "hsv": [
+        105,
+        37,
+        231
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=blue, center=(155,565)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1423",
+      "name": "FB 1423 predicted blue -> white",
+      "hsv": [
+        105,
+        36,
+        237
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=blue, center=(243,268)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1422",
+      "name": "FB 1422 predicted blue -> white",
+      "hsv": [
+        105,
+        28,
+        199
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=blue, center=(207,126)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1421",
+      "name": "FB 1421 predicted yellow -> yellow",
+      "hsv": [
+        24,
+        251,
+        180
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(196,808)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1420",
+      "name": "FB 1420 predicted yellow -> yellow",
+      "hsv": [
+        24,
+        238,
+        139
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(10,787)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1419",
+      "name": "FB 1419 predicted purple -> purple",
+      "hsv": [
+        146,
+        67,
+        171
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(156,557)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1418",
+      "name": "FB 1418 predicted pink -> red",
+      "hsv": [
+        175,
+        184,
+        158
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(87,565)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1417",
+      "name": "FB 1417 predicted red -> red",
+      "hsv": [
+        175,
+        205,
+        182
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(66,513)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1416",
+      "name": "FB 1416 predicted pink -> red",
+      "hsv": [
+        174,
+        185,
+        146
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(32,432)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1415",
+      "name": "FB 1415 predicted pink -> red",
+      "hsv": [
+        174,
+        194,
+        235
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(122,259)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1414",
+      "name": "FB 1414 predicted pink -> red",
+      "hsv": [
+        175,
+        202,
+        228
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(254,183)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1413",
+      "name": "FB 1413 predicted pink -> red",
+      "hsv": [
+        175,
+        204,
+        208
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(179,59)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1412",
+      "name": "FB 1412 predicted black -> black",
+      "hsv": [
+        106,
+        83,
+        101
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(14,348)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1411",
+      "name": "FB 1411 predicted blue -> blue",
+      "hsv": [
+        106,
+        251,
+        135
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(232,537)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1410",
+      "name": "FB 1410 predicted blue -> blue",
+      "hsv": [
+        105,
+        253,
+        102
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(259,552)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1409",
+      "name": "FB 1409 predicted green -> green",
+      "hsv": [
+        72,
+        245,
+        73
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(196,1049)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1408",
+      "name": "FB 1408 predicted green -> green",
+      "hsv": [
+        75,
+        249,
+        82
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(218,820)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1407",
+      "name": "FB 1407 predicted green -> green",
+      "hsv": [
+        77,
+        236,
+        83
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(267,708)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1406",
+      "name": "FB 1406 predicted green -> green",
+      "hsv": [
+        73,
+        251,
+        73
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(212,693)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1405",
+      "name": "FB 1405 predicted mint -> green",
+      "hsv": [
+        81,
+        252,
+        212
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=mint, center=(24,590)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1404",
+      "name": "FB 1404 predicted green -> green",
+      "hsv": [
+        76,
+        253,
+        123
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(140,617)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1403",
+      "name": "FB 1403 predicted mint -> green",
+      "hsv": [
+        82,
+        250,
+        160
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=mint, center=(201,489)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1402",
+      "name": "FB 1402 predicted mint -> green",
+      "hsv": [
+        81,
+        228,
+        179
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=mint, center=(128,366)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1401",
+      "name": "FB 1401 predicted green -> green",
+      "hsv": [
+        79,
+        252,
+        176
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(80,337)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1400",
+      "name": "FB 1400 predicted mint -> green",
+      "hsv": [
+        81,
+        250,
+        153
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=mint, center=(57,321)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1399",
+      "name": "FB 1399 predicted green -> green",
+      "hsv": [
+        78,
+        250,
+        142
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(20,205)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1398",
+      "name": "FB 1398 predicted red -> red",
+      "hsv": [
+        175,
+        175,
+        183
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(86,611)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1397",
+      "name": "FB 1397 predicted red -> red",
+      "hsv": [
+        176,
+        214,
+        202
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(115,247)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1396",
+      "name": "FB 1396 predicted red -> red",
+      "hsv": [
+        176,
+        206,
+        244
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(136,187)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1395",
+      "name": "FB 1395 predicted red -> red",
+      "hsv": [
+        176,
+        215,
+        233
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(206,36)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1394",
+      "name": "FB 1394 predicted purple -> purple",
+      "hsv": [
+        125,
+        118,
+        163
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(129,7)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1393",
+      "name": "FB 1393 predicted purple -> purple",
+      "hsv": [
+        125,
+        112,
+        172
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(105,9)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1392",
+      "name": "FB 1392 predicted mint -> blue",
+      "hsv": [
+        97,
+        135,
+        190
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=mint, center=(247,438)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1391",
+      "name": "FB 1391 predicted purple -> purple",
+      "hsv": [
+        148,
+        75,
+        197
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(154,328)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1390",
+      "name": "FB 1390 predicted pink -> red",
+      "hsv": [
+        176,
+        142,
+        157
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(16,587)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1389",
+      "name": "FB 1389 predicted pink -> pink",
+      "hsv": [
+        170,
+        117,
+        204
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(21,285)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1388",
+      "name": "FB 1388 predicted pink -> pink",
+      "hsv": [
+        160,
+        157,
+        230
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(20,108)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1387",
+      "name": "FB 1387 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        166,
+        195
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(64,681)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1386",
+      "name": "FB 1386 predicted yellow -> yellow",
+      "hsv": [
+        25,
+        153,
+        187
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(47,626)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1385",
+      "name": "FB 1385 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        174,
+        219
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(53,531)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1384",
+      "name": "FB 1384 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        126,
+        207
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(49,432)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1383",
+      "name": "FB 1383 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        155,
+        223
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(101,424)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1382",
+      "name": "FB 1382 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        140,
+        204
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(271,394)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1381",
+      "name": "FB 1381 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        168,
+        230
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(125,253)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1380",
+      "name": "FB 1380 predicted yellow -> yellow",
+      "hsv": [
+        27,
+        254,
+        229
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(91,164)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1379",
+      "name": "FB 1379 predicted yellow -> yellow",
+      "hsv": [
+        27,
+        254,
+        209
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(231,74)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1378",
+      "name": "FB 1378 predicted white -> white",
+      "hsv": [
+        96,
+        11,
+        223
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(162,61)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1377",
+      "name": "FB 1377 predicted white -> white",
+      "hsv": [
+        103,
+        10,
+        229
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(319,138)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1376",
+      "name": "FB 1376 predicted white -> white",
+      "hsv": [
+        103,
+        12,
+        227
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(285,204)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1375",
+      "name": "FB 1375 predicted white -> white",
+      "hsv": [
+        98,
+        14,
+        227
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(198,532)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1374",
+      "name": "FB 1374 predicted black -> white",
+      "hsv": [
+        93,
+        14,
+        138
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=black, center=(380,645)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1373",
+      "name": "FB 1373 predicted white -> white",
+      "hsv": [
+        70,
+        9,
+        174
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(438,628)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1372",
+      "name": "FB 1372 predicted white -> white",
+      "hsv": [
+        90,
+        11,
+        214
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(255,576)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1371",
+      "name": "FB 1371 predicted blue -> blue",
+      "hsv": [
+        103,
+        244,
+        175
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(169,721)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1370",
+      "name": "FB 1370 predicted blue -> blue",
+      "hsv": [
+        107,
+        179,
+        193
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(391,517)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1369",
+      "name": "FB 1369 predicted blue -> blue",
+      "hsv": [
+        104,
+        202,
+        202
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(145,629)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1368",
+      "name": "FB 1368 predicted blue -> blue",
+      "hsv": [
+        104,
+        253,
+        217
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(126,527)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1367",
+      "name": "FB 1367 predicted blue -> blue",
+      "hsv": [
+        103,
+        248,
+        235
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(167,152)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1366",
+      "name": "FB 1366 predicted black -> black",
+      "hsv": [
+        108,
+        87,
+        47
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(474,278)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1365",
+      "name": "FB 1365 predicted purple -> purple",
+      "hsv": [
+        125,
+        84,
+        93
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(405,256)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1364",
+      "name": "FB 1364 predicted purple -> purple",
+      "hsv": [
+        126,
+        124,
+        90
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(418,218)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1363",
+      "name": "FB 1363 predicted purple -> purple",
+      "hsv": [
+        126,
+        107,
+        133
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(366,107)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1362",
+      "name": "FB 1362 predicted lime -> lime",
+      "hsv": [
+        34,
+        196,
+        195
+      ],
+      "expected": "lime",
+      "description": "Imported feedback. predicted=lime, center=(422,342)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1361",
+      "name": "FB 1361 predicted lime -> lime",
+      "hsv": [
+        31,
+        252,
+        157
+      ],
+      "expected": "lime",
+      "description": "Imported feedback. predicted=lime, center=(414,547)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1360",
+      "name": "FB 1360 predicted lime -> lime",
+      "hsv": [
+        32,
+        225,
+        165
+      ],
+      "expected": "lime",
+      "description": "Imported feedback. predicted=lime, center=(426,538)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1359",
+      "name": "FB 1359 predicted lime -> lime",
+      "hsv": [
+        31,
+        240,
+        136
+      ],
+      "expected": "lime",
+      "description": "Imported feedback. predicted=lime, center=(218,570)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1358",
+      "name": "FB 1358 predicted lime -> lime",
+      "hsv": [
+        31,
+        250,
+        145
+      ],
+      "expected": "lime",
+      "description": "Imported feedback. predicted=lime, center=(151,468)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1357",
+      "name": "FB 1357 predicted lime -> lime",
+      "hsv": [
+        36,
+        175,
+        215
+      ],
+      "expected": "lime",
+      "description": "Imported feedback. predicted=lime, center=(231,183)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1356",
+      "name": "FB 1356 predicted lime -> lime",
+      "hsv": [
+        42,
+        173,
+        128
+      ],
+      "expected": "lime",
+      "description": "Imported feedback. predicted=lime, center=(235,189)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1355",
+      "name": "FB 1355 predicted blue -> blue",
+      "hsv": [
+        107,
+        250,
+        181
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(285,105)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1354",
+      "name": "FB 1354 predicted blue -> white",
+      "hsv": [
+        107,
+        43,
+        247
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=blue, center=(469,72)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1353",
+      "name": "FB 1353 predicted white -> white",
+      "hsv": [
+        83,
+        8,
+        186
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(304,286)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1352",
+      "name": "FB 1352 predicted blue -> white",
+      "hsv": [
+        105,
+        35,
+        207
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=blue, center=(459,221)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1351",
+      "name": "FB 1351 predicted black -> white",
+      "hsv": [
+        22,
+        24,
+        134
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=black, center=(107,668)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1350",
+      "name": "FB 1350 predicted black -> white",
+      "hsv": [
+        20,
+        21,
+        132
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=black, center=(49,492)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1349",
+      "name": "FB 1349 predicted yellow -> white",
+      "hsv": [
+        26,
+        30,
+        131
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=yellow, center=(67,432)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1348",
+      "name": "FB 1348 predicted black -> white",
+      "hsv": [
+        25,
+        16,
+        133
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=black, center=(33,324)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1347",
+      "name": "FB 1347 predicted blue -> white",
+      "hsv": [
+        102,
+        28,
+        193
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=blue, center=(168,238)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1346",
+      "name": "FB 1346 predicted blue -> white",
+      "hsv": [
+        105,
+        36,
+        206
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=blue, center=(157,161)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1345",
+      "name": "FB 1345 predicted white -> white",
+      "hsv": [
+        103,
+        30,
+        246
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(146,79)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1344",
+      "name": "FB 1344 predicted purple -> purple",
+      "hsv": [
+        129,
+        94,
+        150
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(10,448)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1343",
+      "name": "FB 1343 predicted green -> green",
+      "hsv": [
+        70,
+        253,
+        135
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(416,597)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1342",
+      "name": "FB 1342 predicted red -> red",
+      "hsv": [
+        178,
+        169,
+        174
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(254,419)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1341",
+      "name": "FB 1341 predicted red -> red",
+      "hsv": [
+        178,
+        192,
+        147
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(469,537)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1340",
+      "name": "FB 1340 predicted red -> red",
+      "hsv": [
+        176,
+        208,
+        238
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(469,468)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1339",
+      "name": "FB 1339 predicted red -> red",
+      "hsv": [
+        177,
+        208,
+        226
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(441,423)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1338",
+      "name": "FB 1338 predicted red -> red",
+      "hsv": [
+        176,
+        189,
+        238
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(433,369)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1337",
+      "name": "FB 1337 predicted red -> red",
+      "hsv": [
+        177,
+        182,
+        210
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(461,179)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1336",
+      "name": "FB 1336 predicted red -> red",
+      "hsv": [
+        177,
+        176,
+        182
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(465,152)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1335",
+      "name": "FB 1335 predicted black -> black",
+      "hsv": [
+        103,
+        38,
+        126
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(269,594)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1334",
+      "name": "FB 1334 predicted black -> black",
+      "hsv": [
+        107,
+        49,
+        181
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(401,474)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1333",
+      "name": "FB 1333 predicted black -> black",
+      "hsv": [
+        105,
+        66,
+        123
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(468,376)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1332",
+      "name": "FB 1332 predicted black -> black",
+      "hsv": [
+        107,
+        72,
+        97
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(453,330)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1331",
+      "name": "FB 1331 predicted white -> white",
+      "hsv": [
+        101,
+        18,
+        240
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(459,249)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1330",
+      "name": "FB 1330 predicted black -> white",
+      "hsv": [
+        50,
+        10,
+        136
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=black, center=(305,603)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1329",
+      "name": "FB 1329 predicted white -> white",
+      "hsv": [
+        103,
+        26,
+        236
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(329,566)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1328",
+      "name": "FB 1328 predicted white -> white",
+      "hsv": [
+        103,
+        20,
+        236
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(290,535)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1327",
+      "name": "FB 1327 predicted white -> white",
+      "hsv": [
+        101,
+        20,
+        228
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(269,467)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1326",
+      "name": "FB 1326 predicted white -> white",
+      "hsv": [
+        101,
+        22,
+        234
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(332,342)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1325",
+      "name": "FB 1325 predicted white -> white",
+      "hsv": [
+        95,
+        15,
+        213
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(306,300)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1324",
+      "name": "FB 1324 predicted blue -> white",
+      "hsv": [
+        101,
+        22,
+        199
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=blue, center=(278,412)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1323",
+      "name": "FB 1323 predicted blue -> blue",
+      "hsv": [
+        108,
+        162,
+        106
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(262,616)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1322",
+      "name": "FB 1322 predicted blue -> blue",
+      "hsv": [
+        104,
+        231,
+        233
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(123,589)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1321",
+      "name": "FB 1321 predicted blue -> blue",
+      "hsv": [
+        105,
+        255,
+        245
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(79,568)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1320",
+      "name": "FB 1320 predicted blue -> blue",
+      "hsv": [
+        105,
+        253,
+        228
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(60,499)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1319",
+      "name": "FB 1319 predicted blue -> blue",
+      "hsv": [
+        108,
+        187,
+        162
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(79,162)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1318",
+      "name": "FB 1318 predicted blue -> blue",
+      "hsv": [
+        104,
+        252,
+        147
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(166,93)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1317",
+      "name": "FB 1317 predicted yellow -> yellow",
+      "hsv": [
+        25,
+        173,
+        182
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(456,508)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1316",
+      "name": "FB 1316 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        205,
+        199
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(201,456)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1315",
+      "name": "FB 1315 predicted yellow -> yellow",
+      "hsv": [
+        27,
+        254,
+        226
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(345,410)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1314",
+      "name": "FB 1314 predicted yellow -> yellow",
+      "hsv": [
+        27,
+        255,
+        235
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(85,313)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1313",
+      "name": "FB 1313 predicted yellow -> yellow",
+      "hsv": [
+        24,
+        174,
+        181
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(195,199)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1312",
+      "name": "FB 1312 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        254,
+        208
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(361,212)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1311",
+      "name": "FB 1311 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        254,
+        208
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(361,212)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1310",
+      "name": "FB 1310 predicted yellow -> yellow",
+      "hsv": [
+        25,
+        255,
+        177
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(278,130)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1309",
+      "name": "FB 1309 predicted yellow -> yellow",
+      "hsv": [
+        25,
+        230,
+        172
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(440,56)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1308",
+      "name": "FB 1308 predicted black -> black",
+      "hsv": [
+        111,
+        85,
+        47
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(55,80)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1307",
+      "name": "FB 1307 predicted black -> black",
+      "hsv": [
+        106,
+        39,
+        175
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(270,256)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1306",
+      "name": "FB 1306 predicted black -> black",
+      "hsv": [
+        109,
+        57,
+        87
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(221,237)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1305",
+      "name": "FB 1305 predicted blue -> blue",
+      "hsv": [
+        108,
+        190,
+        191
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(228,64)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1304",
+      "name": "FB 1304 predicted blue -> blue",
+      "hsv": [
+        106,
+        180,
+        159
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(4,59)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1303",
+      "name": "FB 1303 predicted blue -> blue",
+      "hsv": [
+        105,
+        248,
+        165
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(99,22)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1302",
+      "name": "FB 1302 predicted green -> green",
+      "hsv": [
+        58,
+        172,
+        96
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(39,599)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1301",
+      "name": "FB 1301 predicted green -> green",
+      "hsv": [
+        59,
+        138,
+        113
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(172,563)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1300",
+      "name": "FB 1300 predicted green -> green",
+      "hsv": [
+        59,
+        162,
+        136
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(272,489)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1299",
+      "name": "FB 1299 predicted green -> green",
+      "hsv": [
+        60,
+        149,
+        150
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(271,321)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1298",
+      "name": "FB 1298 predicted green -> green",
+      "hsv": [
+        62,
+        160,
+        104
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(86,292)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1297",
+      "name": "FB 1297 predicted green -> green",
+      "hsv": [
+        65,
+        123,
+        152
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(271,285)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1296",
+      "name": "FB 1296 predicted green -> green",
+      "hsv": [
+        65,
+        162,
+        149
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(336,158)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1295",
+      "name": "FB 1295 predicted green -> green",
+      "hsv": [
+        68,
+        151,
+        146
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(261,51)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1294",
+      "name": "FB 1294 predicted green -> green",
+      "hsv": [
+        68,
+        151,
+        159
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(271,25)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1293",
+      "name": "FB 1293 predicted pink -> red",
+      "hsv": [
+        175,
+        198,
+        160
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(17,486)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1292",
+      "name": "FB 1292 predicted pink -> red",
+      "hsv": [
+        176,
+        142,
+        163
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(240,350)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1291",
+      "name": "FB 1291 predicted pink -> red",
+      "hsv": [
+        175,
+        209,
+        149
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(82,444)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1290",
+      "name": "FB 1290 predicted pink -> red",
+      "hsv": [
+        173,
+        102,
+        199
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(238,112)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1289",
+      "name": "FB 1289 predicted purple -> pink",
+      "hsv": [
+        165,
+        130,
+        180
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=purple, center=(152,226)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1288",
+      "name": "FB 1288 predicted pink -> pink",
+      "hsv": [
+        162,
+        138,
+        224
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(204,106)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1287",
+      "name": "FB 1287 predicted red -> red",
+      "hsv": [
+        175,
+        202,
+        197
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(296,432)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1286",
+      "name": "FB 1286 predicted pink -> red",
+      "hsv": [
+        173,
+        157,
+        203
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(272,110)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1285",
+      "name": "FB 1285 predicted pink -> red",
+      "hsv": [
+        174,
+        185,
+        212
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(279,107)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1284",
+      "name": "FB 1284 predicted pink -> pink",
+      "hsv": [
+        161,
+        159,
+        229
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(375,456)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1283",
+      "name": "FB 1283 predicted pink -> pink",
+      "hsv": [
+        168,
+        186,
+        251
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(305,354)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1282",
+      "name": "FB 1282 predicted pink -> pink",
+      "hsv": [
+        167,
+        181,
+        254
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(352,297)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1281",
+      "name": "FB 1281 predicted pink -> pink",
+      "hsv": [
+        169,
+        187,
+        233
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(181,291)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1280",
+      "name": "FB 1280 predicted pink -> pink",
+      "hsv": [
+        164,
+        251,
+        253
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(165,56)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1279",
+      "name": "FB 1279 predicted pink -> pink",
+      "hsv": [
+        163,
+        239,
+        253
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(342,74)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1278",
+      "name": "FB 1278 predicted purple -> purple",
+      "hsv": [
+        129,
+        112,
+        149
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(174,195)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1277",
+      "name": "FB 1277 predicted purple -> purple",
+      "hsv": [
+        130,
+        103,
+        154
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(202,276)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1276",
+      "name": "FB 1276 predicted purple -> purple",
+      "hsv": [
+        126,
+        98,
+        166
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(156,292)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1275",
+      "name": "FB 1275 predicted purple -> purple",
+      "hsv": [
+        129,
+        95,
+        152
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(235,358)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1274",
+      "name": "FB 1274 predicted purple -> purple",
+      "hsv": [
+        127,
+        114,
+        175
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(215,386)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1273",
+      "name": "FB 1273 predicted purple -> purple",
+      "hsv": [
+        129,
+        114,
+        167
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(177,397)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1272",
+      "name": "FB 1272 predicted purple -> purple",
+      "hsv": [
+        130,
+        115,
+        148
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(104,468)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1271",
+      "name": "FB 1271 predicted purple -> purple",
+      "hsv": [
+        131,
+        117,
+        144
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(91,512)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1270",
+      "name": "FB 1270 predicted purple -> purple",
+      "hsv": [
+        130,
+        94,
+        130
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(220,520)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1269",
+      "name": "FB 1269 predicted purple -> purple",
+      "hsv": [
+        128,
+        99,
+        155
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(201,577)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1268",
+      "name": "FB 1268 predicted purple -> purple",
+      "hsv": [
+        129,
+        96,
+        151
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(133,679)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1267",
+      "name": "FB 1267 predicted purple -> purple",
+      "hsv": [
+        128,
+        97,
+        150
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(210,629)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1266",
+      "name": "FB 1266 predicted black -> black",
+      "hsv": [
+        107,
+        65,
+        110
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(356,662)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1265",
+      "name": "FB 1265 predicted black -> black",
+      "hsv": [
+        108,
+        68,
+        105
+      ],
+      "expected": "black",
+      "description": "Imported feedback. predicted=black, center=(228,699)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1264",
+      "name": "FB 1264 predicted pink -> red",
+      "hsv": [
+        172,
+        166,
+        197
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(13,127)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1263",
+      "name": "FB 1263 predicted pink -> pink",
+      "hsv": [
+        160,
+        144,
+        207
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(9,680)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1262",
+      "name": "FB 1262 predicted pink -> pink",
+      "hsv": [
+        163,
+        220,
+        253
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(19,292)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1261",
+      "name": "FB 1261 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        217,
+        225
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(65,657)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1260",
+      "name": "FB 1260 predicted yellow -> yellow",
+      "hsv": [
+        27,
+        254,
+        235
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(128,585)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1259",
+      "name": "FB 1259 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        217,
+        217
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(47,445)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1258",
+      "name": "FB 1258 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        146,
+        208
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(55,340)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1257",
+      "name": "FB 1257 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        119,
+        219
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(190,358)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1256",
+      "name": "FB 1256 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        254,
+        223
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(283,242)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1255",
+      "name": "FB 1255 predicted yellow -> yellow",
+      "hsv": [
+        24,
+        162,
+        176
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(353,127)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1254",
+      "name": "FB 1254 predicted yellow -> yellow",
+      "hsv": [
+        25,
+        252,
+        167
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(401,110)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1253",
+      "name": "FB 1253 predicted yellow -> yellow",
+      "hsv": [
+        25,
+        252,
+        167
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(383,40)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1252",
+      "name": "FB 1252 predicted blue -> blue",
+      "hsv": [
+        108,
+        185,
+        192
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(401,614)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1251",
+      "name": "FB 1251 predicted blue -> blue",
+      "hsv": [
+        107,
+        219,
+        225
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(183,650)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1250",
+      "name": "FB 1250 predicted blue -> blue",
+      "hsv": [
+        107,
+        212,
+        232
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(278,572)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1249",
+      "name": "FB 1249 predicted blue -> blue",
+      "hsv": [
+        107,
+        194,
+        219
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(57,520)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1248",
+      "name": "FB 1248 predicted blue -> blue",
+      "hsv": [
+        105,
+        237,
+        221
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(352,472)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1247",
+      "name": "FB 1247 predicted blue -> blue",
+      "hsv": [
+        105,
+        254,
+        229
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(307,464)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1246",
+      "name": "FB 1246 predicted blue -> blue",
+      "hsv": [
+        105,
+        253,
+        214
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(283,399)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1245",
+      "name": "FB 1245 predicted blue -> blue",
+      "hsv": [
+        105,
+        254,
+        230
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(103,330)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1244",
+      "name": "FB 1244 predicted blue -> blue",
+      "hsv": [
+        105,
+        252,
+        238
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(76,186)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1243",
+      "name": "FB 1243 predicted blue -> blue",
+      "hsv": [
+        104,
+        250,
+        151
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(316,50)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1242",
+      "name": "FB 1242 predicted red -> red",
+      "hsv": [
+        175,
+        161,
+        173
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=red, center=(8,586)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1241",
+      "name": "FB 1241 predicted pink -> red",
+      "hsv": [
+        174,
+        212,
+        154
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(433,763)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1240",
+      "name": "FB 1240 predicted pink -> red",
+      "hsv": [
+        173,
+        167,
+        192
+      ],
+      "expected": "red",
+      "description": "Imported feedback. predicted=pink, center=(23,258)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1239",
+      "name": "FB 1239 predicted green -> green",
+      "hsv": [
+        79,
+        143,
+        131
+      ],
+      "expected": "green",
+      "description": "Imported feedback. predicted=green, center=(21,211)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1238",
+      "name": "FB 1238 predicted yellow -> yellow",
+      "hsv": [
+        24,
+        93,
+        160
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(399,528)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1237",
+      "name": "FB 1237 predicted yellow -> yellow",
+      "hsv": [
+        28,
+        246,
+        227
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(150,600)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1236",
+      "name": "FB 1236 predicted yellow -> yellow",
+      "hsv": [
+        28,
+        248,
+        232
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(205,549)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1235",
+      "name": "FB 1235 predicted yellow -> yellow",
+      "hsv": [
+        27,
+        248,
+        214
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(388,567)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1234",
+      "name": "FB 1234 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        102,
+        210
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(225,450)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1233",
+      "name": "FB 1233 predicted yellow -> yellow",
+      "hsv": [
+        27,
+        238,
+        234
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(66,459)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1232",
+      "name": "FB 1232 predicted yellow -> yellow",
+      "hsv": [
+        26,
+        228,
+        223
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(63,251)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1231",
+      "name": "FB 1231 predicted yellow -> yellow",
+      "hsv": [
+        25,
+        254,
+        241
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(177,314)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1230",
+      "name": "FB 1230 predicted yellow -> yellow",
+      "hsv": [
+        24,
+        217,
+        180
+      ],
+      "expected": "yellow",
+      "description": "Imported feedback. predicted=yellow, center=(100,154)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1229",
+      "name": "FB 1229 predicted white -> white",
+      "hsv": [
+        103,
+        22,
+        246
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(20,609)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1228",
+      "name": "FB 1228 predicted white -> white",
+      "hsv": [
+        99,
+        17,
+        254
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(47,588)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1227",
+      "name": "FB 1227 predicted white -> white",
+      "hsv": [
+        104,
+        20,
+        232
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(131,742)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1226",
+      "name": "FB 1226 predicted white -> white",
+      "hsv": [
+        103,
+        21,
+        228
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(441,486)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1225",
+      "name": "FB 1225 predicted white -> white",
+      "hsv": [
+        101,
+        25,
+        250
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(156,459)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1224",
+      "name": "FB 1224 predicted white -> white",
+      "hsv": [
+        101,
+        18,
+        242
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(389,349)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1223",
+      "name": "FB 1223 predicted white -> white",
+      "hsv": [
+        24,
+        50,
+        236
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(129,348)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1222",
+      "name": "FB 1222 predicted white -> white",
+      "hsv": [
+        96,
+        11,
+        243
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(263,252)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1221",
+      "name": "FB 1221 predicted white -> white",
+      "hsv": [
+        96,
+        5,
+        240
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(257,214)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1220",
+      "name": "FB 1220 predicted white -> white",
+      "hsv": [
+        98,
+        14,
+        210
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(156,142)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1219",
+      "name": "FB 1219 predicted black -> white",
+      "hsv": [
+        50,
+        5,
+        156
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=black, center=(215,60)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1218",
+      "name": "FB 1218 predicted blue -> blue",
+      "hsv": [
+        105,
+        251,
+        234
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(45,521)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1217",
+      "name": "FB 1217 predicted blue -> blue",
+      "hsv": [
+        107,
+        188,
+        205
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(193,805)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1216",
+      "name": "FB 1216 predicted blue -> blue",
+      "hsv": [
+        105,
+        254,
+        205
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(222,661)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1215",
+      "name": "FB 1215 predicted blue -> blue",
+      "hsv": [
+        105,
+        253,
+        232
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(261,616)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1214",
+      "name": "FB 1214 predicted blue -> blue",
+      "hsv": [
+        105,
+        251,
+        232
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(272,512)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1213",
+      "name": "FB 1213 predicted blue -> blue",
+      "hsv": [
+        105,
+        255,
+        206
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(436,352)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1212",
+      "name": "FB 1212 predicted blue -> blue",
+      "hsv": [
+        105,
+        242,
+        189
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(373,237)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1211",
+      "name": "FB 1211 predicted blue -> blue",
+      "hsv": [
+        106,
+        228,
+        192
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(333,195)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1210",
+      "name": "FB 1210 predicted blue -> blue",
+      "hsv": [
+        105,
+        226,
+        124
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(288,64)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1209",
+      "name": "FB 1209 predicted white -> white",
+      "hsv": [
+        87,
+        17,
+        219
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(454,660)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1208",
+      "name": "FB 1208 predicted pink -> pink",
+      "hsv": [
+        168,
+        184,
+        210
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(587,794)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1207",
+      "name": "FB 1207 predicted pink -> pink",
+      "hsv": [
+        169,
+        183,
+        218
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(509,832)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1206",
+      "name": "FB 1206 predicted lime -> lime",
+      "hsv": [
+        34,
+        250,
+        222
+      ],
+      "expected": "lime",
+      "description": "Imported feedback. predicted=lime, center=(335,923)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1205",
+      "name": "FB 1205 predicted lime -> lime",
+      "hsv": [
+        35,
+        187,
+        210
+      ],
+      "expected": "lime",
+      "description": "Imported feedback. predicted=lime, center=(365,925)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1204",
+      "name": "FB 1204 predicted lime -> lime",
+      "hsv": [
+        35,
+        199,
+        231
+      ],
+      "expected": "lime",
+      "description": "Imported feedback. predicted=lime, center=(462,682)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1203",
+      "name": "FB 1203 predicted lime -> lime",
+      "hsv": [
+        34,
+        245,
+        230
+      ],
+      "expected": "lime",
+      "description": "Imported feedback. predicted=lime, center=(289,756)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1202",
+      "name": "FB 1202 predicted lime -> lime",
+      "hsv": [
+        35,
+        182,
+        238
+      ],
+      "expected": "lime",
+      "description": "Imported feedback. predicted=lime, center=(142,601)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1201",
+      "name": "FB 1201 predicted lime -> lime",
+      "hsv": [
+        34,
+        247,
+        232
+      ],
+      "expected": "lime",
+      "description": "Imported feedback. predicted=lime, center=(239,547)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1200",
+      "name": "FB 1200 predicted lime -> lime",
+      "hsv": [
+        34,
+        253,
+        210
+      ],
+      "expected": "lime",
+      "description": "Imported feedback. predicted=lime, center=(198,472)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1199",
+      "name": "FB 1199 predicted lime -> lime",
+      "hsv": [
+        34,
+        253,
+        241
+      ],
+      "expected": "lime",
+      "description": "Imported feedback. predicted=lime, center=(303,353)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1198",
+      "name": "FB 1198 predicted lime -> lime",
+      "hsv": [
+        34,
+        253,
+        227
+      ],
+      "expected": "lime",
+      "description": "Imported feedback. predicted=lime, center=(253,331)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1197",
+      "name": "FB 1197 predicted lime -> lime",
+      "hsv": [
+        34,
+        254,
+        248
+      ],
+      "expected": "lime",
+      "description": "Imported feedback. predicted=lime, center=(138,272)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1196",
+      "name": "FB 1196 predicted lime -> lime",
+      "hsv": [
+        35,
+        223,
+        222
+      ],
+      "expected": "lime",
+      "description": "Imported feedback. predicted=lime, center=(241,195)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1195",
+      "name": "FB 1195 predicted lime -> lime",
+      "hsv": [
+        34,
+        255,
+        170
+      ],
+      "expected": "lime",
+      "description": "Imported feedback. predicted=lime, center=(305,88)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1194",
+      "name": "FB 1194 predicted white -> white",
+      "hsv": [
+        95,
+        14,
+        190
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(426,126)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1193",
+      "name": "FB 1193 predicted white -> white",
+      "hsv": [
+        55,
+        9,
+        199
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(494,534)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1192",
+      "name": "FB 1192 predicted white -> white",
+      "hsv": [
+        100,
+        18,
+        245
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(529,350)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1191",
+      "name": "FB 1191 predicted white -> white",
+      "hsv": [
+        102,
+        25,
+        230
+      ],
+      "expected": "white",
+      "description": "Imported feedback. predicted=white, center=(519,504)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1190",
+      "name": "FB 1190 predicted pink -> pink",
+      "hsv": [
+        162,
+        124,
+        216
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(516,170)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1189",
+      "name": "FB 1189 predicted pink -> pink",
+      "hsv": [
+        163,
+        124,
+        197
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(428,223)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1188",
+      "name": "FB 1188 predicted purple -> pink",
+      "hsv": [
+        160,
+        104,
+        199
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=purple, center=(575,641)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1187",
+      "name": "FB 1187 predicted purple -> pink",
+      "hsv": [
+        162,
+        105,
+        204
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=purple, center=(381,370)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1186",
+      "name": "FB 1186 predicted purple -> pink",
+      "hsv": [
+        162,
+        102,
+        216
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=purple, center=(382,508)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1185",
+      "name": "FB 1185 predicted purple -> purple",
+      "hsv": [
+        119,
+        127,
+        160
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(96,784)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1184",
+      "name": "FB 1184 predicted purple -> purple",
+      "hsv": [
+        118,
+        115,
+        185
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(78,674)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1183",
+      "name": "FB 1183 predicted purple -> purple",
+      "hsv": [
+        115,
+        52,
+        203
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(181,352)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1182",
+      "name": "FB 1182 predicted purple -> purple",
+      "hsv": [
+        124,
+        96,
+        208
+      ],
+      "expected": "purple",
+      "description": "Imported feedback. predicted=purple, center=(181,326)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1181",
+      "name": "FB 1181 predicted pink -> pink",
+      "hsv": [
+        176,
+        145,
+        162
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(182,529)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1180",
+      "name": "FB 1180 predicted pink -> pink",
+      "hsv": [
+        175,
+        116,
+        149
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(261,601)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1179",
+      "name": "FB 1179 predicted pink -> pink",
+      "hsv": [
+        170,
+        97,
+        182
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(13,721)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1178",
+      "name": "FB 1178 predicted pink -> pink",
+      "hsv": [
+        174,
+        86,
+        140
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(213,866)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1177",
+      "name": "FB 1177 predicted pink -> pink",
+      "hsv": [
+        176,
+        145,
+        162
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(182,529)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1176",
+      "name": "FB 1176 predicted pink -> pink",
+      "hsv": [
+        176,
+        155,
+        171
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(150,530)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1175",
+      "name": "FB 1175 predicted red -> pink",
+      "hsv": [
+        173,
+        138,
+        190
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=red, center=(97,438)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1174",
+      "name": "FB 1174 predicted pink -> pink",
+      "hsv": [
+        169,
+        81,
+        180
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=pink, center=(126,401)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1173",
+      "name": "FB 1173 predicted red -> pink",
+      "hsv": [
+        174,
+        160,
+        185
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=red, center=(49,372)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1172",
+      "name": "FB 1172 predicted red -> pink",
+      "hsv": [
+        173,
+        144,
+        210
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=red, center=(9,230)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1171",
+      "name": "FB 1171 predicted red -> pink",
+      "hsv": [
+        173,
+        129,
+        206
+      ],
+      "expected": "pink",
+      "description": "Imported feedback. predicted=red, center=(59,331)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1170",
+      "name": "FB 1170 predicted blue -> blue",
+      "hsv": [
+        104,
+        220,
+        228
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(145,452)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1169",
+      "name": "FB 1169 predicted blue -> blue",
+      "hsv": [
+        103,
+        249,
+        231
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(57,499)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1168",
+      "name": "FB 1168 predicted blue -> blue",
+      "hsv": [
+        104,
+        254,
+        217
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(192,33)",
+      "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_import_1167",
+      "name": "FB 1167 predicted blue -> blue",
+      "hsv": [
+        106,
+        191,
+        242
+      ],
+      "expected": "blue",
+      "description": "Imported feedback. predicted=blue, center=(60,146)",
+      "source": "feedback_export_2025-10-31T06-46-20"
     }
   ],
   "last_updated": "2025-10-30"
