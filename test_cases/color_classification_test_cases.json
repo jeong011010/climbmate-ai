@@ -8315,7 +8315,3556 @@
       "expected": "blue",
       "description": "Imported feedback. predicted=blue, center=(60,146)",
       "source": "feedback_export_2025-10-31T06-46-20"
+    },
+    {
+      "id": "fb_1887",
+      "name": "FB 1887",
+      "hsv": [
+        105,
+        180,
+        126
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:51:40",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1886",
+      "name": "FB 1886",
+      "hsv": [
+        25,
+        196,
+        218
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:51:34",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1885",
+      "name": "FB 1885",
+      "hsv": [
+        24,
+        132,
+        200
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:51:31",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1883",
+      "name": "FB 1883",
+      "hsv": [
+        25,
+        192,
+        153
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:51:28",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1882",
+      "name": "FB 1882",
+      "hsv": [
+        26,
+        141,
+        172
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:51:23",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1881",
+      "name": "FB 1881",
+      "hsv": [
+        25,
+        179,
+        156
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:51:21",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1880",
+      "name": "FB 1880",
+      "hsv": [
+        23,
+        162,
+        153
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:51:18",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1879",
+      "name": "FB 1879",
+      "hsv": [
+        82,
+        87,
+        215
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: MINT → MINT",
+      "date_added": "2025-10-31 07:51:14",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1878",
+      "name": "FB 1878",
+      "hsv": [
+        79,
+        83,
+        202
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: GREEN → MINT",
+      "date_added": "2025-10-31 07:51:12",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1877",
+      "name": "FB 1877",
+      "hsv": [
+        81,
+        86,
+        199
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: MINT → MINT",
+      "date_added": "2025-10-31 07:51:09",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1876",
+      "name": "FB 1876",
+      "hsv": [
+        77,
+        56,
+        197
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: MINT → MINT",
+      "date_added": "2025-10-31 07:51:06",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1875",
+      "name": "FB 1875",
+      "hsv": [
+        80,
+        51,
+        145
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: MINT → MINT",
+      "date_added": "2025-10-31 07:51:03",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1874",
+      "name": "FB 1874",
+      "hsv": [
+        176,
+        137,
+        129
+      ],
+      "expected": "red",
+      "description": "피드백 병합: PURPLE → RED",
+      "date_added": "2025-10-31 07:51:00",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1873",
+      "name": "FB 1873",
+      "hsv": [
+        177,
+        200,
+        149
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:50:55",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1872",
+      "name": "FB 1872",
+      "hsv": [
+        179,
+        188,
+        138
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:50:51",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1871",
+      "name": "FB 1871",
+      "hsv": [
+        178,
+        189,
+        130
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:50:48",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1870",
+      "name": "FB 1870",
+      "hsv": [
+        23,
+        195,
+        230
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:50:24",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1869",
+      "name": "FB 1869",
+      "hsv": [
+        24,
+        192,
+        241
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:50:22",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1868",
+      "name": "FB 1868",
+      "hsv": [
+        23,
+        198,
+        235
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:50:19",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1867",
+      "name": "FB 1867",
+      "hsv": [
+        24,
+        193,
+        236
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:50:16",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1866",
+      "name": "FB 1866",
+      "hsv": [
+        25,
+        207,
+        242
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:50:13",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1865",
+      "name": "FB 1865",
+      "hsv": [
+        23,
+        207,
+        228
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:50:10",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1864",
+      "name": "FB 1864",
+      "hsv": [
+        23,
+        203,
+        224
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:50:08",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1863",
+      "name": "FB 1863",
+      "hsv": [
+        106,
+        205,
+        151
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:50:01",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1862",
+      "name": "FB 1862",
+      "hsv": [
+        30,
+        22,
+        28
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:49:41",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1861",
+      "name": "FB 1861",
+      "hsv": [
+        80,
+        32,
+        57
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:49:36",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1860",
+      "name": "FB 1860",
+      "hsv": [
+        113,
+        137,
+        13
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:49:33",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1859",
+      "name": "FB 1859",
+      "hsv": [
+        110,
+        35,
+        22
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:49:30",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1858",
+      "name": "FB 1858",
+      "hsv": [
+        1,
+        168,
+        208
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:49:27",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1857",
+      "name": "FB 1857",
+      "hsv": [
+        1,
+        183,
+        193
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:49:25",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1856",
+      "name": "FB 1856",
+      "hsv": [
+        178,
+        164,
+        130
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:49:20",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1855",
+      "name": "FB 1855",
+      "hsv": [
+        70,
+        51,
+        224
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: GREEN → MINT",
+      "date_added": "2025-10-31 07:49:18",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1854",
+      "name": "FB 1854",
+      "hsv": [
+        73,
+        84,
+        166
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: GREEN → MINT",
+      "date_added": "2025-10-31 07:49:15",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1852",
+      "name": "FB 1852",
+      "hsv": [
+        106,
+        188,
+        214
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:49:11",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1851",
+      "name": "FB 1851",
+      "hsv": [
+        107,
+        186,
+        167
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:49:08",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1850",
+      "name": "FB 1850",
+      "hsv": [
+        105,
+        184,
+        227
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:49:05",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1849",
+      "name": "FB 1849",
+      "hsv": [
+        22,
+        209,
+        205
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:48:40",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1848",
+      "name": "FB 1848",
+      "hsv": [
+        24,
+        5,
+        239
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:48:36",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1847",
+      "name": "FB 1847",
+      "hsv": [
+        178,
+        198,
+        87
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:48:33",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1846",
+      "name": "FB 1846",
+      "hsv": [
+        106,
+        168,
+        148
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:48:29",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1845",
+      "name": "FB 1845",
+      "hsv": [
+        106,
+        195,
+        202
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:48:26",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1844",
+      "name": "FB 1844",
+      "hsv": [
+        104,
+        168,
+        176
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:48:24",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1843",
+      "name": "FB 1843",
+      "hsv": [
+        110,
+        16,
+        76
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:48:19",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1842",
+      "name": "FB 1842",
+      "hsv": [
+        110,
+        29,
+        28
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:48:16",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1841",
+      "name": "FB 1841",
+      "hsv": [
+        75,
+        35,
+        17
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:48:13",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1840",
+      "name": "FB 1840",
+      "hsv": [
+        96,
+        51,
+        23
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:48:10",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1839",
+      "name": "FB 1839",
+      "hsv": [
+        72,
+        55,
+        185
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: BLACK → MINT",
+      "date_added": "2025-10-31 07:48:08",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1838",
+      "name": "FB 1838",
+      "hsv": [
+        72,
+        66,
+        187
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: BLACK → MINT",
+      "date_added": "2025-10-31 07:48:06",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1837",
+      "name": "FB 1837",
+      "hsv": [
+        72,
+        64,
+        186
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: BLACK → MINT",
+      "date_added": "2025-10-31 07:48:03",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1836",
+      "name": "FB 1836",
+      "hsv": [
+        72,
+        74,
+        173
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: BLACK → MINT",
+      "date_added": "2025-10-31 07:48:01",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1835",
+      "name": "FB 1835",
+      "hsv": [
+        175,
+        168,
+        128
+      ],
+      "expected": "red",
+      "description": "피드백 병합: PURPLE → RED",
+      "date_added": "2025-10-31 07:47:30",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1834",
+      "name": "FB 1834",
+      "hsv": [
+        175,
+        200,
+        121
+      ],
+      "expected": "red",
+      "description": "피드백 병합: PINK → RED",
+      "date_added": "2025-10-31 07:47:27",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1833",
+      "name": "FB 1833",
+      "hsv": [
+        7,
+        155,
+        183
+      ],
+      "expected": "orange",
+      "description": "피드백 병합: RED → ORANGE",
+      "date_added": "2025-10-31 07:47:24",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1832",
+      "name": "FB 1832",
+      "hsv": [
+        73,
+        180,
+        84
+      ],
+      "expected": "green",
+      "description": "피드백 병합: GREEN → GREEN",
+      "date_added": "2025-10-31 07:47:21",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1831",
+      "name": "FB 1831",
+      "hsv": [
+        80,
+        78,
+        109
+      ],
+      "expected": "green",
+      "description": "피드백 병합: GREEN → GREEN",
+      "date_added": "2025-10-31 07:47:18",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1830",
+      "name": "FB 1830",
+      "hsv": [
+        78,
+        88,
+        113
+      ],
+      "expected": "green",
+      "description": "피드백 병합: MINT → GREEN",
+      "date_added": "2025-10-31 07:47:16",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1829",
+      "name": "FB 1829",
+      "hsv": [
+        74,
+        170,
+        59
+      ],
+      "expected": "green",
+      "description": "피드백 병합: UNKNOWN → GREEN",
+      "date_added": "2025-10-31 07:47:13",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1828",
+      "name": "FB 1828",
+      "hsv": [
+        80,
+        49,
+        128
+      ],
+      "expected": "green",
+      "description": "피드백 병합: BLACK → GREEN",
+      "date_added": "2025-10-31 07:47:11",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1827",
+      "name": "FB 1827",
+      "hsv": [
+        84,
+        24,
+        174
+      ],
+      "expected": "green",
+      "description": "피드백 병합: BLACK → GREEN",
+      "date_added": "2025-10-31 07:47:04",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1826",
+      "name": "FB 1826",
+      "hsv": [
+        168,
+        132,
+        204
+      ],
+      "expected": "pink",
+      "description": "피드백 병합: PINK → PINK",
+      "date_added": "2025-10-31 07:46:59",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1825",
+      "name": "FB 1825",
+      "hsv": [
+        171,
+        179,
+        179
+      ],
+      "expected": "red",
+      "description": "피드백 병합: PINK → RED",
+      "date_added": "2025-10-31 07:46:56",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1824",
+      "name": "FB 1824",
+      "hsv": [
+        178,
+        115,
+        76
+      ],
+      "expected": "red",
+      "description": "피드백 병합: BLACK → RED",
+      "date_added": "2025-10-31 07:46:50",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1823",
+      "name": "FB 1823",
+      "hsv": [
+        178,
+        183,
+        144
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:46:47",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1822",
+      "name": "FB 1822",
+      "hsv": [
+        178,
+        190,
+        127
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:46:43",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1821",
+      "name": "FB 1821",
+      "hsv": [
+        177,
+        248,
+        139
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:46:41",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1820",
+      "name": "FB 1820",
+      "hsv": [
+        177,
+        230,
+        150
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:46:37",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1819",
+      "name": "FB 1819",
+      "hsv": [
+        50,
+        3,
+        216
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:46:33",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1818",
+      "name": "FB 1818",
+      "hsv": [
+        104,
+        111,
+        31
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:46:27",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1817",
+      "name": "FB 1817",
+      "hsv": [
+        102,
+        64,
+        83
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:46:23",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1816",
+      "name": "FB 1816",
+      "hsv": [
+        109,
+        39,
+        92
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:46:20",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1815",
+      "name": "FB 1815",
+      "hsv": [
+        96,
+        128,
+        10
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:46:10",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1814",
+      "name": "FB 1814",
+      "hsv": [
+        103,
+        85,
+        21
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:46:07",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1813",
+      "name": "FB 1813",
+      "hsv": [
+        103,
+        77,
+        23
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:46:03",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1812",
+      "name": "FB 1812",
+      "hsv": [
+        114,
+        24,
+        52
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:45:59",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1811",
+      "name": "FB 1811",
+      "hsv": [
+        90,
+        6,
+        247
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:45:55",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1810",
+      "name": "FB 1810",
+      "hsv": [
+        55,
+        9,
+        220
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:45:52",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1809",
+      "name": "FB 1809",
+      "hsv": [
+        66,
+        5,
+        238
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:45:49",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1808",
+      "name": "FB 1808",
+      "hsv": [
+        30,
+        3,
+        185
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:45:44",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1807",
+      "name": "FB 1807",
+      "hsv": [
+        50,
+        3,
+        239
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:45:40",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1806",
+      "name": "FB 1806",
+      "hsv": [
+        9,
+        192,
+        210
+      ],
+      "expected": "orange",
+      "description": "피드백 병합: ORANGE → ORANGE",
+      "date_added": "2025-10-31 07:45:13",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1805",
+      "name": "FB 1805",
+      "hsv": [
+        10,
+        182,
+        221
+      ],
+      "expected": "orange",
+      "description": "피드백 병합: ORANGE → ORANGE",
+      "date_added": "2025-10-31 07:45:10",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1804",
+      "name": "FB 1804",
+      "hsv": [
+        10,
+        178,
+        225
+      ],
+      "expected": "orange",
+      "description": "피드백 병합: ORANGE → ORANGE",
+      "date_added": "2025-10-31 07:45:06",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1803",
+      "name": "FB 1803",
+      "hsv": [
+        10,
+        191,
+        226
+      ],
+      "expected": "orange",
+      "description": "피드백 병합: ORANGE → ORANGE",
+      "date_added": "2025-10-31 07:45:04",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1802",
+      "name": "FB 1802",
+      "hsv": [
+        175,
+        219,
+        159
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:44:53",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1801",
+      "name": "FB 1801",
+      "hsv": [
+        103,
+        105,
+        17
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:44:51",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1800",
+      "name": "FB 1800",
+      "hsv": [
+        96,
+        118,
+        10
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:44:48",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1799",
+      "name": "FB 1799",
+      "hsv": [
+        103,
+        94,
+        18
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:44:46",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1798",
+      "name": "FB 1798",
+      "hsv": [
+        110,
+        45,
+        17
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:44:43",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1797",
+      "name": "FB 1797",
+      "hsv": [
+        27,
+        202,
+        244
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:44:39",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1796",
+      "name": "FB 1796",
+      "hsv": [
+        26,
+        211,
+        238
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:44:36",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1795",
+      "name": "FB 1795",
+      "hsv": [
+        28,
+        216,
+        246
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:44:33",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1794",
+      "name": "FB 1794",
+      "hsv": [
+        27,
+        212,
+        243
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:44:31",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1793",
+      "name": "FB 1793",
+      "hsv": [
+        27,
+        210,
+        241
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:44:28",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1792",
+      "name": "FB 1792",
+      "hsv": [
+        26,
+        207,
+        244
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:44:25",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1791",
+      "name": "FB 1791",
+      "hsv": [
+        30,
+        8,
+        252
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:44:00",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1790",
+      "name": "FB 1790",
+      "hsv": [
+        30,
+        10,
+        253
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:43:55",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1789",
+      "name": "FB 1789",
+      "hsv": [
+        35,
+        6,
+        247
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:43:52",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1788",
+      "name": "FB 1788",
+      "hsv": [
+        40,
+        7,
+        246
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:43:49",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1787",
+      "name": "FB 1787",
+      "hsv": [
+        30,
+        7,
+        239
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:43:45",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1786",
+      "name": "FB 1786",
+      "hsv": [
+        25,
+        16,
+        247
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:43:41",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1785",
+      "name": "FB 1785",
+      "hsv": [
+        104,
+        220,
+        167
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:43:38",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1784",
+      "name": "FB 1784",
+      "hsv": [
+        104,
+        221,
+        164
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:43:35",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1783",
+      "name": "FB 1783",
+      "hsv": [
+        24,
+        151,
+        157
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:43:05",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1782",
+      "name": "FB 1782",
+      "hsv": [
+        25,
+        207,
+        211
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:43:02",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1781",
+      "name": "FB 1781",
+      "hsv": [
+        25,
+        192,
+        213
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:42:59",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1780",
+      "name": "FB 1780",
+      "hsv": [
+        25,
+        224,
+        218
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:42:56",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1779",
+      "name": "FB 1779",
+      "hsv": [
+        174,
+        161,
+        168
+      ],
+      "expected": "red",
+      "description": "피드백 병합: PINK → RED",
+      "date_added": "2025-10-31 07:42:53",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1778",
+      "name": "FB 1778",
+      "hsv": [
+        175,
+        147,
+        233
+      ],
+      "expected": "red",
+      "description": "피드백 병합: PINK → RED",
+      "date_added": "2025-10-31 07:42:48",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1777",
+      "name": "FB 1777",
+      "hsv": [
+        175,
+        202,
+        188
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:42:46",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1776",
+      "name": "FB 1776",
+      "hsv": [
+        177,
+        188,
+        145
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:42:43",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1775",
+      "name": "FB 1775",
+      "hsv": [
+        104,
+        251,
+        193
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:42:37",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1774",
+      "name": "FB 1774",
+      "hsv": [
+        106,
+        255,
+        148
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:42:35",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1773",
+      "name": "FB 1773",
+      "hsv": [
+        106,
+        252,
+        201
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:42:31",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1772",
+      "name": "FB 1772",
+      "hsv": [
+        106,
+        252,
+        225
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:42:28",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1771",
+      "name": "FB 1771",
+      "hsv": [
+        105,
+        249,
+        204
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:42:01",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1770",
+      "name": "FB 1770",
+      "hsv": [
+        75,
+        85,
+        3
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:41:36",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1769",
+      "name": "FB 1769",
+      "hsv": [
+        110,
+        91,
+        11
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:41:33",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1768",
+      "name": "FB 1768",
+      "hsv": [
+        174,
+        158,
+        45
+      ],
+      "expected": "red",
+      "description": "피드백 병합: BLACK → RED",
+      "date_added": "2025-10-31 07:41:29",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1767",
+      "name": "FB 1767",
+      "hsv": [
+        91,
+        117,
+        49
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: BLACK → MINT",
+      "date_added": "2025-10-31 07:41:26",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1766",
+      "name": "FB 1766",
+      "hsv": [
+        95,
+        85,
+        61
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: BLACK → MINT",
+      "date_added": "2025-10-31 07:41:23",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1765",
+      "name": "FB 1765",
+      "hsv": [
+        110,
+        70,
+        25
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:41:12",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1764",
+      "name": "FB 1764",
+      "hsv": [
+        110,
+        85,
+        10
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:41:09",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1763",
+      "name": "FB 1763",
+      "hsv": [
+        172,
+        113,
+        98
+      ],
+      "expected": "red",
+      "description": "피드백 병합: PURPLE → RED",
+      "date_added": "2025-10-31 07:41:06",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1762",
+      "name": "FB 1762",
+      "hsv": [
+        177,
+        221,
+        61
+      ],
+      "expected": "red",
+      "description": "피드백 병합: BLACK → RED",
+      "date_added": "2025-10-31 07:41:03",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1761",
+      "name": "FB 1761",
+      "hsv": [
+        178,
+        230,
+        64
+      ],
+      "expected": "red",
+      "description": "피드백 병합: BLACK → RED",
+      "date_added": "2025-10-31 07:41:00",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1760",
+      "name": "FB 1760",
+      "hsv": [
+        177,
+        255,
+        72
+      ],
+      "expected": "red",
+      "description": "피드백 병합: BLACK → RED",
+      "date_added": "2025-10-31 07:40:57",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1759",
+      "name": "FB 1759",
+      "hsv": [
+        5,
+        93,
+        39
+      ],
+      "expected": "red",
+      "description": "피드백 병합: BLACK → RED",
+      "date_added": "2025-10-31 07:40:54",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1758",
+      "name": "FB 1758",
+      "hsv": [
+        0,
+        248,
+        66
+      ],
+      "expected": "red",
+      "description": "피드백 병합: BLACK → RED",
+      "date_added": "2025-10-31 07:40:51",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1757",
+      "name": "FB 1757",
+      "hsv": [
+        88,
+        124,
+        34
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: BLACK → MINT",
+      "date_added": "2025-10-31 07:40:47",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1756",
+      "name": "FB 1756",
+      "hsv": [
+        84,
+        142,
+        33
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: BLACK → MINT",
+      "date_added": "2025-10-31 07:40:44",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1755",
+      "name": "FB 1755",
+      "hsv": [
+        87,
+        131,
+        37
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: BLACK → MINT",
+      "date_added": "2025-10-31 07:40:42",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1754",
+      "name": "FB 1754",
+      "hsv": [
+        76,
+        135,
+        31
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: GREEN → MINT",
+      "date_added": "2025-10-31 07:40:39",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1753",
+      "name": "FB 1753",
+      "hsv": [
+        76,
+        142,
+        33
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: GREEN → MINT",
+      "date_added": "2025-10-31 07:40:37",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1752",
+      "name": "FB 1752",
+      "hsv": [
+        35,
+        8,
+        181
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:40:06",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1751",
+      "name": "FB 1751",
+      "hsv": [
+        145,
+        82,
+        42
+      ],
+      "expected": "purple",
+      "description": "피드백 병합: BLACK → PURPLE",
+      "date_added": "2025-10-31 07:40:02",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1750",
+      "name": "FB 1750",
+      "hsv": [
+        137,
+        133,
+        43
+      ],
+      "expected": "purple",
+      "description": "피드백 병합: BLACK → PURPLE",
+      "date_added": "2025-10-31 07:39:59",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1749",
+      "name": "FB 1749",
+      "hsv": [
+        144,
+        89,
+        36
+      ],
+      "expected": "purple",
+      "description": "피드백 병합: BLACK → PURPLE",
+      "date_added": "2025-10-31 07:39:56",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1748",
+      "name": "FB 1748",
+      "hsv": [
+        126,
+        109,
+        97
+      ],
+      "expected": "purple",
+      "description": "피드백 병합: PURPLE → PURPLE",
+      "date_added": "2025-10-31 07:39:52",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1747",
+      "name": "FB 1747",
+      "hsv": [
+        157,
+        107,
+        32
+      ],
+      "expected": "purple",
+      "description": "피드백 병합: PURPLE → PURPLE",
+      "date_added": "2025-10-31 07:39:49",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1746",
+      "name": "FB 1746",
+      "hsv": [
+        145,
+        85,
+        28
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:39:46",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1745",
+      "name": "FB 1745",
+      "hsv": [
+        75,
+        85,
+        7
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:39:43",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1744",
+      "name": "FB 1744",
+      "hsv": [
+        106,
+        46,
+        79
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:39:40",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1743",
+      "name": "FB 1743",
+      "hsv": [
+        110,
+        44,
+        24
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:39:37",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1742",
+      "name": "FB 1742",
+      "hsv": [
+        104,
+        61,
+        78
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:39:35",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1741",
+      "name": "FB 1741",
+      "hsv": [
+        105,
+        69,
+        70
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:39:31",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1740",
+      "name": "FB 1740",
+      "hsv": [
+        32,
+        244,
+        128
+      ],
+      "expected": "lime",
+      "description": "피드백 병합: LIME → LIME",
+      "date_added": "2025-10-31 07:39:29",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1739",
+      "name": "FB 1739",
+      "hsv": [
+        31,
+        253,
+        159
+      ],
+      "expected": "lime",
+      "description": "피드백 병합: LIME → LIME",
+      "date_added": "2025-10-31 07:39:25",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1738",
+      "name": "FB 1738",
+      "hsv": [
+        31,
+        242,
+        159
+      ],
+      "expected": "lime",
+      "description": "피드백 병합: LIME → LIME",
+      "date_added": "2025-10-31 07:39:23",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1737",
+      "name": "FB 1737",
+      "hsv": [
+        31,
+        252,
+        162
+      ],
+      "expected": "lime",
+      "description": "피드백 병합: LIME → LIME",
+      "date_added": "2025-10-31 07:39:20",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1736",
+      "name": "FB 1736",
+      "hsv": [
+        32,
+        252,
+        162
+      ],
+      "expected": "lime",
+      "description": "피드백 병합: LIME → LIME",
+      "date_added": "2025-10-31 07:39:18",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1734",
+      "name": "FB 1734",
+      "hsv": [
+        37,
+        144,
+        87
+      ],
+      "expected": "lime",
+      "description": "피드백 병합: LIME → LIME",
+      "date_added": "2025-10-31 07:39:12",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1733",
+      "name": "FB 1733",
+      "hsv": [
+        106,
+        248,
+        137
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:38:40",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1732",
+      "name": "FB 1732",
+      "hsv": [
+        127,
+        112,
+        123
+      ],
+      "expected": "purple",
+      "description": "피드백 병합: PURPLE → PURPLE",
+      "date_added": "2025-10-31 07:38:38",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1731",
+      "name": "FB 1731",
+      "hsv": [
+        124,
+        108,
+        168
+      ],
+      "expected": "purple",
+      "description": "피드백 병합: BLUE → PURPLE",
+      "date_added": "2025-10-31 07:38:35",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1730",
+      "name": "FB 1730",
+      "hsv": [
+        125,
+        118,
+        175
+      ],
+      "expected": "purple",
+      "description": "피드백 병합: PURPLE → PURPLE",
+      "date_added": "2025-10-31 07:38:33",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1729",
+      "name": "FB 1729",
+      "hsv": [
+        60,
+        56,
+        147
+      ],
+      "expected": "lime",
+      "description": "피드백 병합: BLACK → LIME",
+      "date_added": "2025-10-31 07:38:28",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1728",
+      "name": "FB 1728",
+      "hsv": [
+        106,
+        49,
+        230
+      ],
+      "expected": "white",
+      "description": "피드백 병합: BLUE → WHITE",
+      "date_added": "2025-10-31 07:38:19",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1727",
+      "name": "FB 1727",
+      "hsv": [
+        92,
+        40,
+        221
+      ],
+      "expected": "white",
+      "description": "피드백 병합: MINT → WHITE",
+      "date_added": "2025-10-31 07:38:16",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1726",
+      "name": "FB 1726",
+      "hsv": [
+        103,
+        32,
+        237
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:38:13",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1725",
+      "name": "FB 1725",
+      "hsv": [
+        106,
+        49,
+        247
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:38:10",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1724",
+      "name": "FB 1724",
+      "hsv": [
+        96,
+        10,
+        156
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:38:08",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1723",
+      "name": "FB 1723",
+      "hsv": [
+        107,
+        94,
+        136
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:37:59",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1722",
+      "name": "FB 1722",
+      "hsv": [
+        104,
+        86,
+        129
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:37:57",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1721",
+      "name": "FB 1721",
+      "hsv": [
+        112,
+        80,
+        49
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:37:53",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1720",
+      "name": "FB 1720",
+      "hsv": [
+        115,
+        65,
+        37
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:37:51",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1719",
+      "name": "FB 1719",
+      "hsv": [
+        107,
+        88,
+        118
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:37:47",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1718",
+      "name": "FB 1718",
+      "hsv": [
+        175,
+        181,
+        208
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:37:24",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1717",
+      "name": "FB 1717",
+      "hsv": [
+        175,
+        189,
+        197
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:37:21",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1716",
+      "name": "FB 1716",
+      "hsv": [
+        174,
+        186,
+        208
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:37:18",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1715",
+      "name": "FB 1715",
+      "hsv": [
+        172,
+        155,
+        129
+      ],
+      "expected": "red",
+      "description": "피드백 병합: PURPLE → RED",
+      "date_added": "2025-10-31 07:37:16",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1714",
+      "name": "FB 1714",
+      "hsv": [
+        175,
+        193,
+        173
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:37:13",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1713",
+      "name": "FB 1713",
+      "hsv": [
+        109,
+        135,
+        16
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:37:09",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1712",
+      "name": "FB 1712",
+      "hsv": [
+        113,
+        164,
+        22
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLUE → BLACK",
+      "date_added": "2025-10-31 07:37:06",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1711",
+      "name": "FB 1711",
+      "hsv": [
+        85,
+        124,
+        64
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: BLACK → MINT",
+      "date_added": "2025-10-31 07:37:03",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1710",
+      "name": "FB 1710",
+      "hsv": [
+        98,
+        111,
+        131
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: MINT → MINT",
+      "date_added": "2025-10-31 07:36:56",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1709",
+      "name": "FB 1709",
+      "hsv": [
+        89,
+        119,
+        111
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: GREEN → MINT",
+      "date_added": "2025-10-31 07:36:54",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1708",
+      "name": "FB 1708",
+      "hsv": [
+        100,
+        129,
+        188
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: BLUE → MINT",
+      "date_added": "2025-10-31 07:36:51",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1707",
+      "name": "FB 1707",
+      "hsv": [
+        94,
+        122,
+        191
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: MINT → MINT",
+      "date_added": "2025-10-31 07:36:49",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1706",
+      "name": "FB 1706",
+      "hsv": [
+        93,
+        129,
+        185
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: MINT → MINT",
+      "date_added": "2025-10-31 07:36:47",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1705",
+      "name": "FB 1705",
+      "hsv": [
+        92,
+        117,
+        175
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: MINT → MINT",
+      "date_added": "2025-10-31 07:36:44",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1704",
+      "name": "FB 1704",
+      "hsv": [
+        91,
+        116,
+        172
+      ],
+      "expected": "mint",
+      "description": "피드백 병합: MINT → MINT",
+      "date_added": "2025-10-31 07:36:41",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1703",
+      "name": "FB 1703",
+      "hsv": [
+        104,
+        197,
+        187
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:36:15",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1702",
+      "name": "FB 1702",
+      "hsv": [
+        107,
+        185,
+        195
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:36:03",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1701",
+      "name": "FB 1701",
+      "hsv": [
+        110,
+        43,
+        21
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:36:00",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1700",
+      "name": "FB 1700",
+      "hsv": [
+        30,
+        36,
+        15
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:35:57",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1699",
+      "name": "FB 1699",
+      "hsv": [
+        75,
+        64,
+        8
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:35:54",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1698",
+      "name": "FB 1698",
+      "hsv": [
+        30,
+        128,
+        3
+      ],
+      "expected": "black",
+      "description": "피드백 병합: LIME → BLACK",
+      "date_added": "2025-10-31 07:35:51",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1697",
+      "name": "FB 1697",
+      "hsv": [
+        30,
+        170,
+        2
+      ],
+      "expected": "black",
+      "description": "피드백 병합: LIME → BLACK",
+      "date_added": "2025-10-31 07:35:47",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1696",
+      "name": "FB 1696",
+      "hsv": [
+        17,
+        40,
+        135
+      ],
+      "expected": "white",
+      "description": "피드백 병합: YELLOW → WHITE",
+      "date_added": "2025-10-31 07:35:43",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1695",
+      "name": "FB 1695",
+      "hsv": [
+        21,
+        34,
+        138
+      ],
+      "expected": "white",
+      "description": "피드백 병합: YELLOW → WHITE",
+      "date_added": "2025-10-31 07:35:41",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1694",
+      "name": "FB 1694",
+      "hsv": [
+        35,
+        8,
+        174
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:35:38",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1693",
+      "name": "FB 1693",
+      "hsv": [
+        21,
+        30,
+        170
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:35:35",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1692",
+      "name": "FB 1692",
+      "hsv": [
+        104,
+        20,
+        210
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:35:33",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1691",
+      "name": "FB 1691",
+      "hsv": [
+        98,
+        10,
+        217
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:35:19",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1690",
+      "name": "FB 1690",
+      "hsv": [
+        24,
+        19,
+        214
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:35:16",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1687",
+      "name": "FB 1687",
+      "hsv": [
+        101,
+        21,
+        209
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:34:49",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1686",
+      "name": "FB 1686",
+      "hsv": [
+        105,
+        28,
+        233
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:34:46",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1685",
+      "name": "FB 1685",
+      "hsv": [
+        104,
+        24,
+        209
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:34:43",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1684",
+      "name": "FB 1684",
+      "hsv": [
+        75,
+        128,
+        4
+      ],
+      "expected": "black",
+      "description": "피드백 병합: GREEN → BLACK",
+      "date_added": "2025-10-31 07:34:16",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1683",
+      "name": "FB 1683",
+      "hsv": [
+        107,
+        128,
+        136
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:34:12",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1682",
+      "name": "FB 1682",
+      "hsv": [
+        23,
+        253,
+        143
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:34:09",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1681",
+      "name": "FB 1681",
+      "hsv": [
+        18,
+        47,
+        177
+      ],
+      "expected": "white",
+      "description": "피드백 병합: YELLOW → WHITE",
+      "date_added": "2025-10-31 07:34:06",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1680",
+      "name": "FB 1680",
+      "hsv": [
+        23,
+        217,
+        169
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:34:00",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1679",
+      "name": "FB 1679",
+      "hsv": [
+        23,
+        220,
+        155
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:33:55",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1678",
+      "name": "FB 1678",
+      "hsv": [
+        19,
+        63,
+        123
+      ],
+      "expected": "white",
+      "description": "피드백 병합: YELLOW → WHITE",
+      "date_added": "2025-10-31 07:33:50",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1677",
+      "name": "FB 1677",
+      "hsv": [
+        30,
+        15,
+        192
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:33:47",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1676",
+      "name": "FB 1676",
+      "hsv": [
+        29,
+        21,
+        191
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:33:44",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1675",
+      "name": "FB 1675",
+      "hsv": [
+        50,
+        213,
+        5
+      ],
+      "expected": "black",
+      "description": "피드백 병합: UNKNOWN → BLACK",
+      "date_added": "2025-10-31 07:33:42",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1674",
+      "name": "FB 1674",
+      "hsv": [
+        51,
+        153,
+        5
+      ],
+      "expected": "black",
+      "description": "피드백 병합: UNKNOWN → BLACK",
+      "date_added": "2025-10-31 07:33:38",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1673",
+      "name": "FB 1673",
+      "hsv": [
+        71,
+        185,
+        89
+      ],
+      "expected": "green",
+      "description": "피드백 병합: GREEN → GREEN",
+      "date_added": "2025-10-31 07:33:35",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1672",
+      "name": "FB 1672",
+      "hsv": [
+        68,
+        164,
+        57
+      ],
+      "expected": "green",
+      "description": "피드백 병합: UNKNOWN → GREEN",
+      "date_added": "2025-10-31 07:33:33",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1671",
+      "name": "FB 1671",
+      "hsv": [
+        178,
+        178,
+        150
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:33:04",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1670",
+      "name": "FB 1670",
+      "hsv": [
+        176,
+        200,
+        199
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:33:01",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1669",
+      "name": "FB 1669",
+      "hsv": [
+        175,
+        169,
+        239
+      ],
+      "expected": "red",
+      "description": "피드백 병합: PINK → RED",
+      "date_added": "2025-10-31 07:32:58",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1668",
+      "name": "FB 1668",
+      "hsv": [
+        105,
+        253,
+        212
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:32:43",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1667",
+      "name": "FB 1667",
+      "hsv": [
+        105,
+        253,
+        239
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:32:40",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1666",
+      "name": "FB 1666",
+      "hsv": [
+        104,
+        251,
+        218
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:32:37",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1665",
+      "name": "FB 1665",
+      "hsv": [
+        107,
+        196,
+        139
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:32:33",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1664",
+      "name": "FB 1664",
+      "hsv": [
+        106,
+        255,
+        170
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:32:31",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1663",
+      "name": "FB 1663",
+      "hsv": [
+        104,
+        255,
+        227
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:32:28",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1662",
+      "name": "FB 1662",
+      "hsv": [
+        41,
+        8,
+        201
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:32:25",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1661",
+      "name": "FB 1661",
+      "hsv": [
+        68,
+        14,
+        205
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:32:23",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1660",
+      "name": "FB 1660",
+      "hsv": [
+        105,
+        238,
+        212
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:32:19",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1659",
+      "name": "FB 1659",
+      "hsv": [
+        70,
+        142,
+        77
+      ],
+      "expected": "green",
+      "description": "피드백 병합: GREEN → GREEN",
+      "date_added": "2025-10-31 07:32:16",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1658",
+      "name": "FB 1658",
+      "hsv": [
+        79,
+        158,
+        100
+      ],
+      "expected": "green",
+      "description": "피드백 병합: GREEN → GREEN",
+      "date_added": "2025-10-31 07:32:14",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1657",
+      "name": "FB 1657",
+      "hsv": [
+        75,
+        245,
+        75
+      ],
+      "expected": "green",
+      "description": "피드백 병합: GREEN → GREEN",
+      "date_added": "2025-10-31 07:32:11",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1656",
+      "name": "FB 1656",
+      "hsv": [
+        74,
+        222,
+        49
+      ],
+      "expected": "green",
+      "description": "피드백 병합: UNKNOWN → GREEN",
+      "date_added": "2025-10-31 07:32:07",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1655",
+      "name": "FB 1655",
+      "hsv": [
+        20,
+        59,
+        11
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:31:28",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1654",
+      "name": "FB 1654",
+      "hsv": [
+        151,
+        39,
+        210
+      ],
+      "expected": "purple",
+      "description": "피드백 병합: PURPLE → PURPLE",
+      "date_added": "2025-10-31 07:31:23",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1653",
+      "name": "FB 1653",
+      "hsv": [
+        24,
+        204,
+        165
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:31:20",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1652",
+      "name": "FB 1652",
+      "hsv": [
+        148,
+        61,
+        174
+      ],
+      "expected": "purple",
+      "description": "피드백 병합: PURPLE → PURPLE",
+      "date_added": "2025-10-31 07:31:17",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1651",
+      "name": "FB 1651",
+      "hsv": [
+        175,
+        179,
+        163
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:31:14",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1650",
+      "name": "FB 1650",
+      "hsv": [
+        174,
+        219,
+        169
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:31:11",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1649",
+      "name": "FB 1649",
+      "hsv": [
+        174,
+        186,
+        135
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:31:08",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1648",
+      "name": "FB 1648",
+      "hsv": [
+        174,
+        202,
+        215
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:31:06",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1647",
+      "name": "FB 1647",
+      "hsv": [
+        173,
+        214,
+        203
+      ],
+      "expected": "red",
+      "description": "피드백 병합: PINK → RED",
+      "date_added": "2025-10-31 07:31:03",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1646",
+      "name": "FB 1646",
+      "hsv": [
+        174,
+        222,
+        162
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:31:00",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1645",
+      "name": "FB 1645",
+      "hsv": [
+        30,
+        47,
+        25
+      ],
+      "expected": "black",
+      "description": "피드백 병합: BLACK → BLACK",
+      "date_added": "2025-10-31 07:30:34",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1644",
+      "name": "FB 1644",
+      "hsv": [
+        72,
+        140,
+        89
+      ],
+      "expected": "green",
+      "description": "피드백 병합: GREEN → GREEN",
+      "date_added": "2025-10-31 07:30:29",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1643",
+      "name": "FB 1643",
+      "hsv": [
+        163,
+        175,
+        176
+      ],
+      "expected": "pink",
+      "description": "피드백 병합: PURPLE → PINK",
+      "date_added": "2025-10-31 07:30:25",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1642",
+      "name": "FB 1642",
+      "hsv": [
+        107,
+        204,
+        155
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:30:22",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1641",
+      "name": "FB 1641",
+      "hsv": [
+        107,
+        204,
+        113
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:30:19",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1640",
+      "name": "FB 1640",
+      "hsv": [
+        164,
+        185,
+        161
+      ],
+      "expected": "pink",
+      "description": "피드백 병합: PURPLE → PINK",
+      "date_added": "2025-10-31 07:30:13",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1639",
+      "name": "FB 1639",
+      "hsv": [
+        127,
+        114,
+        77
+      ],
+      "expected": "purple",
+      "description": "피드백 병합: PURPLE → PURPLE",
+      "date_added": "2025-10-31 07:30:10",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1638",
+      "name": "FB 1638",
+      "hsv": [
+        120,
+        80,
+        116
+      ],
+      "expected": "purple",
+      "description": "피드백 병합: BLUE → PURPLE",
+      "date_added": "2025-10-31 07:30:07",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1637",
+      "name": "FB 1637",
+      "hsv": [
+        22,
+        252,
+        165
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:29:52",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1636",
+      "name": "FB 1636",
+      "hsv": [
+        23,
+        254,
+        231
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:29:49",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1635",
+      "name": "FB 1635",
+      "hsv": [
+        25,
+        252,
+        223
+      ],
+      "expected": "yellow",
+      "description": "피드백 병합: YELLOW → YELLOW",
+      "date_added": "2025-10-31 07:28:42",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1634",
+      "name": "FB 1634",
+      "hsv": [
+        176,
+        197,
+        219
+      ],
+      "expected": "red",
+      "description": "피드백 병합: RED → RED",
+      "date_added": "2025-10-31 07:28:36",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1633",
+      "name": "FB 1633",
+      "hsv": [
+        162,
+        139,
+        207
+      ],
+      "expected": "pink",
+      "description": "피드백 병합: PINK → PINK",
+      "date_added": "2025-10-31 07:28:29",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1632",
+      "name": "FB 1632",
+      "hsv": [
+        163,
+        137,
+        214
+      ],
+      "expected": "pink",
+      "description": "피드백 병합: PINK → PINK",
+      "date_added": "2025-10-31 07:28:25",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1631",
+      "name": "FB 1631",
+      "hsv": [
+        164,
+        104,
+        210
+      ],
+      "expected": "pink",
+      "description": "피드백 병합: PINK → PINK",
+      "date_added": "2025-10-31 07:28:22",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1630",
+      "name": "FB 1630",
+      "hsv": [
+        108,
+        168,
+        178
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:28:19",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1629",
+      "name": "FB 1629",
+      "hsv": [
+        163,
+        197,
+        171
+      ],
+      "expected": "pink",
+      "description": "피드백 병합: PURPLE → PINK",
+      "date_added": "2025-10-31 07:28:16",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1628",
+      "name": "FB 1628",
+      "hsv": [
+        160,
+        181,
+        220
+      ],
+      "expected": "pink",
+      "description": "피드백 병합: PINK → PINK",
+      "date_added": "2025-10-31 07:28:10",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1627",
+      "name": "FB 1627",
+      "hsv": [
+        160,
+        182,
+        230
+      ],
+      "expected": "pink",
+      "description": "피드백 병합: PINK → PINK",
+      "date_added": "2025-10-31 07:28:07",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1626",
+      "name": "FB 1626",
+      "hsv": [
+        165,
+        189,
+        147
+      ],
+      "expected": "pink",
+      "description": "피드백 병합: PURPLE → PINK",
+      "date_added": "2025-10-31 07:28:04",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1625",
+      "name": "FB 1625",
+      "hsv": [
+        162,
+        162,
+        184
+      ],
+      "expected": "pink",
+      "description": "피드백 병합: PURPLE → PINK",
+      "date_added": "2025-10-31 07:28:00",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1624",
+      "name": "FB 1624",
+      "hsv": [
+        122,
+        127,
+        182
+      ],
+      "expected": "purple",
+      "description": "피드백 병합: PURPLE → PURPLE",
+      "date_added": "2025-10-31 07:27:53",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1623",
+      "name": "FB 1623",
+      "hsv": [
+        122,
+        110,
+        145
+      ],
+      "expected": "purple",
+      "description": "피드백 병합: BLUE → PURPLE",
+      "date_added": "2025-10-31 07:27:49",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1622",
+      "name": "FB 1622",
+      "hsv": [
+        107,
+        183,
+        198
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:27:46",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1621",
+      "name": "FB 1621",
+      "hsv": [
+        104,
+        253,
+        231
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:27:42",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1620",
+      "name": "FB 1620",
+      "hsv": [
+        104,
+        253,
+        232
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:27:40",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1619",
+      "name": "FB 1619",
+      "hsv": [
+        104,
+        255,
+        231
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:27:37",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1618",
+      "name": "FB 1618",
+      "hsv": [
+        106,
+        195,
+        239
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:27:35",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1617",
+      "name": "FB 1617",
+      "hsv": [
+        106,
+        188,
+        239
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:27:32",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1616",
+      "name": "FB 1616",
+      "hsv": [
+        106,
+        180,
+        237
+      ],
+      "expected": "blue",
+      "description": "피드백 병합: BLUE → BLUE",
+      "date_added": "2025-10-31 07:27:28",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1615",
+      "name": "FB 1615",
+      "hsv": [
+        103,
+        24,
+        237
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:27:23",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1614",
+      "name": "FB 1614",
+      "hsv": [
+        106,
+        28,
+        236
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:27:20",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1613",
+      "name": "FB 1613",
+      "hsv": [
+        105,
+        23,
+        229
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:27:16",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1612",
+      "name": "FB 1612",
+      "hsv": [
+        103,
+        35,
+        235
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:27:10",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1611",
+      "name": "FB 1611",
+      "hsv": [
+        103,
+        26,
+        238
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:27:05",
+      "fix_applied": "feedback_merge"
+    },
+    {
+      "id": "fb_1610",
+      "name": "FB 1610",
+      "hsv": [
+        103,
+        31,
+        226
+      ],
+      "expected": "white",
+      "description": "피드백 병합: WHITE → WHITE",
+      "date_added": "2025-10-31 07:27:01",
+      "fix_applied": "feedback_merge"
     }
   ],
-  "last_updated": "2025-10-30"
+  "last_updated": "2025-10-31 16:56:55"
 }

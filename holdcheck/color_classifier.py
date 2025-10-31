@@ -299,12 +299,68 @@ def get_default_color_ranges_data():
 # ============================================================================
 
 def classify_color_by_hsv(h, s, v, rgb, colors_config):
-    """HSV 범위 기반 색상 분류 (검증된 하드코딩 함수 우선)"""
-    
-    # 🔥 1️⃣ 먼저 검증된 하드코딩 함수 사용 (101개 TC 기반)
-    color_name, confidence = classify_color_simple_hsv(h, s, v)
-    if confidence >= 0.70:  # 신뢰도가 높으면 바로 반환
-        return color_name, confidence, f"Hardcoded: H={h}, S={s}, V={v}"
+    """HSV 범위 기반 색상 분류 (하드코딩 우선 + 경계 ML 하이브리드)"""
+
+    # 1️⃣ 하드코딩 결과 산출
+    base_color, base_conf = classify_color_simple_hsv(h, s, v)
+
+    # 2️⃣ 경계 구간이면 ML 보조 판단 시도 (모델 있을 때만)
+    #   - red/pink/purple 경계: H 155~180
+    #   - mint/green/white 경계: H 70~100
+    #   - blue/purple 경계: H 117~125
+    #   - yellow/lime 경계: H 20~36
+    boundary_type = None
+    if 155 <= h < 180:
+        boundary_type = 'red_pink_purple'
+    elif 70 <= h < 100:
+        boundary_type = 'mint_green_white'
+    elif 117 <= h < 125:
+        boundary_type = 'blue_purple'
+    elif 20 <= h < 36:
+        boundary_type = 'yellow_lime'
+
+    is_boundary = boundary_type is not None
+
+    if is_boundary:
+        # ML 모델 로드 (있을 때만)
+        load_ml_color_model()
+        if _ml_color_model is not None:
+            # LAB 계산
+            try:
+                arr = np.uint8([[[rgb[0], rgb[1], rgb[2]]]])
+                lab = cv2.cvtColor(arr, cv2.COLOR_RGB2LAB)[0][0].tolist()
+            except Exception:
+                lab = [0, 0, 0]
+
+            ml_input = {
+                'rgb': rgb,
+                'hsv': [h, s, v],
+                'lab': lab,
+                'color_stats': {}
+            }
+            ml_color, ml_conf = predict_with_ml(ml_input)
+            # 경계별 허용 클래스 및 임계치
+            allowed_classes = {
+                'red_pink_purple': {'red', 'pink', 'purple'},
+                'mint_green_white': {'mint', 'green', 'white', 'black'},
+                'blue_purple': {'blue', 'purple', 'black', 'white'},
+                'yellow_lime': {'yellow', 'lime', 'white', 'black'},
+            }.get(boundary_type, set())
+            ml_threshold = {
+                'red_pink_purple': 0.70,
+                'mint_green_white': 0.70,
+                'blue_purple': 0.76,
+                'yellow_lime': 0.76,
+            }.get(boundary_type, 0.78)
+
+            # ML이 경계군 내부 예측이고 임계치 이상이면 override (base와 상충 시 우선)
+            if ml_color and ml_color in allowed_classes and ml_conf >= ml_threshold:
+                if ml_color != base_color or ml_conf >= base_conf:
+                    return ml_color, ml_conf, f"Hybrid-ML override[{boundary_type}]: {ml_conf:.2f} (base {base_color}/{base_conf:.2f})"
+
+    # 3️⃣ 하드코딩 결과 반환 (기본)
+    if base_conf >= 0.70:
+        return base_color, base_conf, f"Hardcoded: H={h}, S={s}, V={v}"
     
     # 2️⃣ color_ranges.json 기반 분류 시도 (백업)
     sorted_colors = sorted(colors_config.items(), key=lambda x: x[1].get("priority", 999))
@@ -612,6 +668,9 @@ def classify_color_simple_hsv(h, s, v):
         # 예외: 보라-핑크 경계(H=155~167) 고채도는 어두워도 유채색 유지
         if (h >= 155 and h < 167) and s >= 150 and v >= 55:
             pass
+        # 예외: 핑크/레드 영역(H=166~180) 고채도는 어두워도 유채색 유지
+        elif (h >= 166 and h < 180) and s >= 110 and v >= 55:
+            pass
         elif v < 80:
             # 매우 어두움 → 검정
             return "black", 0.95
@@ -696,6 +755,9 @@ def classify_color_simple_hsv(h, s, v):
         # 국지 베이지 케이스: H=16, S≈32, V≈179 → white 가드
         if h == 16 and s >= 28 and s <= 36 and v >= 175 and v <= 185:
             return "white", 0.85
+        # 추가 white 가드: S≤35 & V≥180
+        if s <= 35 and v >= 180:
+            return "white", 0.85
         if s <= 31 and v >= 150:
             return "white", 0.85
         elif s <= 52 and v >= 200:
@@ -712,6 +774,9 @@ def classify_color_simple_hsv(h, s, v):
         # Yellow: 채도 체크 (white 우선)
         # white↔black 저채도·중명도 white 허용 강화 (H 20~26)
         if h >= 20 and h <= 26 and s <= 22 and v >= 130 and v <= 170:
+            return "white", 0.85
+        # 추가 white 가드: S≤35 & V≥180
+        if s <= 35 and v >= 180:
             return "white", 0.85
         if s <= 31 and v >= 150:
             return "white", 0.85
@@ -730,6 +795,18 @@ def classify_color_simple_hsv(h, s, v):
         if h >= 42 and v < 100 and s > 80:
             return "green", 0.85
         return "lime", 0.90
+    elif h >= 70 and h < 75:
+        # Green↔Mint 경계 보강
+        if s >= 90:
+            return "green", 0.88
+        elif s >= 55 and v >= 165:
+            return "mint", 0.88
+        elif s >= 70 and v < 140:
+            return "green", 0.85
+        elif s <= 25 and v >= 220:
+            return "white", 0.85
+        else:
+            return "mint", 0.75
     elif h >= 75 and h < 80:
         # Mint 경계 (H=75~80) - 고채도는 green으로 보정
         if s >= 100:
@@ -828,6 +905,9 @@ def classify_color_simple_hsv(h, s, v):
             return "purple", 0.85
         if h < 120 and s >= 57 and v >= 193:  # H=117~119, 중간 채도 + 밝으면 purple
             return "purple", 0.85
+        # 추가: H=124, 중고채도+중명도는 purple 우선 (purple→blue 방지)
+        if h >= 124 and s >= 100 and v >= 110:
+            return "purple", 0.85
         # 🔥 H=120, S>=16이면 blue (HSV(120,16,228) 케이스)
         elif s >= 16 and v >= 220 and h >= 120:
             return "blue", 0.80  # 낮은 채도지만 blue-tinted
@@ -845,6 +925,8 @@ def classify_color_simple_hsv(h, s, v):
     elif h >= 125 and h < 155:
         # 보라 순수 범위 (H<155)
         # 🔥 높은 채도는 어두워도 purple! (HSV(125,88,83) 케이스)
+        if h >= 140 and s >= 90 and v >= 40:
+            return "purple", 0.85
         if s >= 80 and v >= 83:  # 높은 채도는 어두워도 purple
             return "purple", 0.90
         elif s >= 50 and v >= 90:
@@ -859,7 +941,7 @@ def classify_color_simple_hsv(h, s, v):
         # 보라-핑크 경계 (H=155~166): 채도+명도로 구분!
         # 🔥 새 케이스: H=159~162, S=92~104는 PURPLE! (HSV(159,92,200), HSV(162,104,198))
         if h <= 162 and s >= 90 and s < 110:
-            if v >= 205:
+            if v >= 195:
                 return "pink", 0.90
             return "purple", 0.90  # H≤162, S=90~110
         # 🔥 새 케이스: H=166, S>=200은 밝으면 pink, 어두우면 purple
@@ -906,6 +988,9 @@ def classify_color_simple_hsv(h, s, v):
         # 새로운 red 보정: H≥177, S≥130, V≥140는 red 경향 (우선)
         elif h >= 177 and s >= 130 and v >= 140:
             return "red", 0.90
+        # H=176, S 130~165 & V 140~180 → red (red→pink 방지)
+        elif h == 176 and s >= 130 and s <= 165 and v >= 140 and v <= 180:
+            return "red", 0.90
         # 핑크 예외: H≤173 또는 (H=174~175이더라도 S≤155 & V≥185) 의 밝은 핑크
         elif h <= 173 and s >= 145 and v >= 185:
             return "pink", 0.90
@@ -916,6 +1001,12 @@ def classify_color_simple_hsv(h, s, v):
             return "pink", 0.90
         # H 173~175, S≥170 & V<180 → red 우선 (단, s≥220 & v<140는 pink 예외 유지)
         elif h >= 173 and h <= 175 and s >= 170 and v < 180 and not (s >= 220 and v < 140) and not (v < 140 and s >= 190):
+            return "red", 0.90
+        # H 172~176, S 100~140 & V 185~220 → red (밝은 중저채도 red 보정)
+        elif h >= 172 and h <= 176 and s >= 100 and s <= 140 and v >= 185 and v <= 220:
+            return "red", 0.90
+        # 추가 red 보정: H 172~174, S≥150 & V≥200 → red
+        elif h >= 172 and h <= 174 and s >= 150 and v >= 200:
             return "red", 0.90
         elif h >= 172 and h < 176 and 80 <= s < 120 and v >= 195:
             return "red", 0.90  # H=172~175, 중간 채도+밝음 → red 보정
@@ -979,11 +1070,14 @@ def classify_color_simple_hsv(h, s, v):
             return "red", 0.90  # H=174, S≥120 → red (HSV(174,122,172))
         elif h >= 174 and s >= 198:
             return "pink", 0.90  # H=174, S≥198 → 진한 pink (HSV(174,198,113))
+        # 어두운 영역: 고채도 red 우선 보정 (red→purple 방지)
+        elif h >= 176 and s >= 133 and v >= 110:
+            return "red", 0.90
         elif h >= 173 and v < 140:
             return "purple", 0.90
         elif s >= 86 and v >= 190 and h < 177:
             return "pink", 0.90
-        elif s >= 100 and v >= 180 and h < 177:
+        elif s >= 120 and v >= 185 and h < 177:
             return "pink", 0.90
         elif s >= 70 and v >= 160 and h < 177:
             return "pink", 0.85
