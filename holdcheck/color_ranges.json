@@ -67,6 +67,27 @@
       ],
       "rgb_conditions": []
     },
+    "orange": {
+      "name": "주황색",
+      "priority": 5,
+      "hsv_ranges": [
+        {
+          "h": [
+            8,
+            18
+          ],
+          "s": [
+            90,
+            255
+          ],
+          "v": [
+            120,
+            255
+          ]
+        }
+      ],
+      "rgb_conditions": []
+    },
     "yellow": {
       "name": "노란색",
       "priority": 6,

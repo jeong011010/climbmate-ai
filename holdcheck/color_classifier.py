@@ -325,6 +325,12 @@ def _candidate_colors_from_ranges(h: int, s: int, v: int, colors_config):
         candidates.update({"mint", "green", "white"})
     elif 20 <= h < 36:
         candidates.update({"yellow", "lime", "white"})
+    elif 8 <= h < 20:
+        candidates.update({"orange", "yellow", "white"})
+    elif 30 <= h < 45:
+        candidates.update({"lime", "green"})
+    elif h < 8:
+        candidates.update({"red", "orange"})
     # 무채색 앵커 후보 추가
     if v < 80 and s < 140:
         candidates.add("black")
@@ -362,8 +368,30 @@ def classify_color_by_hsv(h, s, v, rgb, colors_config):
     # 1️⃣ 하드코딩 결과(정밀) 산출
     base_color, base_conf = classify_color_simple_hsv(h, s, v)
 
+    # 1-보강) 경계에서 RGB 동시채널 보정 (소폭)
+    # - orange↔red (H<12), red↔pink (H 166~176), mint↔green (H 70~85)
+    try:
+        r, g, b = rgb
+    except Exception:
+        r, g, b = 0, 0, 0
+    if 0 <= h < 12 and s >= 100 and v >= 120:
+        # orange: R,G 높고 B 낮음
+        if (r - b >= 80 and g - b >= 40) or (g >= 120 and b <= 110):
+            if base_color == "red" and base_conf <= 0.9:
+                base_color, base_conf = "orange", max(base_conf, 0.86)
+    elif 70 <= h < 85:
+        # mint: G,B 모두 높음
+        if g >= 120 and b >= 120 and b >= g - 20:
+            if base_color == "green" and base_conf <= 0.88:
+                base_color, base_conf = "mint", max(base_conf, 0.86)
+    if 166 <= h < 176:
+        # pink: R 높고 B도 높음(분홍) vs red: R 매우 높고 B 낮음
+        if r >= 170 and b >= 130 and (b - g) >= -10:
+            if base_color == "red" and base_conf <= 0.9:
+                base_color, base_conf = "pink", max(base_conf, 0.86)
+
     # 1-보정) 후보 집합을 벗어나면 후보 쪽으로 스냅(단, 앵커/무후보 제외)
-    if candidates and base_color not in candidates and base_color not in {"black", "white"}:
+    if candidates and base_color not in candidates and base_color not in {"black", "white"} and base_conf < 0.80:
         cand_color, cand_conf = _best_candidate_score(h, s, v, candidates, colors_config)
         if cand_color:
             # 후보 쪽 신뢰가 높거나 베이스 신뢰가 낮으면 후보 채택
@@ -903,13 +931,15 @@ def classify_color_simple_hsv(h, s, v):
         else:
             return "mint", 0.75
     elif h >= 75 and h < 80:
-        # Mint 경계 (H=75~80) - 고채도는 green으로 보정
-        if s >= 100:
+        # Mint 경계 (H=75~80)
+        # 밝고 중고채도(>=70, V>=170)는 mint를 우선
+        if s >= 70 and v >= 170:
+            return "mint", 0.90
+        # 매우 고채도는 어두워도 green
+        elif s >= 100:
             return "green", 0.90
         elif s >= 80 and v >= 120:
             return "green", 0.85
-        elif s >= 70 and v >= 170:
-            return "mint", 0.90
         elif s >= 43 and v >= 200:
             return "mint", 0.85
         elif s >= 80 and v >= 99:
