@@ -24,6 +24,7 @@ VERBOSE = os.getenv('CLIMBMATE_VERBOSE', '0') == '1'
 ML_PRIMARY_THRESHOLD = float(os.getenv('CLIMBMATE_ML_PRIMARY_T', '0.65'))
 LAB_WEIGHT = max(0.0, min(1.0, float(os.getenv('CLIMBMATE_LAB_WEIGHT', '0.3'))))
 RGB_COARSE_ENABLED = os.getenv('CLIMBMATE_RGB_COARSE', '1') == '1'
+RGB_WEIGHT = max(0.0, min(1.0, float(os.getenv('CLIMBMATE_RGB_WEIGHT', '0.2'))))
 
 
 # ============================================================================
@@ -155,6 +156,33 @@ def load_color_ranges(config_path="holdcheck/color_ranges.json"):
     save_color_ranges(_color_ranges_cache, config_path)
     print(f"✅ 기본 색상 범위 생성: {config_path}")
     return _color_ranges_cache
+
+
+def _build_synthetic_color_stats(h: int, s: int, v: int, rgb, lab):
+    """단일 HSV/RGB/LAB로부터 ML이 요구하는 통계 특성을 최소 생성"""
+    r, g, b = rgb
+    L, a, bb = lab
+    hsv_stats = [
+        float(h), float(s), float(v),  # mean
+        0.0, 0.0, 0.0,                 # std
+        float(h), float(s), float(v),  # min
+        float(h), float(s), float(v)   # max
+    ]
+    rgb_stats = [
+        float(r), float(g), float(b),  # mean
+        0.0, 0.0, 0.0,                 # std
+        float(min(r,0)), float(min(g,0)), float(min(b,0)),  # min(0)
+        float(r), float(g), float(b)   # max
+    ]
+    lab_stats = [
+        float(L), float(a), float(bb),  # mean
+        0.0, 0.0, 0.0,                  # std
+    ]
+    return {
+        'hsv_stats': hsv_stats,
+        'rgb_stats': rgb_stats,
+        'lab_stats': lab_stats
+    }
 
 
 def save_color_ranges(ranges, config_path="holdcheck/color_ranges.json"):
@@ -415,9 +443,43 @@ def _lab_hint_score(color_name: str, L: float, a: float, b: float) -> float:
     return max(0.0, min(1.0, score))
 
 
+def _rgb_hint_score(color_name: str, r: int, g: int, b: int) -> float:
+    """RGB 힌트 점수 [0,1]: 채널 지배/두 채널 고값 등 간단 휴리스틱."""
+    maxc, minc = max(r, g, b), min(r, g, b)
+    ch_diff = maxc - minc
+    score = 0.4
+    if color_name == 'white':
+        score = 1.0 if minc > 200 and ch_diff < 15 else 0.4
+    elif color_name == 'black':
+        score = 1.0 if maxc < 80 else 0.4
+    elif color_name == 'red':
+        score = max(score, min(1.0, (r - max(g, b)) / 60))
+    elif color_name == 'orange':
+        score = max(score, min(1.0, (r - b) / 50))
+        score = max(score, min(1.0, (g - b) / 30))
+    elif color_name == 'yellow':
+        score = max(score, min(1.0, (min(r, g) - b) / 50))
+    elif color_name == 'green':
+        score = max(score, min(1.0, (g - max(r, b)) / 40))
+    elif color_name == 'lime':
+        score = max(score, min(1.0, (g - b) / 30))
+    elif color_name == 'mint':
+        score = max(score, min(1.0, (min(g, b) - r) / 40))
+    elif color_name == 'blue':
+        score = max(score, min(1.0, (b - max(r, g)) / 40))
+    elif color_name == 'purple':
+        score = max(score, min(1.0, (b - g) / 30))
+        score = max(score, min(1.0, (r - g) / 30))
+    elif color_name == 'pink':
+        score = max(score, min(1.0, (r - g) / 40))
+        score = max(score, min(1.0, (b - g) / 40))
+    return max(0.0, min(1.0, score))
+
+
 def _best_candidate_score_hsv_lab(h: int, s: int, v: int, rgb, candidates, colors_config):
-    """HSV 중심도(1-LAB_WEIGHT) + LAB 힌트(LAB_WEIGHT) 결합 점수로 후보 선택"""
+    """HSV 중심도 + LAB 힌트 + RGB 힌트 결합 점수로 후보 선택"""
     L, a, b = _rgb_to_lab_signed(rgb)
+    r, g, bb = rgb
     best_color, best_score = None, 0.0
     for color_name in candidates:
         # HSV 신뢰도(최댓값)
@@ -425,7 +487,10 @@ def _best_candidate_score_hsv_lab(h: int, s: int, v: int, rgb, candidates, color
         for hsv_range in colors_config.get(color_name, {}).get("hsv_ranges", []):
             hsv_conf_best = max(hsv_conf_best, calculate_confidence_hsv(h, s, v, hsv_range))
         lab_score = _lab_hint_score(color_name, L, a, b)
-        score = (1.0 - LAB_WEIGHT) * hsv_conf_best + LAB_WEIGHT * lab_score
+        rgb_score = _rgb_hint_score(color_name, r, g, bb)
+        # 정규화: HSV에 (1 - LAB_WEIGHT - RGB_WEIGHT)
+        base_w = max(0.0, 1.0 - LAB_WEIGHT - RGB_WEIGHT)
+        score = base_w * hsv_conf_best + LAB_WEIGHT * lab_score + RGB_WEIGHT * rgb_score
         if score > best_score:
             best_color, best_score = color_name, score
     return best_color, best_score
@@ -458,6 +523,48 @@ def _augment_candidates_with_rgb(rgb, candidates: set) -> set:
     if min(r, g) >= 160 and b <= 150:
         new.update({"yellow", "orange"})
     return new
+
+
+def _post_ml_safety_adjust(h: int, s: int, v: int, rgb, ml_color: str, ml_conf: float, candidates: set):
+    """ML 1차 결과에 안전 가드 적용: white 가드, red/pink 타이브레이크."""
+    r, g, b = rgb
+    # 강한 white 가드
+    if v >= 220 and s <= 25:
+        if ml_color not in {"white", "black"}:
+            return "white", max(ml_conf, 0.88)
+    # 완화 white 가드: 밝고 저채도일 때 mint/lime/yellow로의 비약 방지
+    if v >= 200 and s <= 35 and ml_color in {"mint", "lime", "yellow", "green", "blue"}:
+        return "white", max(ml_conf, 0.85)
+
+    # red↔pink 타이브레이크: R이 B보다 충분히 높으면 red 우선(중명도, 고채도)
+    if 166 <= h < 180 and s >= 120 and 120 <= v <= 225:
+        if (r - b) >= 40 and ml_color == "pink" and ml_conf < 0.92:
+            return "red", max(ml_conf, 0.88)
+
+    # mint↔green: 70~85, G/B 모두 높고 R 낮으면 mint 우선
+    if 70 <= h < 85:
+        if min(g, b) >= 140 and r <= 150:
+            if ml_color == "green" and ml_conf < 0.92:
+                return "mint", max(ml_conf, 0.87)
+
+    # red↔orange: H<12, R 매우 높고 B 낮으며 G도 높으면 orange 우선
+    if 0 <= h < 12 and s >= 140 and v >= 150:
+        if (r - b) >= 60 and (g - b) >= 20:
+            if ml_color == "red" and ml_conf < 0.92:
+                return "orange", max(ml_conf, 0.87)
+
+    return ml_color, ml_conf
+
+
+def _white_guard_only(h: int, s: int, v: int, rgb, color: str, conf: float):
+    """하드코딩 반환 시, white 관련 혼동만 보수적으로 교정"""
+    # 강한 white 가드
+    if v >= 220 and s <= 25 and color not in {"white", "black"}:
+        return "white", max(conf, 0.88)
+    # 완화 white 가드
+    if v >= 200 and s <= 35 and color in {"mint", "lime", "yellow", "green", "blue"}:
+        return "white", max(conf, 0.85)
+    return color, conf
 
 
 def classify_color_by_hsv(h, s, v, rgb, colors_config):
@@ -500,7 +607,9 @@ def classify_color_by_hsv(h, s, v, rgb, colors_config):
         ml_threshold = ML_PRIMARY_THRESHOLD  # 환경변수로 조정 가능
 
         if ml_color and (not allowed or ml_color in allowed) and ml_conf >= ml_threshold:
-            return ml_color, ml_conf, f"ML-primary: {ml_conf:.2f} (candidates={sorted(list(candidates)) if candidates else 'none'})"
+            # 안전 가드 적용
+            adj_color, adj_conf = _post_ml_safety_adjust(h, s, v, rgb, ml_color, ml_conf, candidates)
+            return adj_color, adj_conf, f"ML-primary: {adj_conf:.2f} (base={ml_color}/{ml_conf:.2f}; candidates={sorted(list(candidates)) if candidates else 'none'})"
 
     # 1️⃣ 하드코딩 결과(정밀) 산출
     base_color, base_conf = classify_color_simple_hsv(h, s, v)
@@ -570,7 +679,9 @@ def classify_color_by_hsv(h, s, v, rgb, colors_config):
                 'rgb': rgb,
                 'hsv': [h, s, v],
                 'lab': lab,
-                'color_stats': {}
+                'color_stats': _build_synthetic_color_stats(h, s, v, rgb, lab),
+                'area': 0,
+                'circularity': 0.0,
             }
             ml_color, ml_conf = predict_with_ml(ml_input)
             # 경계별 허용 클래스 및 임계치
@@ -602,7 +713,9 @@ def classify_color_by_hsv(h, s, v, rgb, colors_config):
 
     # 3️⃣ 하드코딩(or 후보 스냅) 결과 반환 (기본)
     if base_conf >= 0.70:
-        return base_color, base_conf, f"Hardcoded/Coarse: H={h}, S={s}, V={v} (candidates={sorted(list(candidates)) if candidates else 'none'})"
+        # 하드코딩 결과엔 white 혼동만 보수적으로 교정
+        adj_color, adj_conf = _white_guard_only(h, s, v, rgb, base_color, base_conf)
+        return adj_color, adj_conf, f"Hardcoded/Coarse: H={h}, S={s}, V={v} (candidates={sorted(list(candidates)) if candidates else 'none'})"
 
     # 4️⃣ color_ranges.json 기반 분류 시도 (백업)
     sorted_colors = sorted(colors_config.items(), key=lambda x: x[1].get("priority", 999))

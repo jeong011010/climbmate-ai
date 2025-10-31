@@ -130,3 +130,4 @@ if __name__ == "__main__":
 		print(f"\n🎉 훌륭합니다! 정확도 {acc:.1f}%")
 	else:
 		print(f"\n✅ 양호합니다. 정확도 {acc:.1f}%")
+

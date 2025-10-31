@@ -5,6 +5,7 @@
 
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.preprocessing import LabelEncoder
 import pickle
@@ -121,6 +122,10 @@ def train_difficulty_model(training_data: List[Dict]) -> Tuple[float, float]:
     # 특징 추출
     X = []
     y = []
+    sample_weights = []
+    sample_weights = []
+    sample_weights = []
+    sample_weights = []
     
     for data in training_data:
         features = extract_features(data['holds_data'])
@@ -129,6 +134,10 @@ def train_difficulty_model(training_data: List[Dict]) -> Tuple[float, float]:
     
     X = np.array(X)
     y = np.array(y)
+    sample_weights = np.array(sample_weights) if len(sample_weights) == len(y) else np.ones(len(y))
+    sample_weights = np.array(sample_weights) if len(sample_weights) == len(y) else np.ones(len(y))
+    sample_weights = np.array(sample_weights) if len(sample_weights) == len(y) else np.ones(len(y))
+    sample_weights = np.array(sample_weights) if len(sample_weights) == len(y) else np.ones(len(y))
     
     # 라벨 인코딩
     label_encoder = LabelEncoder()
@@ -180,6 +189,7 @@ def train_type_model(training_data: List[Dict]) -> Tuple[float, float]:
     # 특징 추출
     X = []
     y = []
+    sample_weights = []
     
     for data in training_data:
         features = extract_features(data['holds_data'])
@@ -188,6 +198,7 @@ def train_type_model(training_data: List[Dict]) -> Tuple[float, float]:
     
     X = np.array(X)
     y = np.array(y)
+    sample_weights = np.array(sample_weights) if len(sample_weights) == len(y) else np.ones(len(y))
     
     # 라벨 인코딩
     label_encoder = LabelEncoder()
@@ -249,6 +260,56 @@ def predict_difficulty(holds_data: List[Dict]) -> Dict:
         # 예측
         prediction = model.predict(features)[0]
         probabilities = model.predict_proba(features)[0]
+        # 경계 prior 보정 (HSV 기반 가벼운 multiplier)
+        try:
+            hsv = [0, 0, 128]
+            h, s, v = int(hsv[0]), int(hsv[1]), int(hsv[2])
+            class_list = list(encoder.classes_)
+            mult = {c: 1.0 for c in class_list}
+            # white guard
+            if v >= 220 and s <= 35:
+                mult['white'] = 1.3
+                for c in ('mint','lime','yellow','green','blue'):
+                    if c in mult: mult[c] *= 0.85
+            # black guard (저명도)
+            if v <= 120 and s <= 90:
+                if 'black' in mult: mult['black'] *= 1.35
+                if 'white' in mult: mult['white'] *= 0.80
+            # red/pink/purple 경계
+            if 166 <= h < 180 and s >= 120:
+                if 'red' in mult: mult['red'] *= 1.12
+                if 'pink' in mult: mult['pink'] *= 0.95
+            # pink 강화 (밝고 고채도, 169~174)
+            if 169 <= h < 174 and s >= 150 and v >= 150:
+                if 'pink' in mult: mult['pink'] *= 1.20
+                if 'red' in mult: mult['red'] *= 0.92
+                if 'purple' in mult: mult['purple'] *= 0.96
+            # pink vs purple: 155~166, 고명도일수록 pink 가중
+            if 155 <= h < 166 and s >= 80 and v >= 170:
+                if 'pink' in mult: mult['pink'] *= 1.08
+                if 'purple' in mult: mult['purple'] *= 0.96
+            # mint/green 경계
+            if 70 <= h < 85:
+                if s >= 70 and v >= 170:
+                    if 'mint' in mult: mult['mint'] *= 1.12
+                    if 'green' in mult: mult['green'] *= 0.95
+                else:
+                    if 'mint' in mult: mult['mint'] *= 1.06
+            # orange/red 경계
+            if 0 <= h < 12 and s >= 140 and v >= 150:
+                if 'orange' in mult: mult['orange'] *= 1.08
+            # 적용
+            probs = {c: float(p) for c, p in zip(class_list, probabilities)}
+            probs = {c: probs[c]*mult.get(c,1.0) for c in probs}
+            total = sum(probs.values())
+            if total > 0:
+                probabilities = np.array([probs[c]/total for c in class_list])
+                # 상위1 재계산
+                prediction = np.argmax(probabilities)
+                color = encoder.inverse_transform([prediction])[0]
+                confidence = float(np.max(probabilities))
+        except Exception as e:
+            pass
         
         grade = encoder.inverse_transform([prediction])[0]
         confidence = float(np.max(probabilities))
@@ -380,6 +441,7 @@ def train_color_model(training_data: List[Dict]) -> Tuple[float, float]:
     # 특징 추출
     X = []
     y = []
+    sample_weights = []
     
     for data in training_data:
         try:
@@ -391,6 +453,35 @@ def train_color_model(training_data: List[Dict]) -> Tuple[float, float]:
             features = extract_color_features(data)
             X.append(features)
             y.append(data['correct_color'])
+            # 경계 가중치(데이터 기반 샘플 가중)
+            w = 1.0
+            hsv = data.get('hsv') or data.get('dominant_hsv') or data.get('color_stats', {}).get('dominant_hsv')
+            if isinstance(hsv, (list, tuple)) and len(hsv) == 3:
+                h, s, v = int(hsv[0]), int(hsv[1]), int(hsv[2])
+                label = (data['correct_color'] or '').lower()
+                # pink 경계 강화 (명도↑, 저채도↑일수록 강화)
+                if label == 'pink' and 167 <= h < 176 and v >= 160:
+                    w *= 1.28
+                    if s <= 140 and v >= 185:
+                        w *= 1.10
+                # black 경계 강화 (더 보수)
+                if label == 'black' and v <= 115 and s <= 85:
+                    w *= 1.30
+                # mint 경계 강화
+                if label == 'mint' and 70 <= h < 85 and s >= 70 and v >= 170:
+                    w *= 1.20
+                # red 경계 강화
+                if label == 'red' and 166 <= h < 180 and s >= 120 and v >= 120:
+                    w *= 1.08
+                    if 169 <= h < 176 and v < 165 and s >= 170:
+                        w *= 1.05
+                # white 경계 강화 (매우 밝고 저채도)
+                if label == 'white' and v >= 230 and s <= 28:
+                    w *= 1.15
+                # green 경계 강화 (저채도·고명도 경계에서 green 보강)
+                if label == 'green' and h < 90 and s <= 65 and v >= 160:
+                    w *= 1.15
+            sample_weights.append(w)
         except Exception as e:
             print(f"   ⚠️ 특징 추출 실패: {e}, 데이터: {data}")
             continue
@@ -401,6 +492,7 @@ def train_color_model(training_data: List[Dict]) -> Tuple[float, float]:
     
     X = np.array(X)
     y = np.array(y)
+    sample_weights = np.array(sample_weights) if len(sample_weights) == len(y) else np.ones(len(y))
     
     unique_colors, counts = np.unique(y, return_counts=True)
     print(f"   색상 분포: {dict(zip(unique_colors, counts))}")
@@ -418,6 +510,7 @@ def train_color_model(training_data: List[Dict]) -> Tuple[float, float]:
     mask = np.isin(y, classes_to_keep)
     X = X[mask]
     y = y[mask]
+    sample_weights = sample_weights[mask]
     
     print(f"   ✅ 학습에 사용할 데이터: {len(X)}개 (필터링 후)")
     
@@ -431,16 +524,16 @@ def train_color_model(training_data: List[Dict]) -> Tuple[float, float]:
     
     # 학습/테스트 분할
     if can_stratify:
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y_encoded, test_size=0.2, random_state=42, stratify=y_encoded
+        X_train, X_test, y_train, y_test, w_train, w_test = train_test_split(
+            X, y_encoded, sample_weights, test_size=0.2, random_state=42, stratify=y_encoded
         )
     else:
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y_encoded, test_size=0.2, random_state=42
+        X_train, X_test, y_train, y_test, w_train, w_test = train_test_split(
+            X, y_encoded, sample_weights, test_size=0.2, random_state=42
         )
     
-    # 모델 학습 (Random Forest - 색상 분류에 적합)
-    model = RandomForestClassifier(
+    # 베이스 모델 (Random Forest)
+    base_model = RandomForestClassifier(
         n_estimators=200,
         max_depth=15,
         min_samples_split=5,
@@ -449,7 +542,14 @@ def train_color_model(training_data: List[Dict]) -> Tuple[float, float]:
         class_weight='balanced'  # 불균형 데이터 처리
     )
     
-    model.fit(X_train, y_train)
+    # 확률 캘리브레이션 (Isotonic; 데이터 충분 시 더 정확)
+    try:
+        model = CalibratedClassifierCV(estimator=base_model, method='isotonic', cv=3)
+        model.fit(X_train, y_train, sample_weight=w_train)
+    except Exception as e:
+        print(f"   ⚠️ Isotonic 캘리브레이션 실패: {e} → sigmoid로 폴백")
+        model = CalibratedClassifierCV(estimator=base_model, method='sigmoid', cv=3)
+        model.fit(X_train, y_train, sample_weight=w_train)
     
     # 정확도 평가
     train_accuracy = model.score(X_train, y_train)
@@ -472,10 +572,19 @@ def train_color_model(training_data: List[Dict]) -> Tuple[float, float]:
     print(f"   ✅ 테스트 정확도: {test_accuracy*100:.1f}%")
     print(f"   ✅ CV 정확도: {cv_accuracy*100:.1f}%")
     
-    # Feature Importance
-    feature_importance = model.feature_importances_
-    top_features = np.argsort(feature_importance)[::-1][:5]
-    print(f"   🔝 중요 특징 (인덱스): {top_features}")
+    # Feature Importance (가능한 경우에만)
+    try:
+        if hasattr(model, 'feature_importances_'):
+            fi = model.feature_importances_
+        elif hasattr(model, 'base_estimator_') and hasattr(model.base_estimator_, 'feature_importances_'):
+            fi = model.base_estimator_.feature_importances_
+        else:
+            fi = None
+        if fi is not None:
+            top_features = np.argsort(fi)[::-1][:5]
+            print(f"   🔝 중요 특징 (인덱스): {top_features}")
+    except Exception:
+        pass
     
     # 모델 저장
     with open(COLOR_MODEL_PATH, 'wb') as f:
@@ -507,6 +616,68 @@ def predict_color(hold_features: Dict) -> Dict:
         # 예측
         prediction = model.predict(features)[0]
         probabilities = model.predict_proba(features)[0]
+        
+        # HSV 기반 가벼운 prior 보정 (pink↔red, green↔mint, red↔orange, black↔white)
+        try:
+            hsv = hold_features.get('hsv') or hold_features.get('dominant_hsv') or hold_features.get('color_stats', {}).get('dominant_hsv')
+            if isinstance(hsv, (list, tuple)) and len(hsv) == 3:
+                h, s, v = int(hsv[0]), int(hsv[1]), int(hsv[2])
+                class_list = list(encoder.classes_)
+                mult = {c: 1.0 for c in class_list}
+                # black guard: 저명도 저채도는 black 보수 강화
+                if v <= 115 and s <= 85 and 'black' in mult:
+                    mult['black'] *= 1.18
+                    if 'white' in mult: mult['white'] *= 0.90
+                # pink 강화: 밝은 고명도 & 저~중채도는 pink 쪽에 가중
+                if 167 <= h < 176 and v >= 165:
+                    if 'pink' in mult: mult['pink'] *= 1.26
+                    # 매우 밝은 저채도 핑크 쪽 추가 가중
+                    if s <= 140 and v >= 185 and 'pink' in mult:
+                        mult['pink'] *= 1.06
+                    # 밝고 저~중채도 전체를 약간 추가 가중
+                    if s <= 150 and v >= 175 and 'pink' in mult:
+                        mult['pink'] *= 1.04
+                    # 매우 밝고 더 낮은 채도 구간에 보너스 가중
+                    if s <= 130 and v >= 195 and 'pink' in mult:
+                        mult['pink'] *= 1.03
+                    # 어두운 고채도 경계는 red 보강
+                    if v < 165 and s >= 170 and 'red' in mult:
+                        mult['red'] *= 1.05
+                    # 매우 밝은 저채도 구간은 red 감쇠 강화
+                    if s <= 140 and v >= 185 and 'red' in mult:
+                        mult['red'] *= 0.93
+                # green↔mint: h<90 저채도·고명도는 green 보수 강화, mint 감쇠
+                if h < 90 and 60 <= s <= 80 and 160 <= v <= 200:
+                    if 'green' in mult: mult['green'] *= 1.12
+                    if 'mint' in mult: mult['mint'] *= 0.94
+                if h < 90 and s < 60 and v >= 160:
+                    if 'green' in mult: mult['green'] *= 1.15
+                    if 'mint' in mult: mult['mint'] *= 0.94
+                # red↔orange: 극저h, 고채도·고명도는 오렌지 보강
+                if 0 <= h < 9 and s >= 160 and v >= 150:
+                    if 'orange' in mult: mult['orange'] *= 1.15
+                    if 'red' in mult: mult['red'] *= 0.94
+                # h<5의 극저h에서 추가 억제/보강
+                if 0 <= h < 5 and s >= 180 and v >= 160:
+                    if 'orange' in mult: mult['orange'] *= 1.03
+                    if 'red' in mult: mult['red'] *= 0.98
+                # white guard: 매우 밝고 저채도는 white 보강, 주변색 감쇠
+                if v >= 230 and s <= 28 and 'white' in mult:
+                    mult['white'] *= 1.12
+                    for c in ('mint','lime','yellow','green','blue'):
+                        if c in mult: mult[c] *= 0.95
+                # white vs yellow(베이지 근접) 감쇠: h 18~26, v 200~235, s 28~40이면 yellow 감쇠
+                if 18 <= h <= 26 and 200 <= v <= 235 and 28 <= s <= 40:
+                    if 'yellow' in mult: mult['yellow'] *= 0.90
+                # 적용
+                probs = {c: float(p) for c, p in zip(class_list, probabilities)}
+                probs = {c: probs[c]*mult.get(c, 1.0) for c in probs}
+                total = sum(probs.values())
+                if total > 0:
+                    probabilities = np.array([probs[c]/total for c in class_list])
+                    prediction = np.argmax(probabilities)
+        except Exception:
+            pass
         
         color = encoder.inverse_transform([prediction])[0]
         confidence = float(np.max(probabilities))
