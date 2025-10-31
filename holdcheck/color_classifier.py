@@ -298,11 +298,80 @@ def get_default_color_ranges_data():
 # 🎨 색상 분류 함수
 # ============================================================================
 
-def classify_color_by_hsv(h, s, v, rgb, colors_config):
-    """HSV 범위 기반 색상 분류 (하드코딩 우선 + 경계 ML 하이브리드)"""
+def _candidate_colors_from_ranges(h: int, s: int, v: int, colors_config):
+    """color_ranges.json을 이용해 coarse 후보 색 집합 추출"""
+    candidates = set()
+    for color_name, config in colors_config.items():
+        for hsv_range in config.get("hsv_ranges", []):
+            h_min, h_max = hsv_range["h"]
+            s_min, s_max = hsv_range["s"]
+            v_min, v_max = hsv_range["v"]
 
-    # 1️⃣ 하드코딩 결과 산출
+            # Hue는 원형
+            if h_min <= h_max:
+                h_match = h_min <= h <= h_max
+            else:
+                h_match = (h >= h_min) or (h <= h_max)
+
+            if h_match and s_min <= s <= s_max and v_min <= v <= v_max:
+                candidates.add(color_name)
+                break
+    # 경계 구간은 넓게 허용 (휴리스틱)
+    if 166 <= h < 180:
+        candidates.update({"red", "pink", "purple"})
+    elif 117 <= h <= 125:
+        candidates.update({"blue", "purple"})
+    elif 70 <= h < 100:
+        candidates.update({"mint", "green", "white"})
+    elif 20 <= h < 36:
+        candidates.update({"yellow", "lime", "white"})
+    # 무채색 앵커 후보 추가
+    if v < 80 and s < 140:
+        candidates.add("black")
+    if v >= 220 and s <= 20:
+        candidates.add("white")
+    return candidates
+
+
+def _best_candidate_score(h: int, s: int, v: int, candidates, colors_config):
+    """후보 색상들 중 HSV 중심과의 거리 기반 최고 점수 선택"""
+    best_color, best_conf = None, 0.0
+    for color_name in candidates:
+        for hsv_range in colors_config[color_name].get("hsv_ranges", []):
+            conf = calculate_confidence_hsv(h, s, v, hsv_range)
+            if conf > best_conf:
+                best_color, best_conf = color_name, conf
+    return best_color, best_conf
+
+
+def classify_color_by_hsv(h, s, v, rgb, colors_config):
+    """HSV 분류 (coarse→refine→ML). ranges로 후보를 좁히고, 룰로 정밀화, 경계에서만 ML."""
+
+    # 0️⃣ coarse 후보 추출
+    candidates = _candidate_colors_from_ranges(h, s, v, colors_config)
+
+    # 앵커 규칙: 극단 무채색과 고채도 red는 ML이 덮지 못함
+    anchor_color = None
+    if v < 70 and s < 140:
+        anchor_color = "black"
+    elif v >= 230 and s <= 12:
+        anchor_color = "white"
+    elif h >= 176 and s >= 150 and v >= 90:
+        anchor_color = "red"
+
+    # 1️⃣ 하드코딩 결과(정밀) 산출
     base_color, base_conf = classify_color_simple_hsv(h, s, v)
+
+    # 1-보정) 후보 집합을 벗어나면 후보 쪽으로 스냅(단, 앵커/무후보 제외)
+    if candidates and base_color not in candidates and base_color not in {"black", "white"}:
+        cand_color, cand_conf = _best_candidate_score(h, s, v, candidates, colors_config)
+        if cand_color:
+            # 후보 쪽 신뢰가 높거나 베이스 신뢰가 낮으면 후보 채택
+            if cand_conf >= max(base_conf, 0.78):
+                base_color, base_conf = cand_color, cand_conf
+            else:
+                # ML 개입 여지를 주기 위해 살짝 낮춤
+                base_conf = min(base_conf, 0.74)
 
     # 2️⃣ 경계 구간이면 ML 보조 판단 시도 (모델 있을 때만)
     #   - red/pink/purple 경계: H 155~180
@@ -353,16 +422,24 @@ def classify_color_by_hsv(h, s, v, rgb, colors_config):
                 'yellow_lime': 0.76,
             }.get(boundary_type, 0.78)
 
-            # ML이 경계군 내부 예측이고 임계치 이상이면 override (base와 상충 시 우선)
-            if ml_color and ml_color in allowed_classes and ml_conf >= ml_threshold:
+            # 후보 집합이 있으면 ML 허용 집합을 후보로 추가 제한
+            if candidates:
+                allowed_classes = allowed_classes.intersection(candidates.union({'white','black'}))
+
+            # 앵커가 있으면 ML 오버라이드 금지
+            if anchor_color is not None:
+                allowed_classes = set()
+
+            # ML이 허용 집합 내에서 임계치 이상이면 override
+            if ml_color and (not allowed_classes or ml_color in allowed_classes) and ml_conf >= ml_threshold:
                 if ml_color != base_color or ml_conf >= base_conf:
                     return ml_color, ml_conf, f"Hybrid-ML override[{boundary_type}]: {ml_conf:.2f} (base {base_color}/{base_conf:.2f})"
 
-    # 3️⃣ 하드코딩 결과 반환 (기본)
+    # 3️⃣ 하드코딩(or 후보 스냅) 결과 반환 (기본)
     if base_conf >= 0.70:
-        return base_color, base_conf, f"Hardcoded: H={h}, S={s}, V={v}"
-    
-    # 2️⃣ color_ranges.json 기반 분류 시도 (백업)
+        return base_color, base_conf, f"Hardcoded/Coarse: H={h}, S={s}, V={v} (candidates={sorted(list(candidates)) if candidates else 'none'})"
+
+    # 4️⃣ color_ranges.json 기반 분류 시도 (백업)
     sorted_colors = sorted(colors_config.items(), key=lambda x: x[1].get("priority", 999))
     
     for color_name, config in sorted_colors:
@@ -391,7 +468,7 @@ def classify_color_by_hsv(h, s, v, rgb, colors_config):
                     confidence = 0.8  # RGB 조건은 약간 낮은 신뢰도
                     return color_name, confidence, f"color_ranges.json RGB: {rgb}"
     
-    # 3️⃣ 매칭 실패 - 폴백
+    # 5️⃣ 매칭 실패 - 폴백
     return find_nearest_color_hsv(h, s, v, colors_config)
 
 

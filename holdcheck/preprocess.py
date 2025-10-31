@@ -1649,7 +1649,23 @@ def preprocess(image_input, model_path="/app/holdcheck/roboflow_weights/weights.
 
     h_img, w_img = original_image.shape[:2]
     # 🔥 작은 홀드 보강: 입력을 크게 리사이즈해서 YOLO가 더 조밀하게 보게 함
+    # 자동 가중(멀리서 찍힌 이미지에 더 크게 확대)
+    try:
+        auto_on = os.getenv('CLIMBMATE_UPSCALE_AUTO', '1') == '1'
+    except Exception:
+        auto_on = True
     upscale_factor = max(1.0, float(upscale_factor))
+    if auto_on:
+        long_side = max(h_img, w_img)
+        # 카메라가 멀수록(long_side가 작을수록) 더 크게 스케일업
+        if long_side < 900:
+            upscale_factor = max(upscale_factor, 3.0)
+        elif long_side < 1200:
+            upscale_factor = max(upscale_factor, 2.6)
+        elif long_side < 1600:
+            upscale_factor = max(upscale_factor, 2.2)
+        else:
+            upscale_factor = max(upscale_factor, 1.8)
     base_side = 640
     base_imgsz = 512
     target_side = min(_round_to_multiple(base_side * upscale_factor), max_side)
