@@ -90,6 +90,60 @@ export const useFeedback = ({
     }
   }
 
+  // 🎨 색상 피드백 전체 삭제
+  const deleteAllFeedbacks = async () => {
+    if (colorFeedbacks.length === 0) {
+      alert('삭제할 피드백이 없습니다.')
+      return
+    }
+
+    if (!confirm(`⚠️ 누적된 피드백 ${colorFeedbacks.length}개를 모두 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`)) {
+      return
+    }
+
+    try {
+      setFeedbacksLoading(true)
+      const data = await api.deleteAllColorFeedbacks()
+      alert(`🗑️ 피드백 ${data.deleted_count}개를 삭제했습니다.`)
+      loadColorFeedbacks()
+    } catch (error) {
+      console.error('전체 피드백 삭제 실패:', error)
+      alert('전체 피드백 삭제에 실패했습니다.')
+    } finally {
+      setFeedbacksLoading(false)
+    }
+  }
+
+  // 📤 색상 피드백 JSON 내보내기
+  const exportColorFeedbacks = async () => {
+    try {
+      const data = await api.exportColorFeedbacks()
+
+      if (!data.feedbacks || data.feedbacks.length === 0) {
+        alert('내보낼 피드백이 없습니다.')
+        return
+      }
+
+      const jsonString = JSON.stringify(data.feedbacks, null, 2)
+      const blob = new Blob([jsonString], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+      link.href = url
+      link.download = `color-feedback-${timestamp}.json`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+
+      alert(`✅ 피드백 ${data.count}개를 JSON으로 추출했습니다.`)
+    } catch (error) {
+      console.error('피드백 내보내기 실패:', error)
+      alert('피드백 JSON 내보내기에 실패했습니다.')
+    }
+  }
+
   // 🤖 ML 학습 실행
   const trainColorModel = async () => {
     const confirmedCount = colorFeedbacks.filter(f => f.confirmed).length
@@ -186,6 +240,8 @@ export const useFeedback = ({
     confirmFeedback,
     confirmAllFeedbacks,
     deleteFeedback,
+    deleteAllFeedbacks,
+    exportColorFeedbacks,
     trainColorModel,
     checkGpt4Status,
     testGpt4,

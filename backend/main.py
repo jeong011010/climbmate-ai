@@ -645,6 +645,48 @@ if DB_AVAILABLE:
             print(f"❌ 피드백 삭제 오류: {e}")
             raise HTTPException(status_code=500, detail=str(e))
 
+    @app.delete("/api/color-feedbacks")
+    async def delete_all_color_feedbacks():
+        """🎨 모든 홀드 색상 피드백 삭제"""
+        try:
+            if not DB_AVAILABLE:
+                raise HTTPException(status_code=503, detail="Database not available")
+
+            from database import delete_all_color_feedbacks
+            deleted_count = delete_all_color_feedbacks()
+
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "message": "모든 피드백을 삭제했습니다.",
+                    "deleted_count": deleted_count
+                }
+            )
+        except Exception as e:
+            print(f"❌ 전체 피드백 삭제 오류: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
+
+    @app.get("/api/color-feedbacks/export")
+    async def export_color_feedbacks():
+        """🎨 홀드 색상 피드백 JSON 추출"""
+        try:
+            if not DB_AVAILABLE:
+                raise HTTPException(status_code=503, detail="Database not available")
+
+            from database import get_color_feedbacks_for_export
+            feedbacks = get_color_feedbacks_for_export()
+
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "feedbacks": feedbacks,
+                    "count": len(feedbacks)
+                }
+            )
+        except Exception as e:
+            print(f"❌ 피드백 JSON 추출 오류: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
+
 if ML_AVAILABLE and DB_AVAILABLE:
     @app.get("/api/ml-model-stats")
     async def get_ml_model_stats():

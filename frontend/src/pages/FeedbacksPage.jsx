@@ -61,7 +61,9 @@ const FeedbacksPage = ({
   trainColorModel,
   confirmFeedback,
   confirmAllFeedbacks,
-  deleteFeedback
+  deleteFeedback,
+  deleteAllFeedbacks,
+  exportColorFeedbacks
 }) => {
   const [mlStats, setMlStats] = useState(null)
   const [statsLoading, setStatsLoading] = useState(false)
@@ -91,6 +93,22 @@ const FeedbacksPage = ({
         <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-800">🎨 색상 피드백 관리</h2>
           <div className="flex gap-2">
+            <button
+              onClick={exportColorFeedbacks}
+              disabled={feedbacksLoading}
+              className="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              📤 JSON 추출
+            </button>
+            {colorFeedbacks.length > 0 && (
+              <button
+                onClick={deleteAllFeedbacks}
+                disabled={feedbacksLoading}
+                className="px-4 py-2 bg-gradient-to-r from-rose-500 to-red-600 text-white rounded-lg hover:shadow-lg transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                🗑️ 전체 삭제
+              </button>
+            )}
             {colorFeedbacks.filter(f => !f.confirmed).length > 0 && (
               <button
                 onClick={confirmAllFeedbacks}

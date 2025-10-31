@@ -522,6 +522,85 @@ def delete_color_feedback(feedback_id: int):
     print(f"✅ 피드백 ID {feedback_id} 삭제 완료")
     return True
 
+
+def delete_all_color_feedbacks() -> int:
+    """🎨 색상 피드백 전체 삭제"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT COUNT(*) FROM hold_color_feedback")
+    count = cursor.fetchone()[0]
+
+    if count == 0:
+        conn.close()
+        print("ℹ️ 삭제할 피드백이 없습니다")
+        return 0
+
+    cursor.execute("DELETE FROM hold_color_feedback")
+    conn.commit()
+    conn.close()
+
+    print(f"🗑️ 총 {count}개의 피드백을 삭제했습니다")
+    return count
+
+
+def get_color_feedbacks_for_export() -> List[Dict]:
+    """🎨 JSON 내보내기용 홀드 색상 피드백 전체 조회"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT 
+            id, problem_id, hold_id,
+            center_x, center_y,
+            rgb_r, rgb_g, rgb_b,
+            hsv_h, hsv_s, hsv_v,
+            lab_l, lab_a, lab_b,
+            color_stats,
+            predicted_color, user_correct_color,
+            created_at, confirmed
+        FROM hold_color_feedback
+        ORDER BY created_at DESC
+    """)
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    feedbacks = []
+    for row in rows:
+        color_stats = json.loads(row[14]) if row[14] else {}
+        feedbacks.append({
+            'id': row[0],
+            'problem_id': row[1],
+            'hold_id': row[2],
+            'center': {
+                'x': row[3],
+                'y': row[4]
+            },
+            'rgb': {
+                'r': row[5],
+                'g': row[6],
+                'b': row[7]
+            },
+            'hsv': {
+                'h': row[8],
+                's': row[9],
+                'v': row[10]
+            },
+            'lab': {
+                'l': row[11],
+                'a': row[12],
+                'b': row[13]
+            },
+            'color_stats': color_stats,
+            'predicted_color': row[15],
+            'user_correct_color': row[16],
+            'created_at': row[17],
+            'confirmed': row[18] == 1
+        })
+
+    return feedbacks
+
 def calculate_statistics(holds_data: List[Dict]) -> Dict:
     """홀드 데이터로부터 통계 계산"""
     if not holds_data:

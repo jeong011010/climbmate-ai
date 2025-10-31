@@ -53,6 +53,32 @@ export const deleteColorFeedback = async (feedbackId) => {
 }
 
 /**
+ * 색상 피드백 전체 삭제
+ */
+export const deleteAllColorFeedbacks = async () => {
+  try {
+    const response = await axios.delete(`${API_URL}/api/color-feedbacks`)
+    return response.data
+  } catch (error) {
+    console.error('❌ 전체 피드백 삭제 실패:', error)
+    throw error
+  }
+}
+
+/**
+ * 색상 피드백 JSON 추출
+ */
+export const exportColorFeedbacks = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/api/color-feedbacks/export`)
+    return response.data
+  } catch (error) {
+    console.error('❌ 피드백 내보내기 실패:', error)
+    throw error
+  }
+}
+
+/**
  * 색상 ML 모델 학습
  */
 export const trainColorModel = async () => {
