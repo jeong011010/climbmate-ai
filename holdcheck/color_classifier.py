@@ -540,10 +540,15 @@ def _post_ml_safety_adjust(h: int, s: int, v: int, rgb, ml_color: str, ml_conf: 
     if v >= 200 and s <= 35 and ml_color in {"mint", "lime", "yellow", "green", "blue"}:
         return "white", max(ml_conf, 0.85)
 
-    # red↔pink 타이브레이크: R이 B보다 충분히 높으면 red 우선(중명도, 고채도)
-    if 166 <= h < 180 and s >= 120 and 120 <= v <= 225:
-        if (r - b) >= 40 and ml_color == "pink" and ml_conf < 0.92:
+    # red↔pink 타이브레이크 조정
+    # - 진적색 영역(문턱 ↑): H>=174에서만 pink→red 뒤집기 허용, 조건 강화
+    if 174 <= h < 180 and s >= 120 and 120 <= v <= 225:
+        if (r - b) >= 50 and ml_color == "pink" and ml_conf < 0.92:
             return "red", max(ml_conf, 0.88)
+    # - 마젠타 영역 보호: H 169~173, 충분히 밝고 채도 높으면 red→pink로 보정 허용
+    if 169 <= h < 174 and s >= 140 and v >= 160:
+        if ml_color == "red" and ml_conf < 0.93:
+            return "pink", max(ml_conf, 0.88)
 
     # mint↔green: 70~85, G/B 모두 높고 R 낮으면 mint 우선
     if 70 <= h < 85:
