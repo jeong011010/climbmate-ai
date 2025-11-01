@@ -698,6 +698,10 @@ if ML_AVAILABLE and DB_AVAILABLE:
             import pickle
             from collections import Counter
             from database import get_color_training_data
+            import json as _json
+            import time as _time
+            import sys as _sys
+            import numpy as _np
             
             # 모델 파일 존재 여부
             model_path = os.path.join(os.path.dirname(__file__), 'models', 'color_model.pkl')
@@ -745,6 +749,53 @@ if ML_AVAILABLE and DB_AVAILABLE:
                             ml_cv_accuracy = meta.get('cv_accuracy', None)
                 except:
                     pass
+
+            # 현재 저장소 내 테스트 케이스 기준 런타임 정확도 (색상)
+            runtime_color_accuracy = None
+            runtime_color_counts = None
+            try:
+                # holdcheck 경로 보장
+                holdcheck_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'holdcheck')
+                if holdcheck_path not in _sys.path:
+                    _sys.path.insert(0, holdcheck_path)
+                from color_classifier import load_color_ranges, classify_color_by_hsv, hsv_to_rgb_fast
+
+                tc_path = os.path.normpath(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'test_cases', 'color_classification_test_cases.json'))
+                if os.path.exists(tc_path):
+                    with open(tc_path, 'r', encoding='utf-8') as f:
+                        cases = _json.load(f)
+                    ranges_data = load_color_ranges(os.path.join(holdcheck_path, 'color_ranges.json'))
+                    colors_config = ranges_data["colors"]
+                    total, correct = 0, 0
+                    per_color = {}
+                    start = _time.time()
+                    for case in cases:
+                        total += 1
+                        try:
+                            expected = (case.get('expected') or case.get('correct_color') or '').lower()
+                            hsv = case.get('hsv') or case.get('dominant_hsv') or case.get('color_stats', {}).get('dominant_hsv')
+                            if isinstance(hsv, dict):
+                                h, s, v = int(hsv.get('h', 0)), int(hsv.get('s', 0)), int(hsv.get('v', 128))
+                            elif isinstance(hsv, (list, tuple)) and len(hsv) == 3:
+                                h, s, v = int(hsv[0]), int(hsv[1]), int(hsv[2])
+                            else:
+                                h, s, v = 0, 0, 128
+                            rgb = hsv_to_rgb_fast(h, s, v)
+                            pred, _conf, _ = classify_color_by_hsv(h, s, v, rgb, colors_config)
+                            if pred == expected:
+                                correct += 1
+                                per_color[expected] = per_color.get(expected, 0) + 1
+                        except Exception:
+                            continue
+                        # 안전 타임아웃 (대략 2초 넘으면 중단)
+                        if _time.time() - start > 2.5:
+                            break
+                    if total > 0:
+                        runtime_color_accuracy = round((correct / total) * 100, 1)
+                        runtime_color_counts = {"correct": int(correct), "total": int(total), "by_color": per_color}
+            except Exception as _e:
+                runtime_color_accuracy = None
+                runtime_color_counts = None
             
             return JSONResponse(
                 status_code=200,
@@ -756,6 +807,8 @@ if ML_AVAILABLE and DB_AVAILABLE:
                     "rule_based_accuracy": round(rule_based_accuracy, 1),
                     "ml_test_accuracy": round(ml_accuracy * 100, 1) if ml_accuracy else None,
                     "ml_cv_accuracy": round(ml_cv_accuracy * 100, 1) if ml_cv_accuracy else None,
+                    "runtime_color_accuracy": runtime_color_accuracy,
+                    "runtime_color_counts": runtime_color_counts,
                     "color_distribution": dict(color_distribution),
                     "top_misclassifications": dict(sorted(misclassifications.items(), key=lambda x: -x[1])[:10]),
                     "can_train": total_samples >= 30,

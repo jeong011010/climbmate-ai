@@ -143,10 +143,10 @@ const FeedbacksPage = ({
                 label="규칙 기반 정확도" 
                 color="blue"
               />
-              {mlStats.ml_test_accuracy && (
+              {(mlStats.runtime_color_accuracy || mlStats.ml_test_accuracy) && (
                 <CircularGauge 
-                  value={mlStats.ml_test_accuracy} 
-                  label="ML 테스트 정확도" 
+                  value={mlStats.runtime_color_accuracy || mlStats.ml_test_accuracy} 
+                  label={mlStats.runtime_color_accuracy ? "현재 색상모델 정확도" : "ML 테스트 정확도"} 
                   color="green"
                 />
               )}
@@ -163,6 +163,14 @@ const FeedbacksPage = ({
                 color={mlStats.can_train ? "green" : "red"}
               />
             </div>
+
+            {mlStats.runtime_color_counts && (
+              <div className="mb-4 text-xs text-slate-600">
+                <span className="px-2 py-1 bg-emerald-50 border border-emerald-200 rounded-md mr-2">
+                  현재 모델 평가: {mlStats.runtime_color_counts.correct}/{mlStats.runtime_color_counts.total}
+                </span>
+              </div>
+            )}
             
             {/* 색상별 분포 */}
             {mlStats.color_distribution && Object.keys(mlStats.color_distribution).length > 0 && (
