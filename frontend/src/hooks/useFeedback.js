@@ -21,10 +21,10 @@ export const useFeedback = ({
   }
 
   // 🎨 색상 피드백 목록 로드
-  const loadColorFeedbacks = async () => {
+  const loadColorFeedbacks = async (limit = 300, offset = 0) => {
     setFeedbacksLoading(true)
     try {
-      const data = await api.getColorFeedbacks()
+      const data = await api.getColorFeedbacks(limit, offset)
       setColorFeedbacks(data.feedbacks || [])
       console.log(`✅ 피드백 ${data.count}개 로드 완료`)
     } catch (error) {

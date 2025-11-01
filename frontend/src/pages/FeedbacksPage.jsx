@@ -119,7 +119,7 @@ const FeedbacksPage = ({
               </button>
             )}
             <button
-              onClick={() => { loadColorFeedbacks(); loadMlStats(); }}
+              onClick={() => { loadColorFeedbacks(300, 0); loadMlStats(); }}
               className="px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all"
             >
               🔄 새로고침
@@ -220,7 +220,7 @@ const FeedbacksPage = ({
             <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <p className="text-sm text-blue-800">
-                  📊 총 <span className="font-bold text-lg">{colorFeedbacks.length}</span>개의 피드백
+                  📊 총 <span className="font-bold text-lg">{colorFeedbacks.length}</span>개의 피드백 (최대 300개 표시)
                   <span className="mx-2">|</span>
                   ✅ 확인됨: <span className="font-bold">{colorFeedbacks.filter(f => f.confirmed).length}</span>개
                   <span className="mx-2">|</span>

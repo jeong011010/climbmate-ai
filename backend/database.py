@@ -429,26 +429,30 @@ def get_color_training_data(min_samples: int = 10, confirmed_only: bool = False)
     print(f"✅ 색상 학습 데이터 {len(training_data)}건 로드")
     return training_data
 
-def get_all_color_feedbacks() -> List[Dict]:
-    """🎨 모든 홀드 색상 피드백 가져오기 (관리용)"""
+def get_all_color_feedbacks(limit: int = 300, offset: int = 0) -> List[Dict]:
+    """🎨 홀드 색상 피드백 가져오기 (관리용, 페이지네이션)
+    limit 기본 300으로 줄여 초기 로딩 지연 방지
+    """
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    
-    cursor.execute("""
-        SELECT 
-            id, problem_id, hold_id,
-            center_x, center_y,
-            rgb_r, rgb_g, rgb_b,
-            hsv_h, hsv_s, hsv_v,
-            predicted_color, user_correct_color,
-            created_at, confirmed
-        FROM hold_color_feedback
-        ORDER BY created_at DESC
-    """)
-    
-    rows = cursor.fetchall()
-    conn.close()
-    
+
+    try:
+        cursor.execute("""
+            SELECT 
+                id, problem_id, hold_id,
+                center_x, center_y,
+                rgb_r, rgb_g, rgb_b,
+                hsv_h, hsv_s, hsv_v,
+                predicted_color, user_correct_color,
+                created_at, confirmed
+            FROM hold_color_feedback
+            ORDER BY created_at DESC
+            LIMIT ? OFFSET ?
+        """, (int(max(1, limit)), int(max(0, offset))))
+        rows = cursor.fetchall()
+    finally:
+        conn.close()
+
     feedbacks = []
     for row in rows:
         feedbacks.append({
@@ -461,9 +465,9 @@ def get_all_color_feedbacks() -> List[Dict]:
             'predicted_color': row[11],
             'user_correct_color': row[12],
             'created_at': row[13],
-            'confirmed': row[14] == 1  # Boolean으로 변환
+            'confirmed': row[14] == 1
         })
-    
+
     return feedbacks
 
 def confirm_color_feedback(feedback_id: int):

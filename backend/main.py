@@ -1,4 +1,5 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException, Form
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form, Query
+import time as _time
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
@@ -570,7 +571,7 @@ if DB_AVAILABLE:
             raise HTTPException(status_code=500, detail=str(e))
     
     @app.get("/api/color-feedbacks")
-    async def get_color_feedbacks():
+    async def get_color_feedbacks(limit: int = Query(300, ge=1, le=2000), offset: int = Query(0, ge=0)):
         """🎨 모든 홀드 색상 피드백 조회"""
         try:
             if not DB_AVAILABLE:
@@ -580,13 +581,15 @@ if DB_AVAILABLE:
                 )
             
             from database import get_all_color_feedbacks
-            feedbacks = get_all_color_feedbacks()
+            feedbacks = get_all_color_feedbacks(limit=limit, offset=offset)
             
             return JSONResponse(
                 status_code=200,
                 content={
                     "feedbacks": feedbacks,
-                    "count": len(feedbacks)
+                    "count": len(feedbacks),
+                    "limit": limit,
+                    "offset": offset
                 }
             )
         except Exception as e:
@@ -689,17 +692,22 @@ if DB_AVAILABLE:
             print(f"❌ 피드백 JSON 추출 오류: {e}")
             raise HTTPException(status_code=500, detail=str(e))
 
+ML_STATS_CACHE = {"ts": 0.0, "data": None}
+
 if ML_AVAILABLE and DB_AVAILABLE:
     @app.get("/api/ml-model-stats")
     async def get_ml_model_stats():
         """🤖 ML 모델 학습 상태 및 성능 조회"""
         try:
+            # 캐시(60초)로 서버 부하 완화
+            now = _time.time()
+            if ML_STATS_CACHE["data"] is not None and (now - ML_STATS_CACHE["ts"]) < 60:
+                return JSONResponse(status_code=200, content=ML_STATS_CACHE["data"])
             import os
             import pickle
             from collections import Counter
             from database import get_color_training_data
             import json as _json
-            import time as _time
             import sys as _sys
             import numpy as _np
             
@@ -807,9 +815,7 @@ if ML_AVAILABLE and DB_AVAILABLE:
                 runtime_color_accuracy = None
                 runtime_color_counts = None
             
-            return JSONResponse(
-                status_code=200,
-                content={
+            payload = {
                     "model_exists": model_exists,
                     "model_trained": model_exists,
                     "total_samples": total_samples,
@@ -824,7 +830,9 @@ if ML_AVAILABLE and DB_AVAILABLE:
                     "can_train": total_samples >= 30,
                     "samples_needed": max(0, 30 - total_samples)
                 }
-            )
+            ML_STATS_CACHE["ts"] = now
+            ML_STATS_CACHE["data"] = payload
+            return JSONResponse(status_code=200, content=payload)
         except Exception as e:
             print(f"❌ ML 통계 조회 오류: {e}")
             raise HTTPException(status_code=500, detail=str(e))

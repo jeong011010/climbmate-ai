@@ -5,9 +5,11 @@ const API_URL = import.meta.env.VITE_API_URL || 'https://climbmate.store'
 /**
  * 색상 피드백 목록 조회
  */
-export const getColorFeedbacks = async () => {
+export const getColorFeedbacks = async (limit = 300, offset = 0) => {
   try {
-    const response = await axios.get(`${API_URL}/api/color-feedbacks`)
+    const response = await axios.get(`${API_URL}/api/color-feedbacks`, {
+      params: { limit, offset }
+    })
     return response.data
   } catch (error) {
     console.error('❌ 피드백 조회 실패:', error)
