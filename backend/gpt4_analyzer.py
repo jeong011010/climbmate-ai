@@ -1,6 +1,6 @@
 import os
 import base64
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 import json
 import re
 import asyncio
@@ -19,10 +19,188 @@ except:
 #     """원본 이미지를 그대로 사용하도록 변경"""
 #     return image_base64
 
+def _grade_to_int(grade: str) -> Optional[int]:
+    if not isinstance(grade, str):
+        return None
+    grade = grade.strip().upper()
+    if grade.startswith('V') and grade[1:].isdigit():
+        return int(grade[1:])
+    return None
+
+def _int_to_grade(v: int) -> str:
+    v = max(0, min(12, int(v)))
+    return f"V{v}"
+
+def _aggregate_results(results: List[Dict]) -> Dict:
+    if not results:
+        return {}
+    # difficulty: median
+    grades = [g for g in (_grade_to_int(r.get('difficulty')) for r in results) if g is not None]
+    if grades:
+        grades.sort()
+        mid = grades[len(grades)//2]
+        agg_diff = _int_to_grade(mid)
+    else:
+        agg_diff = results[0].get('difficulty', 'V?')
+    # primary_type: majority
+    counts: Dict[str,int] = {}
+    for r in results:
+        t = r.get('type') or r.get('primary_type') or '일반'
+        counts[t] = counts.get(t, 0) + 1
+    agg_type = max(counts.items(), key=lambda x: x[1])[0]
+    # secondary_types: union up to 3
+    sec_union = []
+    seen = set()
+    for r in results:
+        for t in r.get('secondary_types', []) or []:
+            if t not in seen:
+                seen.add(t)
+                sec_union.append(t)
+    sec_union = sec_union[:3]
+    # confidence: average
+    confs = [float(r.get('confidence', 0.6)) for r in results]
+    avg_conf = sum(confs)/len(confs)
+    # merge brief reasoning
+    reasons = [r.get('reasoning','') for r in results if r.get('reasoning')]
+    merged_reason = " \n".join(reasons[:2])
+    base = dict(results[0])
+    base.update({
+        'difficulty': agg_diff,
+        'type': agg_type,
+        'secondary_types': sec_union,
+        'confidence': avg_conf,
+        'reasoning': merged_reason
+    })
+    return base
+
+def _build_context(holds_info: List[Dict], wall_angle: Optional[str], rule_based: Optional[Dict]) -> Dict[str, Any]:
+    # 홀드 요약
+    num_holds = len(holds_info)
+    color_groups: Dict[str,int] = {}
+    for hold in holds_info:
+        color = hold.get('color_name', 'unknown')
+        color_groups[color] = color_groups.get(color, 0) + 1
+    areas = [h.get('area', 0) for h in holds_info]
+    avg_area = sum(areas) / len(areas) if areas else 0
+    # 거리 요약
+    try:
+        import numpy as np
+        centers = [h.get('center', [0, 0]) for h in holds_info]
+        distances = []
+        for i in range(len(centers)):
+            for j in range(i+1, len(centers)):
+                dist = np.linalg.norm(np.array(centers[i]) - np.array(centers[j]))
+                distances.append(float(dist))
+        max_dist = max(distances) if distances else 0.0
+        p90_dist = float(np.percentile(distances, 90)) if distances else 0.0
+    except Exception:
+        max_dist = 0.0
+        p90_dist = 0.0
+    # 규칙/하이브리드 힌트
+    rule_hint = {}
+    if rule_based:
+        d = (rule_based.get('difficulty') or {}).get('grade') or rule_based.get('difficulty')
+        t = (rule_based.get('climb_type') or {}).get('primary_type') or (rule_based.get('type') if isinstance(rule_based.get('type'), str) else None)
+        if d: rule_hint['rule_difficulty'] = d
+        if t: rule_hint['rule_type'] = t
+    return {
+        'num_holds': num_holds,
+        'color_counts': color_groups,
+        'avg_hold_area': round(avg_area, 2),
+        'max_center_distance': round(float(max_dist), 2),
+        'p90_center_distance': round(float(p90_dist), 2),
+        'wall_angle': wall_angle or 'unknown',
+        **({'rule_hint': rule_hint} if rule_hint else {})
+    }
+
+async def _call_gpt4(image_base64: str, prompt: str, temperature: float = 0.2) -> Dict:
+    response = await client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{
+            "role": "system",
+            "content": (
+                "You are an expert bouldering route setter and judge. "
+                "Respond in JSON only, strictly matching the provided schema. "
+                "Base difficulty on observable features and the rubric; avoid generic answers."
+            )
+        }, {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": prompt},
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{image_base64}",
+                        "detail": "low"
+                    }
+                }
+            ]
+        }],
+        max_tokens=600,
+        temperature=temperature,
+        timeout=30
+    )
+    content = response.choices[0].message.content
+    # JSON 추출 동일 로직 재사용
+    try:
+        if "```json" in content:
+            json_start = content.find("```json") + 7
+            json_end = content.find("```", json_start)
+            json_str = content[json_start:json_end].strip()
+        elif "```" in content:
+            json_start = content.find("```") + 3
+            json_end = content.find("```", json_start)
+            json_str = content[json_start:json_end].strip()
+        else:
+            json_match = re.search(r'\{[\s\S]*\}', content)
+            json_str = json_match.group() if json_match else content.strip()
+        result = json.loads(json_str)
+        if 'primary_type' in result and 'type' not in result:
+            result['type'] = result['primary_type']
+        if 'secondary_types' not in result:
+            result['secondary_types'] = []
+        for k in ('key_factors','movements','challenges','tips'):
+            result[k] = result.get(k, [])
+        result['used_gpt4'] = True
+        result['raw_response'] = content
+        return result
+    except Exception as e:
+        return { 'difficulty':'V?', 'type':'일반', 'confidence':0.5, 'reasoning': str(e), 'used_gpt4': True, 'raw_response': content }
+
+async def _refine_result(image_base64: str, context: Dict[str,Any], first_result: Dict) -> Dict:
+    schema = (
+        "JSON 스키마: {\n"
+        "  \"difficulty\": \"V0~V12\",\n"
+        "  \"confidence\": 0.0~1.0,\n"
+        "  \"primary_type\": one of [dynamic, static, crimp, sloper, pinch, balance, power, technical, coordination],\n"
+        "  \"secondary_types\": string[],\n"
+        "  \"reasoning\": string,\n"
+        "  \"key_factors\": string[],\n"
+        "  \"crux\": string,\n"
+        "  \"movements\": string[],\n"
+        "  \"challenges\": string[],\n"
+        "  \"tips\": string[],\n"
+        "  \"comparison\": string\n"
+        "}"
+    )
+    rubric = (
+        "검토 규칙: 컨텍스트(홀드 수/간격/각도/규칙 힌트)와 1차 결과가 일치하는지 점검하고, 필요시 난이도/타입을 '약간'만 조정. "
+        "근거 없는 큰 변경 금지. JSON만 출력."
+    )
+    prompt = (
+        "다음 1차 분석을 검토하고 필요한 최소 수정만 적용해 더 일관된 결과로 보정하세요.\n"
+        f"컨텍스트: {json.dumps(context, ensure_ascii=False)}\n"
+        f"1차 결과: {json.dumps(first_result, ensure_ascii=False)}\n"
+        f"{rubric}\n"
+        f"{schema}"
+    )
+    return await _call_gpt4(image_base64, prompt, temperature=0.2)
+
 async def analyze_with_gpt4_vision(
     image_base64: str,
     holds_info: List[Dict],
-    wall_angle: Optional[str] = None
+    wall_angle: Optional[str] = None,
+    rule_based: Optional[Dict] = None
 ) -> Dict:
     """
     GPT-4 Vision으로 클라이밍 문제 분석
@@ -52,37 +230,8 @@ async def analyze_with_gpt4_vision(
         }
     
     try:
-        # 홀드 정보 요약
-        num_holds = len(holds_info)
-        color_groups = {}
-        for hold in holds_info:
-            color = hold.get('color_name', 'unknown')
-            color_groups[color] = color_groups.get(color, 0) + 1
-        
-        # 평균 크기 계산
-        areas = [h.get('area', 0) for h in holds_info]
-        avg_area = sum(areas) / len(areas) if areas else 0
-        
-        # 거리 계산
-        import numpy as np
-        centers = [h.get('center', [0, 0]) for h in holds_info]
-        distances = []
-        for i in range(len(centers)):
-            for j in range(i+1, len(centers)):
-                dist = np.linalg.norm(np.array(centers[i]) - np.array(centers[j]))
-                distances.append(dist)
-        max_dist = max(distances) if distances else 0
-        
-        # 프롬프트 구성 (원본 이미지 사용) + 엄격 스키마/루브릭
-        wall_info = f"\n벽 각도: {wall_angle}" if wall_angle else ""
-
-        context = {
-            "num_holds": num_holds,
-            "color_counts": color_groups,
-            "avg_hold_area": round(avg_area, 2),
-            "max_center_distance": round(float(max_dist), 2),
-            "wall_angle": wall_angle or "unknown"
-        }
+        # 컨텍스트 구축(룰 힌트 포함)
+        context = _build_context(holds_info, wall_angle, rule_based)
 
         rubric = (
             "난이도 루브릭: V0-1(큰 홀드/짧은 동작), V2-3(중간 간격/기본 기술), "
@@ -107,108 +256,34 @@ async def analyze_with_gpt4_vision(
         )
 
         prompt = (
-            "클라이밍 문제를 정확히 분석하세요. 모호한 일반론(V4 고정 등)을 피하고, 눈에 보이는 특징과 제공된 메타데이터를 근거로 판단하세요.\n"
+            "클라이밍 문제를 정확히 분석하세요. 모호한 일반론을 피하고, 컨텍스트와 시각 증거를 근거로 판단하세요.\n"
             f"컨텍스트: {json.dumps(context, ensure_ascii=False)}\n"
             f"{rubric}\n"
             "출력은 반드시 순수 JSON(추가 텍스트/마크다운 금지). 스키마를 준수하세요.\n"
             f"{schema}"
         )
+        # 앙상블/리파인 설정
+        ens_n = int(os.getenv('CLIMBMATE_GPT_ENS_N', '2'))
+        enable_refine = os.getenv('CLIMBMATE_GPT_REFINE', '1') == '1'
+        temps = [0.2, 0.0]
 
-        # 🚀 GPT-4o 사용 + 병렬처리 (원본 이미지)
-        response = await client.chat.completions.create(
-            model="gpt-4o",
-            messages=[{
-                "role": "system",
-                "content": (
-                    "You are an expert bouldering route setter and judge. "
-                    "Respond in JSON only, strictly matching the provided schema. "
-                    "Base difficulty on observable features and the rubric; avoid generic answers."
-                )
-            }, {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt},
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:image/jpeg;base64,{image_base64}",  # 원본 이미지 사용
-                            "detail": "low"
-                        }
-                    }
-                ]
-            }],
-            max_tokens=600,
-            temperature=0.2,
-            timeout=30  # 12초 → 30초 증가 (병렬 처리 대응)
-        )
-        
-        # 응답 파싱
-        content = response.choices[0].message.content
-        print(f"📝 GPT-4 응답 (처음 500자): {content[:500]}...")
-        
-        # JSON 추출
-        try:
-            # JSON 블록 찾기 (마크다운 코드 블록 제거)
-            if "```json" in content:
-                json_start = content.find("```json") + 7
-                json_end = content.find("```", json_start)
-                json_str = content[json_start:json_end].strip()
-            elif "```" in content:
-                json_start = content.find("```") + 3
-                json_end = content.find("```", json_start)
-                json_str = content[json_start:json_end].strip()
-            else:
-                json_match = re.search(r'\{[\s\S]*\}', content)
-                if json_match:
-                    json_str = json_match.group()
-                else:
-                    json_str = content.strip()
-            
-            result = json.loads(json_str)
-            
-            # 새로운 필드 처리
-            # primary_type이 있으면 type으로 매핑
-            if 'primary_type' in result:
-                result['type'] = result['primary_type']
-            elif 'type' not in result:
-                result['type'] = '일반'
-            
-            # secondary_types 추가
-            if 'secondary_types' not in result:
-                result['secondary_types'] = []
-            
-            # 새 필드들 추가
-            if 'key_factors' not in result:
-                result['key_factors'] = []
-            if 'crux' not in result:
-                result['crux'] = ''
-            if 'comparison' not in result:
-                result['comparison'] = ''
-            
-            # movements, challenges, tips는 기존과 동일
-            if 'movements' not in result:
-                result['movements'] = []
-            if 'challenges' not in result:
-                result['challenges'] = []
-            if 'tips' not in result:
-                result['tips'] = []
-            
-            print(f"✅ GPT-4 JSON 파싱 성공:")
-            print(f"   - 난이도: {result.get('difficulty')}")
-            print(f"   - 주요 스타일: {result.get('type')}")
-            print(f"   - 부가 스타일: {result.get('secondary_types')}")
-            print(f"   - 핵심 요인: {len(result.get('key_factors', []))}개")
-            print(f"   - 크럭스: {'있음' if result.get('crux') else '없음'}")
-            
-        except Exception as e:
-            print(f"⚠️ JSON 파싱 실패: {e}")
-            print(f"   원본 응답: {content[:200]}...")
-            result = parse_text_response(content)
-        
-        result['used_gpt4'] = True
-        result['raw_response'] = content
-        
-        return result
+        # 1) 앙상블 1차 호출들
+        results = []
+        for i in range(max(1, ens_n)):
+            t = temps[i % len(temps)]
+            r = await _call_gpt4(image_base64, prompt, temperature=t)
+            results.append(r)
+        base = _aggregate_results(results) if len(results) > 1 else results[0]
+
+        # 2) 리파인 패스
+        final = base
+        if enable_refine:
+            refined = await _refine_result(image_base64, context, base)
+            # 간단 머지: 리파인이 스키마 준수 시 우선
+            if refined.get('difficulty') and refined.get('type'):
+                final = refined
+
+        return final
         
     except Exception as e:
         print(f"❌ GPT-4 Vision 분석 실패: {e}")

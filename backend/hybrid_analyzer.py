@@ -47,7 +47,7 @@ async def hybrid_analyze(
     if gpt4_status['available'] and os.getenv('OPENAI_API_KEY'):
         print("🤖 GPT-4 Vision 사용 중...")
         
-        gpt4_result = await analyze_with_gpt4_vision(image_base64, holds_data, wall_angle)
+        gpt4_result = await analyze_with_gpt4_vision(image_base64, holds_data, wall_angle, rule_based_analysis)
         print(f"🔍 GPT-4 결과: {gpt4_result}")
         
         if gpt4_result.get('used_gpt4'):
@@ -73,38 +73,19 @@ async def hybrid_analyze(
                     print(f"   ✅ 규칙 기반 결과: {result['difficulty']['grade']}, {result['type']['primary_type']}")
                     return result
             else:
-                # 정상 응답 처리 - 한글 번역 및 상세 분석 추가
-                enhanced_result = translate_and_enhance_gpt4_result(gpt4_result)
-                
+                # 정상 결과
+                result['methods_tried'].append('gpt4')
+                translated = translate_and_enhance_gpt4_result(gpt4_result)
                 result['difficulty'] = {
-                    'grade': gpt4_result.get('difficulty', 'V?'),
-                    'confidence': gpt4_result.get('confidence', 0.5)
+                    'grade': translated.get('difficulty', 'V?'),
+                    'confidence': translated.get('confidence', 0.6)
                 }
-                
-                # 주요 타입과 부가 타입 처리
-                primary_type = gpt4_result.get('type', gpt4_result.get('primary_type', '일반'))
-                secondary_types = gpt4_result.get('secondary_types', [])
-                
                 result['type'] = {
-                    'primary_type': primary_type,
-                    'secondary_types': secondary_types,
-                    'confidence': gpt4_result.get('confidence', 0.5)
+                    'primary_type': translated.get('type', '일반'),
+                    'confidence': translated.get('confidence', 0.6)
                 }
-                result['method_used'] = 'gpt4_vision'
-                result['methods_tried'].append('gpt4_vision')
-                result['gpt4_reasoning'] = enhanced_result['detailed_analysis']
-                result['gpt4_secondary_types'] = secondary_types  # 프론트엔드 전달용
-                result['gpt4_key_factors'] = enhanced_result.get('key_factors', [])
-                result['gpt4_crux'] = enhanced_result.get('crux', '')
-                result['gpt4_movements'] = enhanced_result.get('movements', [])
-                result['gpt4_challenges'] = enhanced_result.get('challenges', [])
-                result['gpt4_tips'] = enhanced_result.get('tips', [])
-                result['gpt4_comparison'] = enhanced_result.get('comparison', '')
-                
-                print(f"   ✅ GPT-4 결과: {gpt4_result.get('difficulty')}, {primary_type}")
-                if secondary_types:
-                    print(f"   ✅ 부가 스타일: {', '.join(secondary_types)}")
-                print(f"   ✅ GPT-4 상세 분석 생성 완료")
+                result['method_used'] = 'gpt4'
+                result['gpt4_reasoning'] = translated.get('detailed_analysis')
                 return result
         else:
             result['methods_tried'].append('gpt4_failed')
