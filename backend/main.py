@@ -716,22 +716,32 @@ if ML_AVAILABLE and DB_AVAILABLE:
             # 색상별 분포
             color_distribution = Counter([d['correct_color'] for d in training_data])
             
-            # predicted vs correct 오분류 통계
+            # 규칙 기반 정확도: 현재 룰 분류기로 재평가 (DB 예측값 의존 제거)
             misclassifications = {}
             correct_predictions = 0
-            
-            for data in training_data:
-                predicted = data.get('predicted_color', 'unknown')
-                correct = data.get('correct_color', 'unknown')
-                
-                if predicted == correct:
-                    correct_predictions += 1
-                elif predicted != 'unknown':  # unknown은 제외
-                    key = f"{predicted}→{correct}"
-                    misclassifications[key] = misclassifications.get(key, 0) + 1
-            
-            # 규칙 기반 정확도 (unknown 제외)
-            valid_predictions = sum(1 for d in training_data if d.get('predicted_color') != 'unknown')
+            valid_predictions = 0
+            try:
+                holdcheck_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'holdcheck')
+                if holdcheck_path not in _sys.path:
+                    _sys.path.insert(0, holdcheck_path)
+                from color_classifier import load_color_ranges, classify_color_by_hsv, hsv_to_rgb_fast
+                ranges_data = load_color_ranges(os.path.join(holdcheck_path, 'color_ranges.json'))
+                colors_config = ranges_data["colors"]
+                for data in training_data:
+                    correct = (data.get('correct_color') or '').lower()
+                    hsv = data.get('hsv')
+                    if isinstance(hsv, (list, tuple)) and len(hsv) == 3 and correct:
+                        h, s, v = int(hsv[0]), int(hsv[1]), int(hsv[2])
+                        rgb = hsv_to_rgb_fast(h, s, v)
+                        pred, _conf, _meta = classify_color_by_hsv(h, s, v, rgb, colors_config)
+                        valid_predictions += 1
+                        if pred == correct:
+                            correct_predictions += 1
+                        else:
+                            key = f"{pred}→{correct}"
+                            misclassifications[key] = misclassifications.get(key, 0) + 1
+            except Exception:
+                pass
             rule_based_accuracy = (correct_predictions / valid_predictions * 100) if valid_predictions > 0 else 0
             
             # ML 모델 성능 (파일에서 읽기)
