@@ -522,6 +522,9 @@ def _augment_candidates_with_rgb(rgb, candidates: set) -> set:
         new.add("mint")
     if min(r, g) >= 160 and b <= 150:
         new.update({"yellow", "orange"})
+        # 라임 보강: R/G 모두 높고 B 낮으며 두 채널 차이가 작으면 라임 후보 추가
+        if abs(r - g) <= 50:
+            new.add("lime")
     return new
 
 
@@ -582,6 +585,9 @@ def classify_color_by_hsv(h, s, v, rgb, colors_config):
         anchor_color = "white"
     elif h >= 176 and s >= 150 and v >= 90:
         anchor_color = "red"
+    # 밝은 라임 앵커: H 30~36, 고채도·고명도는 라임 고정(ML이 덮지 않도록)
+    elif 30 <= h < 36 and s >= 180 and v >= 170:
+        anchor_color = "lime"
 
     # 0.5️⃣ ML 1차 시도 (후보 제한, 앵커 우선)
     load_ml_color_model()
