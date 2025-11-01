@@ -121,6 +121,7 @@ async def _call_gpt4(image_base64: str, prompt: str, temperature: float = 0.2) -
             "content": (
                 "You are an expert bouldering route setter and judge. "
                 "Respond in JSON only, strictly matching the provided schema. "
+                "All textual content must be written in Korean (한국어), with no English explanations. "
                 "Base difficulty on observable features and the rubric; avoid generic answers."
             )
         }, {
@@ -174,18 +175,18 @@ async def _refine_result(image_base64: str, context: Dict[str,Any], first_result
         "  \"confidence\": 0.0~1.0,\n"
         "  \"primary_type\": one of [dynamic, static, crimp, sloper, pinch, balance, power, technical, coordination],\n"
         "  \"secondary_types\": string[],\n"
-        "  \"reasoning\": string,\n"
-        "  \"key_factors\": string[],\n"
-        "  \"crux\": string,\n"
-        "  \"movements\": string[],\n"
-        "  \"challenges\": string[],\n"
-        "  \"tips\": string[],\n"
+        "  \"reasoning\": string (모든 텍스트는 한국어),\n"
+        "  \"key_factors\": string[] (한국어),\n"
+        "  \"crux\": string (한국어),\n"
+        "  \"movements\": string[] (한국어),\n"
+        "  \"challenges\": string[] (한국어),\n"
+        "  \"tips\": string[] (한국어),\n"
         "  \"comparison\": string\n"
         "}"
     )
     rubric = (
         "검토 규칙: 컨텍스트(홀드 수/간격/각도/규칙 힌트)와 1차 결과가 일치하는지 점검하고, 필요시 난이도/타입을 '약간'만 조정. "
-        "근거 없는 큰 변경 금지. JSON만 출력."
+        "근거 없는 큰 변경 금지. JSON만 출력. 모든 텍스트는 한국어로 작성."
     )
     prompt = (
         "다음 1차 분석을 검토하고 필요한 최소 수정만 적용해 더 일관된 결과로 보정하세요.\n"
@@ -332,18 +333,24 @@ def translate_and_enhance_gpt4_result(gpt4_result):
     secondary_types = gpt4_result.get('secondary_types', [])
     secondary_types_kr = [type_map.get(t, t) for t in secondary_types]
     
-    # 기본 결과
+    # 보조 필드 한국어 매핑(간이)
+    movements_kr = translate_movements(gpt4_result.get('movements', []))
+    challenges_kr = translate_challenges(gpt4_result.get('challenges', []))
+    tips_kr = translate_tips(gpt4_result.get('tips', []))
+    reasoning_kr = translate_reasoning(gpt4_result.get('reasoning', ''))
+
+    # 기본 결과 (한국어 필드 반영)
     result = {
         'difficulty': difficulty_map.get(gpt4_result.get('difficulty', 'V?'), 'V? (미분석)'),
         'type': primary_type_kr,
         'secondary_types': secondary_types_kr,
         'confidence': gpt4_result.get('confidence', 0.0),
-        'reasoning': gpt4_result.get('reasoning', ''),
+        'reasoning': reasoning_kr,
         'key_factors': gpt4_result.get('key_factors', []),
         'crux': gpt4_result.get('crux', ''),
-        'movements': gpt4_result.get('movements', []),
-        'challenges': gpt4_result.get('challenges', []),
-        'tips': gpt4_result.get('tips', []),
+        'movements': movements_kr,
+        'challenges': challenges_kr,
+        'tips': tips_kr,
         'comparison': gpt4_result.get('comparison', '')
     }
     
