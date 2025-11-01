@@ -25,6 +25,7 @@ ML_PRIMARY_THRESHOLD = float(os.getenv('CLIMBMATE_ML_PRIMARY_T', '0.65'))
 LAB_WEIGHT = max(0.0, min(1.0, float(os.getenv('CLIMBMATE_LAB_WEIGHT', '0.3'))))
 RGB_COARSE_ENABLED = os.getenv('CLIMBMATE_RGB_COARSE', '1') == '1'
 RGB_WEIGHT = max(0.0, min(1.0, float(os.getenv('CLIMBMATE_RGB_WEIGHT', '0.2'))))
+RULE_CONF_THRESHOLD = float(os.getenv('CLIMBMATE_RULE_CONF_T', '0.65'))
 
 
 # ============================================================================
@@ -899,7 +900,7 @@ def find_nearest_color_hsv(h, s, v, colors_config):
 # ============================================================================
 
 def rule_based_color_clustering(hold_data, vectors, config_path="holdcheck/color_ranges.json", 
-                                confidence_threshold=0.7, use_hsv=True):
+                                confidence_threshold=None, use_hsv=True):
     """
     ⚡ 룰 기반 색상 클러스터링 (CLIP 대체, 초고속)
     
@@ -925,6 +926,8 @@ def rule_based_color_clustering(hold_data, vectors, config_path="holdcheck/color
     print(f"\n⚡ 룰 기반 색상 클러스터링 시작 (CLIP 없음, 초고속)")
     print(f"   홀드 개수: {len(hold_data)}개")
     print(f"   색상 공간: {'HSV' if use_hsv else 'RGB'}")
+    # 임계치: 인자 우선, 없으면 환경변수, 없으면 기본
+    _conf_th = confidence_threshold if confidence_threshold is not None else RULE_CONF_THRESHOLD
     
     # 색상 범위 로드
     ranges_data = load_color_ranges(config_path)
@@ -977,7 +980,7 @@ def rule_based_color_clustering(hold_data, vectors, config_path="holdcheck/color
                 )
         
         # 신뢰도 낮으면 unknown
-        if confidence < confidence_threshold:
+        if confidence < _conf_th:
             color_name = "unknown"
         
         # 홀드에 정보 추가 (CLIP 호환)
