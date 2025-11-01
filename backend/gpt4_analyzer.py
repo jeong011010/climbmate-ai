@@ -73,38 +73,57 @@ async def analyze_with_gpt4_vision(
                 distances.append(dist)
         max_dist = max(distances) if distances else 0
         
-        # 프롬프트 구성 (원본 이미지 사용)
+        # 프롬프트 구성 (원본 이미지 사용) + 엄격 스키마/루브릭
         wall_info = f"\n벽 각도: {wall_angle}" if wall_angle else ""
-        
-        prompt = f"""이 클라이밍 벽 이미지를 분석해주세요. {num_holds}개의 홀드가 있습니다.{wall_info}
 
-다음을 제공해주세요:
-1. 난이도 (V0-V10)
-2. 주요 스타일 1개 (dynamic/static/crimp/sloper/balance/power/technical)
-3. 부가 스타일 2-3개
-4. 상세 분석 (난이도 요인, 크럭스, 필요한 동작, 도전과제, 팁)
+        context = {
+            "num_holds": num_holds,
+            "color_counts": color_groups,
+            "avg_hold_area": round(avg_area, 2),
+            "max_center_distance": round(float(max_dist), 2),
+            "wall_angle": wall_angle or "unknown"
+        }
 
-JSON 형식으로 응답해주세요:
-{{
-  "difficulty": "V3",
-  "confidence": 0.75,
-  "primary_type": "dynamic",
-  "secondary_types": ["power", "coordination"],
-  "reasoning": "홀드 간격이 넓어서 다이나믹한 움직임이 필요합니다.",
-  "key_factors": ["큰 리치 필요", "파워 요구"],
-  "crux": "중간 구간에서 큰 점프가 필요합니다.",
-  "movements": ["시작: 양손 잡기", "중간: 다이나믹 무브", "마무리: 안정화"],
-  "challenges": ["큰 리치", "밸런스 유지"],
-  "tips": ["코어를 활용하세요", "모멘텀을 사용하세요"],
-  "comparison": "일반적인 V3보다 약간 어렵습니다."
-}}"""
+        rubric = (
+            "난이도 루브릭: V0-1(큰 홀드/짧은 동작), V2-3(중간 간격/기본 기술), "
+            "V4-5(긴 리치/힘 요구/정확한 풋워크), V6+(고난도 시퀀스/파워 또는 정밀도 상). "
+            "오버행이면 같은 패턴에서 0.5~1단계 상향. 큰 간격, 크림프/슬로퍼, 크럭스의 난이도 증가 요인을 구체적으로 반영."
+        )
+
+        schema = (
+            "JSON 스키마: {\n"
+            "  \"difficulty\": \"V0~V12\",\n"
+            "  \"confidence\": 0.0~1.0,\n"
+            "  \"primary_type\": one of [dynamic, static, crimp, sloper, pinch, balance, power, technical, coordination],\n"
+            "  \"secondary_types\": string[],\n"
+            "  \"reasoning\": string (근거는 구체적 요소만),\n"
+            "  \"key_factors\": string[],\n"
+            "  \"crux\": string,\n"
+            "  \"movements\": string[],\n"
+            "  \"challenges\": string[],\n"
+            "  \"tips\": string[],\n"
+            "  \"comparison\": string\n"
+            "}"
+        )
+
+        prompt = (
+            "클라이밍 문제를 정확히 분석하세요. 모호한 일반론(V4 고정 등)을 피하고, 눈에 보이는 특징과 제공된 메타데이터를 근거로 판단하세요.\n"
+            f"컨텍스트: {json.dumps(context, ensure_ascii=False)}\n"
+            f"{rubric}\n"
+            "출력은 반드시 순수 JSON(추가 텍스트/마크다운 금지). 스키마를 준수하세요.\n"
+            f"{schema}"
+        )
 
         # 🚀 GPT-4o 사용 + 병렬처리 (원본 이미지)
         response = await client.chat.completions.create(
             model="gpt-4o",
             messages=[{
                 "role": "system",
-                "content": "You are a climbing coach. Analyze bouldering routes and respond in JSON format only."
+                "content": (
+                    "You are an expert bouldering route setter and judge. "
+                    "Respond in JSON only, strictly matching the provided schema. "
+                    "Base difficulty on observable features and the rubric; avoid generic answers."
+                )
             }, {
                 "role": "user",
                 "content": [
@@ -118,8 +137,8 @@ JSON 형식으로 응답해주세요:
                     }
                 ]
             }],
-            max_tokens=500,
-            temperature=0.3,
+            max_tokens=600,
+            temperature=0.2,
             timeout=30  # 12초 → 30초 증가 (병렬 처리 대응)
         )
         
