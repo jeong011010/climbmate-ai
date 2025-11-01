@@ -693,16 +693,21 @@ if DB_AVAILABLE:
             raise HTTPException(status_code=500, detail=str(e))
 
 ML_STATS_CACHE = {"ts": 0.0, "data": None}
+ML_STATS_CACHE_RUNTIME = {"ts": 0.0, "data": None}
 
 if ML_AVAILABLE and DB_AVAILABLE:
     @app.get("/api/ml-model-stats")
-    async def get_ml_model_stats():
+    async def get_ml_model_stats(include_runtime: bool = Query(False)):
         """🤖 ML 모델 학습 상태 및 성능 조회"""
         try:
-            # 캐시(60초)로 서버 부하 완화
+            # 캐시(기본 120초), 런타임 계산은 별도 캐시 60초
             now = _time.time()
-            if ML_STATS_CACHE["data"] is not None and (now - ML_STATS_CACHE["ts"]) < 60:
-                return JSONResponse(status_code=200, content=ML_STATS_CACHE["data"])
+            if not include_runtime:
+                if ML_STATS_CACHE["data"] is not None and (now - ML_STATS_CACHE["ts"]) < 120:
+                    return JSONResponse(status_code=200, content=ML_STATS_CACHE["data"])
+            else:
+                if ML_STATS_CACHE_RUNTIME["data"] is not None and (now - ML_STATS_CACHE_RUNTIME["ts"]) < 60:
+                    return JSONResponse(status_code=200, content=ML_STATS_CACHE_RUNTIME["data"])
             import os
             import pickle
             from collections import Counter
@@ -768,52 +773,51 @@ if ML_AVAILABLE and DB_AVAILABLE:
                 except:
                     pass
 
-            # 현재 저장소 내 테스트 케이스 기준 런타임 정확도 (색상)
+            # 현재 저장소 내 테스트 케이스 기준 런타임 정확도 (색상) - 요청 시에만 계산
             runtime_color_accuracy = None
             runtime_color_counts = None
-            try:
-                # holdcheck 경로 보장
-                holdcheck_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'holdcheck')
-                if holdcheck_path not in _sys.path:
-                    _sys.path.insert(0, holdcheck_path)
-                from color_classifier import load_color_ranges, classify_color_by_hsv, hsv_to_rgb_fast
+            if include_runtime:
+                try:
+                    holdcheck_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'holdcheck')
+                    if holdcheck_path not in _sys.path:
+                        _sys.path.insert(0, holdcheck_path)
+                    from color_classifier import load_color_ranges, classify_color_by_hsv, hsv_to_rgb_fast
 
-                tc_path = os.path.normpath(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'test_cases', 'color_classification_test_cases.json'))
-                if os.path.exists(tc_path):
-                    with open(tc_path, 'r', encoding='utf-8') as f:
-                        cases = _json.load(f)
-                    ranges_data = load_color_ranges(os.path.join(holdcheck_path, 'color_ranges.json'))
-                    colors_config = ranges_data["colors"]
-                    total, correct = 0, 0
-                    per_color = {}
-                    start = _time.time()
-                    for case in cases:
-                        total += 1
-                        try:
-                            expected = (case.get('expected') or case.get('correct_color') or '').lower()
-                            hsv = case.get('hsv') or case.get('dominant_hsv') or case.get('color_stats', {}).get('dominant_hsv')
-                            if isinstance(hsv, dict):
-                                h, s, v = int(hsv.get('h', 0)), int(hsv.get('s', 0)), int(hsv.get('v', 128))
-                            elif isinstance(hsv, (list, tuple)) and len(hsv) == 3:
-                                h, s, v = int(hsv[0]), int(hsv[1]), int(hsv[2])
-                            else:
-                                h, s, v = 0, 0, 128
-                            rgb = hsv_to_rgb_fast(h, s, v)
-                            pred, _conf, _ = classify_color_by_hsv(h, s, v, rgb, colors_config)
-                            if pred == expected:
-                                correct += 1
-                                per_color[expected] = per_color.get(expected, 0) + 1
-                        except Exception:
-                            continue
-                        # 안전 타임아웃 (대략 2초 넘으면 중단)
-                        if _time.time() - start > 2.5:
-                            break
-                    if total > 0:
-                        runtime_color_accuracy = round((correct / total) * 100, 1)
-                        runtime_color_counts = {"correct": int(correct), "total": int(total), "by_color": per_color}
-            except Exception as _e:
-                runtime_color_accuracy = None
-                runtime_color_counts = None
+                    tc_path = os.path.normpath(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'test_cases', 'color_classification_test_cases.json'))
+                    if os.path.exists(tc_path):
+                        with open(tc_path, 'r', encoding='utf-8') as f:
+                            cases = _json.load(f)
+                        ranges_data = load_color_ranges(os.path.join(holdcheck_path, 'color_ranges.json'))
+                        colors_config = ranges_data["colors"]
+                        total, correct = 0, 0
+                        per_color = {}
+                        start = _time.time()
+                        for case in cases:
+                            total += 1
+                            try:
+                                expected = (case.get('expected') or case.get('correct_color') or '').lower()
+                                hsv = case.get('hsv') or case.get('dominant_hsv') or case.get('color_stats', {}).get('dominant_hsv')
+                                if isinstance(hsv, dict):
+                                    h, s, v = int(hsv.get('h', 0)), int(hsv.get('s', 0)), int(hsv.get('v', 128))
+                                elif isinstance(hsv, (list, tuple)) and len(hsv) == 3:
+                                    h, s, v = int(hsv[0]), int(hsv[1]), int(hsv[2])
+                                else:
+                                    h, s, v = 0, 0, 128
+                                rgb = hsv_to_rgb_fast(h, s, v)
+                                pred, _conf, _ = classify_color_by_hsv(h, s, v, rgb, colors_config)
+                                if pred == expected:
+                                    correct += 1
+                                    per_color[expected] = per_color.get(expected, 0) + 1
+                            except Exception:
+                                continue
+                            if _time.time() - start > 2.5:
+                                break
+                        if total > 0:
+                            runtime_color_accuracy = round((correct / total) * 100, 1)
+                            runtime_color_counts = {"correct": int(correct), "total": int(total), "by_color": per_color}
+                except Exception:
+                    runtime_color_accuracy = None
+                    runtime_color_counts = None
             
             payload = {
                     "model_exists": model_exists,
@@ -830,8 +834,12 @@ if ML_AVAILABLE and DB_AVAILABLE:
                     "can_train": total_samples >= 30,
                     "samples_needed": max(0, 30 - total_samples)
                 }
-            ML_STATS_CACHE["ts"] = now
-            ML_STATS_CACHE["data"] = payload
+            if include_runtime:
+                ML_STATS_CACHE_RUNTIME["ts"] = now
+                ML_STATS_CACHE_RUNTIME["data"] = payload
+            else:
+                ML_STATS_CACHE["ts"] = now
+                ML_STATS_CACHE["data"] = payload
             return JSONResponse(status_code=200, content=payload)
         except Exception as e:
             print(f"❌ ML 통계 조회 오류: {e}")

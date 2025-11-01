@@ -69,10 +69,10 @@ const FeedbacksPage = ({
   const [statsLoading, setStatsLoading] = useState(false)
   
   // ML 통계 로드
-  const loadMlStats = async () => {
+  const loadMlStats = async (includeRuntime = false) => {
     setStatsLoading(true)
     try {
-      const response = await fetch('/api/ml-model-stats')
+      const response = await fetch(`/api/ml-model-stats?include_runtime=${includeRuntime ? '1' : '0'}`)
       const data = await response.json()
       setMlStats(data)
     } catch (error) {
@@ -84,7 +84,7 @@ const FeedbacksPage = ({
   
   // 페이지 로드 시 & 피드백 변경 시 통계 로드
   useEffect(() => {
-    loadMlStats()
+    loadMlStats(false)
   }, [colorFeedbacks.length])
   
   return (
@@ -119,7 +119,7 @@ const FeedbacksPage = ({
               </button>
             )}
             <button
-              onClick={() => { loadColorFeedbacks(300, 0); loadMlStats(); }}
+              onClick={() => { loadColorFeedbacks(300, 0); loadMlStats(true); }}
               className="px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all"
             >
               🔄 새로고침
