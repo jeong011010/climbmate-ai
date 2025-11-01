@@ -550,6 +550,15 @@ def _post_ml_safety_adjust(h: int, s: int, v: int, rgb, ml_color: str, ml_conf: 
             if ml_color == "green" and ml_conf < 0.92:
                 return "mint", max(ml_conf, 0.87)
 
+    # green 우선 보정(ML 결과가 mint일 때 뒤집기):
+    # 80~86, S 70~110, V<=125이며 G가 B보다 충분히 높고 R<=G면 green
+    if 80 <= h <= 86 and 70 <= s <= 110 and v <= 125:
+        # mint 유지 보호창: H 80~82 & S 85~95 & V 98~110 → mint 유지
+        if not (80 <= h <= 82 and 85 <= s <= 95 and 98 <= v <= 110):
+            if (g - b) >= 10 and r <= g:
+                if ml_color == "mint" and ml_conf < 0.92:
+                    return "green", max(ml_conf, 0.82)
+
     # red↔orange: H<12, R 매우 높고 B 낮으며 G도 높으면 orange 우선
     if 0 <= h < 12 and s >= 140 and v >= 150:
         if (r - b) >= 60 and (g - b) >= 20:
@@ -1100,7 +1109,7 @@ def classify_color_simple_hsv(h, s, v):
                 return "white", 0.85
         # white↔black(저채도·중명도) 예외: H 20~26, S≤22, V 130~170은 white 허용
         if h >= 20 and h <= 26 and s <= 22 and v >= 130 and v <= 170:
-            return "white", 0.85
+                return "white", 0.85
         # 채도 낮고 어두우면 → 검정
         if s <= 25 and v < 165:
             return "black", 0.85
@@ -1209,6 +1218,20 @@ def classify_color_simple_hsv(h, s, v):
         # 🔥 새 케이스: H=93, S=14는 WHITE! (HSV(93,14,138))
         if h == 93 and s <= 15 and v >= 130:
             return "white", 0.90  # H=93 (Green 범위) 저채도 중간명도 → white
+        # 딥 틸(매우 고채도+저명도)은 blue 우선 (blue→mint 방지)
+        if h >= 95 and s >= 220 and v <= 90:
+            return "blue", 0.85
+        # Green 우선 보정: 80~86, (고채도 저명도) 또는 (중채도 저중명도)
+        if 80 <= h <= 86 and s >= 95 and v <= 130:
+            return "green", 0.85
+        if 80 <= h <= 86 and 68 <= s <= 100 and v <= 125:
+            # G가 B보다 확실히 높고 R이 G보다 낮거나 비슷하면 green 성향
+            try:
+                r, g, bb = rgb
+                if (g - bb) >= 8 and r <= g:
+                    return "green", 0.80
+            except Exception:
+                return "green", 0.78
         # 🔥 H=89도 mint 범위! (HSV(89,81,139) 케이스)
         # 예외: 특정 케이스 보정 (H=88, S<60, 매우 밝음 → green)
         elif h == 88 and (40 <= s < 60) and v >= 170:
@@ -1216,6 +1239,9 @@ def classify_color_simple_hsv(h, s, v):
         # 어두운 민트 보강: V가 낮아도 고채도면 mint 유지
         elif s >= 95 and v >= 45:
             return "mint", 0.80
+        # 80~86, 고채도이면서 저중명도는 green 우선 (green→mint 방지)
+        if h <= 86 and s >= 95 and v <= 130:
+            return "green", 0.80
         elif s <= 25 and v >= 230:
             return "white", 0.85
         if s >= 80 and v >= 139:  # 높은 채도는 어두워도 mint
@@ -1229,6 +1255,9 @@ def classify_color_simple_hsv(h, s, v):
         elif v < 70:
             return "black", 0.80
         else:
+            # 88~96, 중간명도/중고채도 민트는 최소 신뢰도로 mint 처리 (unknown 방지)
+            if 88 <= h <= 96 and s >= 80 and v >= 105:
+                return "mint", 0.78
             return "unknown", 0.65
     elif h >= 100 and h < 117:
         # 파랑: purple과 분리 (H<117, H=117은 별도 범위)

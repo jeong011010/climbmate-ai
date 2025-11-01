@@ -1,3 +1,51 @@
+# Python venv and caches
+venv*/
+**/__pycache__/
+*.pyc
+
+# Node modules and build caches
+frontend/node_modules/
+frontend/.vite/
+frontend/.next/
+
+# Local outputs, logs, artifacts
+outputs/
+**/*.log
+*.csv
+
+# Datasets and training artifacts
+holdcheck/dataset/
+holdcheck/runs/
+holdcheck/roboflow_weights/
+
+# Test cases and dev scripts
+test_cases/
+*.ipynb
+scripts/*.py
+!scripts/dump_all_feedback_rule_decisions.py
+
+# Large models (keep only required)
+*.pt
+!holdcheck/yolov8n.pt
+!backend/models/clip_fp16.pt
+
+# Feedback JSON dumps (huge)
+color-feedback-*.json
+
+# Certbot, nginx cache
+certbot/conf/
+certbot/www/
+
+# Docker and compose backups
+docker-compose.yml.backup
+
+# Dist (built in CI/CD; not needed as context)
+frontend/dist/
+
+# Docs (to shrink context; available in repo)
+*.md
+!.github/**
+
 # Python
 __pycache__/
 *.py[cod]

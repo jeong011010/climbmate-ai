@@ -624,35 +624,68 @@ def predict_color(hold_features: Dict) -> Dict:
                 h, s, v = int(hsv[0]), int(hsv[1]), int(hsv[2])
                 class_list = list(encoder.classes_)
                 mult = {c: 1.0 for c in class_list}
-                # black guard: 저명도 저채도는 black 보수 강화
+                # black guard: 저명도 저채도는 black 보수 강화 + 주변 감쇠
                 if v <= 115 and s <= 85 and 'black' in mult:
-                    mult['black'] *= 1.18
+                    mult['black'] *= 1.22
+                    for c in ('white','blue','green','mint','lime'):
+                        if c in mult: mult[c] *= 0.92
+                if v <= 95 and 'black' in mult:
+                    mult['black'] *= 1.05
                     if 'white' in mult: mult['white'] *= 0.90
-                # pink 강화: 밝은 고명도 & 저~중채도는 pink 쪽에 가중
-                if 167 <= h < 176 and v >= 165:
-                    if 'pink' in mult: mult['pink'] *= 1.26
-                    # 매우 밝은 저채도 핑크 쪽 추가 가중
-                    if s <= 140 and v >= 185 and 'pink' in mult:
-                        mult['pink'] *= 1.06
-                    # 밝고 저~중채도 전체를 약간 추가 가중
-                    if s <= 150 and v >= 175 and 'pink' in mult:
+                # pink↔red 집중 보수화: hue 165~178 구간 세분화
+                if 165 <= h < 178:
+                    # 밝고 저채도는 pink 강화 (강화)
+                    if v >= 185 and s <= 140 and 'pink' in mult:
+                        mult['pink'] *= 1.12
+                        if 'red' in mult: mult['red'] *= 0.92
+                    # 추가: V 175~195에서 S 기준 완화로 pink 영역 확대
+                    if 175 <= v < 195 and s <= 155 and 'pink' in mult:
                         mult['pink'] *= 1.04
-                    # 매우 밝고 더 낮은 채도 구간에 보너스 가중
-                    if s <= 130 and v >= 195 and 'pink' in mult:
-                        mult['pink'] *= 1.03
-                    # 어두운 고채도 경계는 red 보강
-                    if v < 165 and s >= 170 and 'red' in mult:
+                        if 'red' in mult: mult['red'] *= 0.97
+                    # 매우 밝고 매우 저채도는 pink를 더 강하게, red 더 감쇠 (강화)
+                    if v >= 190 and s <= 135 and 'pink' in mult:
+                        mult['pink'] *= 1.08
+                        if 'red' in mult: mult['red'] *= 0.92
+                    # 어두운 고채도는 red 강화 (강화)
+                    if v <= 155 and s >= 180 and 'red' in mult:
+                        mult['red'] *= 1.10
+                        if 'pink' in mult: mult['pink'] *= 0.94
+                    # 추가: 더 어두운·더 고채도에서 red 우선 강화
+                    if v <= 150 and s >= 190 and 'red' in mult:
+                        mult['red'] *= 1.12
+                        if 'pink' in mult: mult['pink'] *= 0.93
+                    # 중간 영역은 과증폭 방지로 red 약가중 (강화)
+                    if 155 < v < 185 and 150 <= s < 180 and 'red' in mult:
                         mult['red'] *= 1.05
-                    # 매우 밝은 저채도 구간은 red 감쇠 강화
-                    if s <= 140 and v >= 185 and 'red' in mult:
-                        mult['red'] *= 0.93
+                    # LAB 힌트가 있으면 약하게 반영 (a* 양수 크면 red 쪽)
+                    lab = hold_features.get('lab') or hold_features.get('color_stats', {}).get('lab_stats')
+                    if isinstance(lab, (list, tuple)) and len(lab) >= 2:
+                        a_val = lab[1] if len(lab) == 3 else lab[1]
+                        if isinstance(a_val, (int, float)):
+                            if a_val >= 32 and v < 190 and 'red' in mult:
+                                mult['red'] *= 1.05
+                            if a_val <= 18 and v >= 185 and 'pink' in mult:
+                                mult['pink'] *= 1.04
                 # green↔mint: h<90 저채도·고명도는 green 보수 강화, mint 감쇠
-                if h < 90 and 60 <= s <= 80 and 160 <= v <= 200:
-                    if 'green' in mult: mult['green'] *= 1.12
+                if h < 90 and 60 <= s <= 85 and 160 <= v <= 190:
+                    if 'green' in mult: mult['green'] *= 1.14
                     if 'mint' in mult: mult['mint'] *= 0.94
                 if h < 90 and s < 60 and v >= 160:
-                    if 'green' in mult: mult['green'] *= 1.15
+                    if 'green' in mult: mult['green'] *= 1.16
                     if 'mint' in mult: mult['mint'] *= 0.94
+                # mint 보강: 88~96, 중간 명도/중고채도 민트가 unknown으로 빠지는 케이스 보강
+                if 88 <= h <= 96 and 80 <= s <= 150 and 105 <= v <= 175:
+                    if 'mint' in mult: mult['mint'] *= 1.15
+                    if 'green' in mult: mult['green'] *= 0.95
+                # green 보강: 80~86, 고채도이면서 저중명도 구간은 green 우선
+                if 80 <= h < 86 and s >= 95 and v <= 130:
+                    if 'green' in mult: mult['green'] *= 1.10
+                    if 'mint' in mult: mult['mint'] *= 0.95
+                # blue 가드: 매우 높은 채도 + 저명도(딥 틸)일 때 mint로 치우치는 문제 방지
+                if 95 <= h <= 110 and s >= 220 and v <= 90:
+                    if 'blue' in mult: mult['blue'] *= 1.22
+                    if 'mint' in mult: mult['mint'] *= 0.85
+                    if 'green' in mult: mult['green'] *= 0.92
                 # red↔orange: 극저h, 고채도·고명도는 오렌지 보강
                 if 0 <= h < 9 and s >= 160 and v >= 150:
                     if 'orange' in mult: mult['orange'] *= 1.15
@@ -661,6 +694,22 @@ def predict_color(hold_features: Dict) -> Dict:
                 if 0 <= h < 5 and s >= 180 and v >= 160:
                     if 'orange' in mult: mult['orange'] *= 1.03
                     if 'red' in mult: mult['red'] *= 0.98
+                # RGB 기반 red↔orange 타이브레이크: R 매우 높고 G/B 중간이면 orange 쪽 가중
+                try:
+                    rgb = hold_features.get('rgb') or hold_features.get('dominant_rgb')
+                    if isinstance(rgb, (list, tuple)) and len(rgb) == 3:
+                        r, g, b = int(rgb[0]), int(rgb[1]), int(rgb[2])
+                        if r >= 230 and 60 <= g <= 140 and 60 <= b <= 140:
+                            gb_ratio = g / max(1, b)
+                            if gb_ratio >= 0.8 and (g + b) >= 130:
+                                if 'orange' in mult: mult['orange'] *= 1.12
+                                if 'red' in mult: mult['red'] *= 0.95
+                except Exception:
+                    pass
+                # purple 보호: 어두운 고채도 보라가 black으로 끌리지 않도록 소폭 보강
+                if 150 <= h <= 170 and s >= 110 and v < 100:
+                    if 'purple' in mult: mult['purple'] *= 1.06
+                    if 'black' in mult: mult['black'] *= 0.97
                 # white guard: 매우 밝고 저채도는 white 보강, 주변색 감쇠
                 if v >= 230 and s <= 28 and 'white' in mult:
                     mult['white'] *= 1.12

@@ -69,3 +69,12 @@ frontend/public/models/*.onnx*
 
 # Legacy code (archived)
 holdcheck/legacy/
+*.md
+!README*
+test_cases/
+run_all_test_cases.py
+test_all_color_cases.py
+run_all_test_cases_ranges_only.py
+add_all_hsv_test_cases.py
+outputs/
+color-feedback-*.json
