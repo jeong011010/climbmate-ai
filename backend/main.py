@@ -1451,6 +1451,7 @@ async def analyze_image_sync(
                     
                     cleaned_problem = {
                         'id': problem.get('id', 'unknown'),
+                        'db_id': problem.get('db_id', None),
                         'color_name': problem.get('color_name', 'unknown'),
                         'color_rgb': problem.get('color_rgb', [128, 128, 128]),
                         'holds': problem.get('holds', []),
