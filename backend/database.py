@@ -470,6 +470,29 @@ def get_all_color_feedbacks(limit: int = 300, offset: int = 0) -> List[Dict]:
 
     return feedbacks
 
+def get_rule_based_accuracy_quick() -> Dict:
+    """규칙 기반 정확도(피드백 테이블 기준) 집계 - 매우 빠름.
+    predicted_color 가 비어있거나 'unknown' 인 항목은 분모에서 제외합니다.
+    """
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT 
+                SUM(CASE WHEN predicted_color = user_correct_color AND predicted_color IS NOT NULL AND predicted_color != '' AND LOWER(predicted_color) != 'unknown' THEN 1 ELSE 0 END) AS correct_cnt,
+                SUM(CASE WHEN predicted_color IS NOT NULL AND predicted_color != '' AND LOWER(predicted_color) != 'unknown' THEN 1 ELSE 0 END) AS valid_cnt
+            FROM hold_color_feedback
+            """
+        )
+        row = cursor.fetchone()
+    finally:
+        conn.close()
+    correct = int(row[0] or 0)
+    valid = int(row[1] or 0)
+    acc = round((correct / valid) * 100, 1) if valid > 0 else 0.0
+    return {"accuracy": acc, "correct": correct, "valid": valid}
+
 def confirm_color_feedback(feedback_id: int):
     """🎨 색상 피드백 확인 (ML 학습 데이터로 확정)"""
     conn = sqlite3.connect(DB_PATH)

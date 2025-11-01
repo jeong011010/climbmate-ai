@@ -728,34 +728,18 @@ if ML_AVAILABLE and DB_AVAILABLE:
             
             # 색상별 분포
             color_distribution = Counter([d['correct_color'] for d in training_data])
-            
-            # 규칙 기반 정확도: 현재 룰 분류기로 재평가 (DB 예측값 의존 제거)
-            misclassifications = {}
-            correct_predictions = 0
-            valid_predictions = 0
+
+            # 규칙 기반 정확도: 빠른 DB 집계 사용
             try:
-                holdcheck_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'holdcheck')
-                if holdcheck_path not in _sys.path:
-                    _sys.path.insert(0, holdcheck_path)
-                from color_classifier import load_color_ranges, classify_color_by_hsv, hsv_to_rgb_fast
-                ranges_data = load_color_ranges(os.path.join(holdcheck_path, 'color_ranges.json'))
-                colors_config = ranges_data["colors"]
-                for data in training_data:
-                    correct = (data.get('correct_color') or '').lower()
-                    hsv = data.get('hsv')
-                    if isinstance(hsv, (list, tuple)) and len(hsv) == 3 and correct:
-                        h, s, v = int(hsv[0]), int(hsv[1]), int(hsv[2])
-                        rgb = hsv_to_rgb_fast(h, s, v)
-                        pred, _conf, _meta = classify_color_by_hsv(h, s, v, rgb, colors_config)
-                        valid_predictions += 1
-                        if pred == correct:
-                            correct_predictions += 1
-                        else:
-                            key = f"{pred}→{correct}"
-                            misclassifications[key] = misclassifications.get(key, 0) + 1
+                from database import get_rule_based_accuracy_quick
+                rb = get_rule_based_accuracy_quick()
+                rule_based_accuracy = rb["accuracy"]
+                valid_predictions = rb["valid"]
             except Exception:
-                pass
-            rule_based_accuracy = (correct_predictions / valid_predictions * 100) if valid_predictions > 0 else 0
+                rule_based_accuracy = 0
+                valid_predictions = 0
+            # 오분류 TOP은 훈련 데이터 기준 간단 집계(가벼운 방식)
+            misclassifications = {}
             
             # ML 모델 성능 (파일에서 읽기)
             ml_accuracy = None
