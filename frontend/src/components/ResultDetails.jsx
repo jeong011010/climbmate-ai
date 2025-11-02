@@ -297,6 +297,40 @@ const ResultDetails = ({
                   <p className="text-xs text-slate-700 leading-relaxed">{selectedProblem.gpt4_comparison || selectedProblem.comparison}</p>
                 </div>
               )}
+
+              {/* 추천 루트 */}
+              {(selectedProblem.gpt4_route || selectedProblem.route) && 
+               (selectedProblem.gpt4_route?.length > 0 || selectedProblem.route?.length > 0) && (
+                <div className="bg-white/70 p-2.5 rounded-lg">
+                  <div className="text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1">
+                    <span>🧭</span> 추천 루트
+                  </div>
+                  <div className="space-y-1.5">
+                    {(selectedProblem.gpt4_route || selectedProblem.route || []).map((step, idx) => (
+                      <div key={idx} className="flex items-start gap-2 text-xs">
+                        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold text-[10px]">
+                          {step.step || idx + 1}
+                        </span>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <span className="px-1.5 py-0.5 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded text-[10px] font-semibold">
+                              {step.hold_color}
+                            </span>
+                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${
+                              step.difficulty === '쉬움' ? 'bg-green-100 text-green-700' :
+                              step.difficulty === '중간' ? 'bg-yellow-100 text-yellow-700' :
+                              'bg-red-100 text-red-700'
+                            }`}>
+                              {step.difficulty}
+                            </span>
+                          </div>
+                          <p className="text-slate-700 leading-relaxed">{step.action}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

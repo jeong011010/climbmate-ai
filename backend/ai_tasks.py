@@ -278,6 +278,7 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                     problem['gpt4_challenges'] = result.get('challenges', [])
                     problem['gpt4_tips'] = result.get('tips', [])
                     problem['gpt4_comparison'] = result.get('comparison', '')
+                    problem['gpt4_route'] = result.get('route', [])
         
         # 비동기 함수 실행
         import asyncio

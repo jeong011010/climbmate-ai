@@ -162,6 +162,9 @@ async def _call_gpt4(image_base64: str, prompt: str, temperature: float = 0.2) -
             result['secondary_types'] = []
         for k in ('key_factors','movements','challenges','tips'):
             result[k] = result.get(k, [])
+        # route 필드 기본값
+        if 'route' not in result:
+            result['route'] = []
         result['used_gpt4'] = True
         result['raw_response'] = content
         return result
@@ -169,21 +172,22 @@ async def _call_gpt4(image_base64: str, prompt: str, temperature: float = 0.2) -
         return { 'difficulty':'V?', 'type':'일반', 'confidence':0.5, 'reasoning': str(e), 'used_gpt4': True, 'raw_response': content }
 
 async def _refine_result(image_base64: str, context: Dict[str,Any], first_result: Dict) -> Dict:
-    schema = (
-        "JSON 스키마: {\n"
-        "  \"difficulty\": \"V0~V12\",\n"
-        "  \"confidence\": 0.0~1.0,\n"
-        "  \"primary_type\": one of [dynamic, static, crimp, sloper, pinch, balance, power, technical, coordination],\n"
-        "  \"secondary_types\": string[],\n"
-        "  \"reasoning\": string (모든 텍스트는 한국어),\n"
-        "  \"key_factors\": string[] (한국어),\n"
-        "  \"crux\": string (한국어),\n"
-        "  \"movements\": string[] (한국어),\n"
-        "  \"challenges\": string[] (한국어),\n"
-        "  \"tips\": string[] (한국어),\n"
-        "  \"comparison\": string\n"
-        "}"
-    )
+        schema = (
+            "JSON 스키마: {\n"
+            "  \"difficulty\": \"V0~V12\",\n"
+            "  \"confidence\": 0.0~1.0,\n"
+            "  \"primary_type\": one of [dynamic, static, crimp, sloper, pinch, balance, power, technical, coordination],\n"
+            "  \"secondary_types\": string[],\n"
+            "  \"reasoning\": string (모든 텍스트는 한국어),\n"
+            "  \"key_factors\": string[] (한국어),\n"
+            "  \"crux\": string (한국어),\n"
+            "  \"movements\": string[] (한국어),\n"
+            "  \"challenges\": string[] (한국어),\n"
+            "  \"tips\": string[] (한국어),\n"
+            "  \"comparison\": string,\n"
+            "  \"route\": [{\"step\": int, \"hold_id\": int, \"hold_color\": string, \"action\": string (한국어), \"difficulty\": string (한국어: 쉬움/중간/어려움)}]\n"
+            "}"
+        )
     rubric = (
         "검토 규칙: 컨텍스트(홀드 수/간격/각도/규칙 힌트)와 1차 결과가 일치하는지 점검하고, 필요시 난이도/타입을 '약간'만 조정. "
         "근거 없는 큰 변경 금지. JSON만 출력. 모든 텍스트는 한국어로 작성."
@@ -233,6 +237,16 @@ async def analyze_with_gpt4_vision(
     try:
         # 컨텍스트 구축(룰 힌트 포함)
         context = _build_context(holds_info, wall_angle, rule_based)
+        
+        # 홀드 리스트 구축 (루트파인딩용)
+        holds_list = []
+        for i, h in enumerate(holds_info):
+            holds_list.append({
+                "id": i,
+                "color": h.get('color_name', 'unknown'),
+                "center": h.get('center', [0, 0]),
+                "area": round(h.get('area', 0), 1)
+            })
 
         rubric = (
             "난이도 루브릭: V0-1(큰 홀드/짧은 동작), V2-3(중간 간격/기본 기술), "
@@ -246,20 +260,24 @@ async def analyze_with_gpt4_vision(
             "  \"confidence\": 0.0~1.0,\n"
             "  \"primary_type\": one of [dynamic, static, crimp, sloper, pinch, balance, power, technical, coordination],\n"
             "  \"secondary_types\": string[],\n"
-            "  \"reasoning\": string (근거는 구체적 요소만),\n"
-            "  \"key_factors\": string[],\n"
-            "  \"crux\": string,\n"
-            "  \"movements\": string[],\n"
-            "  \"challenges\": string[],\n"
-            "  \"tips\": string[],\n"
-            "  \"comparison\": string\n"
+            "  \"reasoning\": string (모든 텍스트는 한국어),\n"
+            "  \"key_factors\": string[] (한국어),\n"
+            "  \"crux\": string (한국어),\n"
+            "  \"movements\": string[] (한국어),\n"
+            "  \"challenges\": string[] (한국어),\n"
+            "  \"tips\": string[] (한국어),\n"
+            "  \"comparison\": string,\n"
+            "  \"route\": [{\"step\": int, \"hold_id\": int, \"hold_color\": string, \"action\": string (한국어), \"difficulty\": string (한국어: 쉬움/중간/어려움)}]\n"
             "}"
         )
 
         prompt = (
-            "클라이밍 문제를 정확히 분석하세요. 모호한 일반론을 피하고, 컨텍스트와 시각 증거를 근거로 판단하세요.\n"
+            "클라이밍 문제를 정확히 분석하고 추천 루트를 제시하세요. 모호한 일반론을 피하고, 컨텍스트와 시각 증거를 근거로 판단하세요.\n"
             f"컨텍스트: {json.dumps(context, ensure_ascii=False)}\n"
+            f"홀드 리스트: {json.dumps(holds_list, ensure_ascii=False)}\n"
             f"{rubric}\n"
+            "루트파인딩: 홀드 리스트의 id를 참고해 시작부터 끝까지 추천 경로를 step 순서대로 제시하세요. "
+            "각 스텝마다 hold_id, hold_color, action(어떤 손/발로 어떻게 잡는지 한국어로), difficulty(쉬움/중간/어려움)를 명시하세요.\n"
             "출력은 반드시 순수 JSON(추가 텍스트/마크다운 금지). 스키마를 준수하세요.\n"
             f"{schema}"
         )
@@ -351,7 +369,8 @@ def translate_and_enhance_gpt4_result(gpt4_result):
         'movements': movements_kr,
         'challenges': challenges_kr,
         'tips': tips_kr,
-        'comparison': gpt4_result.get('comparison', '')
+        'comparison': gpt4_result.get('comparison', ''),
+        'route': gpt4_result.get('route', [])
     }
     
     # 상세 분석 생성 (훨씬 더 자세하게)

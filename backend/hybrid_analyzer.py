@@ -86,6 +86,7 @@ async def hybrid_analyze(
                 }
                 result['method_used'] = 'gpt4'
                 result['gpt4_reasoning'] = translated.get('detailed_analysis')
+                result['gpt4_route'] = translated.get('route', [])
                 return result
         else:
             result['methods_tried'].append('gpt4_failed')
