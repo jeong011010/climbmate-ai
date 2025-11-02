@@ -277,25 +277,48 @@ async def analyze_with_gpt4_vision(
 
         # 홀드를 y좌표 내림차순으로 정렬해 "시작→끝" 순서 명확화
         sorted_by_position = sorted(enumerate(holds_info), key=lambda x: x[1].get('center', [0, 0])[1], reverse=True)
-        start_holds = sorted_by_position[:3]  # 하단 3개 (시작)
+        
+        # 이미지 높이 추정 (가장 큰 y값 기준)
+        max_y = max([h[1].get('center', [0, 0])[1] for h in sorted_by_position])
+        
+        # 바닥 근처 홀드 필터링 (하단 20% 이내는 발홀드 가능성 높음)
+        floor_threshold = max_y * 0.80  # 상위 80% 이상 y값 = 바닥 근처
+        
+        # 시작 홀드 선정: 바닥 근처가 아니면서 하단에 있는 홀드
+        start_candidates = []
+        for idx, hold in sorted_by_position:
+            y_pos = hold.get('center', [0, 0])[1]
+            area = hold.get('area', 0)
+            # 바닥 근처(큰 y)가 아니거나, 작은 홀드면 손 홀드로 간주
+            if y_pos < floor_threshold or area < 3000:
+                start_candidates.append((idx, hold))
+            if len(start_candidates) >= 5:  # 후보 5개 수집
+                break
+        
+        # 시작 홀드가 부족하면 상위 3개 사용
+        if len(start_candidates) < 3:
+            start_candidates = sorted_by_position[:3]
+        
+        start_holds = start_candidates[:3]
         top_holds = sorted_by_position[-3:]   # 상단 3개 (탑)
         
         start_ids = [h[0] for h in start_holds]
         top_ids = [h[0] for h in top_holds]
         
         # 시작/탑 홀드 정보를 명확하게 표시
-        start_holds_info = [(h[0], h[1].get('center', [0, 0])[1]) for h in start_holds]
+        start_holds_info = [(h[0], h[1].get('center', [0, 0])[1], h[1].get('area', 0)) for h in start_holds]
         top_holds_info = [(h[0], h[1].get('center', [0, 0])[1]) for h in top_holds]
         
         # Few-shot 예시 (실제 좌표 기반)
         example = (
-            f"⚠️ 중요: 이미지 좌표계에서 y값이 클수록 아래쪽입니다.\n"
-            f"✅ 시작 홀드 후보 (하단): {start_holds_info} (큰 y값)\n"
+            f"⚠️ 중요: 이미지 좌표계에서 y값이 클수록 아래쪽입니다. (이미지 최대 y={int(max_y)})\n"
+            f"✅ 시작 홀드 후보 (하단 손 홀드): {start_holds_info} (id, y좌표, 면적)\n"
+            f"   - 바닥 근처(y>{int(floor_threshold)})의 큰 홀드는 발홀드로 제외됨\n"
             f"✅ 탑 홀드 후보 (상단): {top_holds_info} (작은 y값)\n"
             f"📌 루트는 반드시 큰 y → 작은 y 순서로 진행.\n"
-            f"📌 첫 스텝 hold_id는 {start_ids} 중 하나여야 함.\n"
-            f"📌 마지막 스텝 hold_id는 {top_ids} 중 하나여야 함.\n"
-            "예시: step 1 hold_id=5 (y=1400) → step 2 hold_id=3 (y=900) → step 3 hold_id=1 (y=200, 탑아웃)"
+            f"📌 첫 스텝 hold_id는 {start_ids} 중 하나 (손으로 잡는 시작 홀드).\n"
+            f"📌 마지막 스텝 hold_id는 {top_ids} 중 하나 (탑아웃).\n"
+            "예시: step 1 hold_id=5 (y=1400, 시작 홀드 잡기) → step 2 hold_id=3 (y=900) → step 3 hold_id=1 (y=200, 탑아웃)"
         )
         
         prompt = (
@@ -307,14 +330,18 @@ async def analyze_with_gpt4_vision(
             f"{rubric}\n"
             f"{example}\n"
             "\n=== 루트파인딩 규칙 (필수 준수) ===\n"
-            f"1. 첫 스텝: hold_id는 반드시 {start_ids} 중 하나. action='시작 홀드 잡기' 또는 구체적 동작.\n"
-            f"2. 마지막 스텝: hold_id는 반드시 {top_ids} 중 하나. action='탑아웃' 또는 '탑 홀드 완등'.\n"
+            f"1. 첫 스텝 (손으로 잡기): hold_id는 반드시 {start_ids} 중 하나.\n"
+            f"   - {start_ids}는 바닥 근처 발홀드를 제외한 하단 손 홀드입니다.\n"
+            f"   - 바닥 가까이 있는 큰 홀드(y>{int(floor_threshold)}, area>3000)는 발로 밟는 홀드이므로 첫 스텝으로 사용 금지.\n"
+            f"   - action='시작 홀드 잡기' 또는 구체적 동작.\n"
+            f"2. 마지막 스텝 (탑아웃): hold_id는 반드시 {top_ids} 중 하나. action='탑아웃' 또는 '탑 홀드 완등'.\n"
             "3. 중간 스텝: 각 스텝의 y값이 점진적으로 감소(아래→위). 각 구간의 핵심 무브/기술을 action에 명시.\n"
-            "4. action 설명 예시:\n"
+            f"4. 발홀드 인식: 바닥 근처(y>{int(floor_threshold)})의 큰 홀드는 발로 디디는 홀드. 루트 스텝에 명시하지 않음.\n"
+            "5. action 설명 예시:\n"
             "   - 평범: '시작 홀드 잡기', '중간 홀드로 이동', '탑아웃'\n"
             "   - 구체적: '다이노로 멀리 떨어진 슬로퍼 제압', '크로스 무브로 상단 크림프', '토훅 걸고 밸런싱', '데드포인트', '매칭 후 크로스', '플래깅으로 균형', '힐훅 걸어 당기기'\n"
-            "5. 스텝 개수: 홀드 개수와 난이도에 맞게 3~10개. 복잡한 문제는 더 많은 스텝 허용.\n"
-            "6. hold_id 검증: 제공된 홀드 리스트의 id만 사용 (0~N-1).\n"
+            "6. 스텝 개수: 홀드 개수와 난이도에 맞게 3~10개. 복잡한 문제는 더 많은 스텝 허용.\n"
+            "7. hold_id 검증: 제공된 홀드 리스트의 id만 사용 (0~N-1).\n"
             "\n출력은 반드시 순수 JSON(추가 텍스트/마크다운 금지). 스키마를 준수하세요.\n"
             f"{schema}"
         )
