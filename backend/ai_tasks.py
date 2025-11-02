@@ -83,20 +83,25 @@ def analyze_image_async(self, image_base64, wall_angle=None):
             }
         
         # 1단계: 이미지 디코딩 및 YOLO 모델 로딩 (0~40%)
+        import time
+        
         self.update_state(
             state='PROGRESS',
             meta={'progress': 0, 'message': '📷 이미지 디코딩 중...', 'step': 'image_decoding'}
         )
+        time.sleep(0.5)  # 프론트엔드 폴링을 위한 최소 지연
         
         self.update_state(
             state='PROGRESS',
             meta={'progress': 5, 'message': '📷 이미지 디코딩 완료', 'step': 'image_decoding_complete'}
         )
+        time.sleep(0.5)
         
         self.update_state(
             state='PROGRESS',
             meta={'progress': 10, 'message': '🧠 YOLO 모델 로딩 중...', 'step': 'yolo_loading'}
         )
+        time.sleep(0.5)
         
         self.update_state(
             state='PROGRESS',
@@ -117,6 +122,7 @@ def analyze_image_async(self, image_base64, wall_angle=None):
             state='PROGRESS',
             meta={'progress': 40, 'message': f'✅ {len(hold_data) if hold_data else 0}개 홀드 감지 완료', 'step': 'detection_complete'}
         )
+        time.sleep(0.5)
         
         if not hold_data:
             self.update_state(
@@ -147,6 +153,7 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                 'holds_count': total_holds
             }
         )
+        time.sleep(0.5)
         
         from holdcheck.color_classifier import rule_based_color_clustering
         
@@ -161,12 +168,14 @@ def analyze_image_async(self, image_base64, wall_angle=None):
             state='PROGRESS',
             meta={'progress': 60, 'message': f'✅ 색상 클러스터링 완료', 'step': 'color_clustering_complete'}
         )
+        time.sleep(0.5)
         
         # 3단계: 문제 분석 (60% ~ 80%)
         self.update_state(
             state='PROGRESS',
             meta={'progress': 65, 'message': '📊 문제 분석 시작...', 'step': 'problem_analysis'}
         )
+        time.sleep(0.5)
         
         # 색상별로 그룹핑
         from holdcheck.clustering import analyze_problem
