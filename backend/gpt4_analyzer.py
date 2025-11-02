@@ -240,11 +240,13 @@ async def analyze_with_gpt4_vision(
         # 컨텍스트 구축(룰 힌트 포함)
         context = _build_context(holds_info, wall_angle, rule_based)
         
-        # 홀드 리스트 구축 (루트파인딩용) - 크기 제한
+        # 홀드 리스트 구축 (루트파인딩용) - unknown 제외
         max_holds_in_prompt = int(os.getenv('CLIMBMATE_GPT_MAX_HOLDS', '20'))
         holds_list = []
-        # 큰 홀드 우선 정렬 (루트에 중요한 홀드)
-        sorted_holds = sorted(enumerate(holds_info), key=lambda x: x[1].get('area', 0), reverse=True)
+        # 색상이 있는 홀드만 필터링 (unknown 제외)
+        known_holds = [(i, h) for i, h in enumerate(holds_info) if h.get('color_name', 'unknown') != 'unknown']
+        # 큰 홀드 우선 정렬
+        sorted_holds = sorted(known_holds, key=lambda x: x[1].get('area', 0), reverse=True)
         for idx, (i, h) in enumerate(sorted_holds[:max_holds_in_prompt]):
             holds_list.append({
                 "id": i,
@@ -252,7 +254,17 @@ async def analyze_with_gpt4_vision(
                 "center": [round(c, 1) for c in h.get('center', [0, 0])],
                 "area": round(h.get('area', 0), 1)
             })
-        holds_summary = f"{len(holds_info)}개 홀드 중 주요 {len(holds_list)}개"
+        # 색상 있는 홀드가 없으면 전체에서 큰 것만
+        if not holds_list:
+            sorted_all = sorted(enumerate(holds_info), key=lambda x: x[1].get('area', 0), reverse=True)
+            for idx, (i, h) in enumerate(sorted_all[:min(5, max_holds_in_prompt)]):
+                holds_list.append({
+                    "id": i,
+                    "color": "검출 중",
+                    "center": [round(c, 1) for c in h.get('center', [0, 0])],
+                    "area": round(h.get('area', 0), 1)
+                })
+        holds_summary = f"{len(holds_info)}개 홀드 (색상 확인된 홀드: {len(known_holds)}개)"
 
         rubric = (
             "난이도 루브릭: V0-1(큰 홀드/짧은 동작), V2-3(중간 간격/기본 기술), "
