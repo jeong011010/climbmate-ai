@@ -325,9 +325,11 @@ const ResultDetails = ({
                         </span>
                         <div className="flex-1">
                           <div className="flex items-center gap-1.5 mb-0.5">
-                            <span className="px-1.5 py-0.5 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded text-[10px] font-semibold">
-                              {step.hold_color}
-                            </span>
+                            {step.limb && (
+                              <span className="px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded text-[10px] font-semibold">
+                                {step.limb}
+                              </span>
+                            )}
                             <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${
                               step.difficulty === '쉬움' ? 'bg-green-100 text-green-700' :
                               step.difficulty === '중간' ? 'bg-yellow-100 text-yellow-700' :
