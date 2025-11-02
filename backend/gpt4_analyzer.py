@@ -283,12 +283,19 @@ async def analyze_with_gpt4_vision(
         start_ids = [h[0] for h in start_holds]
         top_ids = [h[0] for h in top_holds]
         
+        # 시작/탑 홀드 정보를 명확하게 표시
+        start_holds_info = [(h[0], h[1].get('center', [0, 0])[1]) for h in start_holds]
+        top_holds_info = [(h[0], h[1].get('center', [0, 0])[1]) for h in top_holds]
+        
         # Few-shot 예시 (실제 좌표 기반)
         example = (
-            f"중요: 이미지 좌표계에서 y값이 클수록 아래쪽입니다. "
-            f"현재 홀드 중 하단(시작 후보)은 id {start_ids} (큰 y), 상단(탑 후보)은 id {top_ids} (작은 y)입니다. "
-            f"루트는 반드시 큰 y → 작은 y 순서로 진행되어야 합니다. "
-            "예: y=1500(id:0) → y=800(id:1) → y=200(id:2) 순서."
+            f"⚠️ 중요: 이미지 좌표계에서 y값이 클수록 아래쪽입니다.\n"
+            f"✅ 시작 홀드 후보 (하단): {start_holds_info} (큰 y값)\n"
+            f"✅ 탑 홀드 후보 (상단): {top_holds_info} (작은 y값)\n"
+            f"📌 루트는 반드시 큰 y → 작은 y 순서로 진행.\n"
+            f"📌 첫 스텝 hold_id는 {start_ids} 중 하나여야 함.\n"
+            f"📌 마지막 스텝 hold_id는 {top_ids} 중 하나여야 함.\n"
+            "예시: step 1 hold_id=5 (y=1400) → step 2 hold_id=3 (y=900) → step 3 hold_id=1 (y=200, 탑아웃)"
         )
         
         prompt = (
@@ -299,16 +306,16 @@ async def analyze_with_gpt4_vision(
             f"주요 홀드 샘플 (id/x/y/area): {json.dumps(holds_list[:10], ensure_ascii=False)}\n"
             f"{rubric}\n"
             f"{example}\n"
-            "루트파인딩 규칙:\n"
-            "1. 첫 스텝: 하단 시작 후보 중 하나(큰 y)에서 시작. action은 '시작 홀드 잡기' 또는 구체적 동작.\n"
-            "2. 마지막 스텝: 상단 탑 후보 중 하나(작은 y)로 완등. action에 '탑아웃' 또는 '탑 홀드 완등' 포함.\n"
-            "3. 중간 스텝: y값 점진적 감소(아래→위). 각 구간의 핵심 무브/기술을 action에 명시.\n"
+            "\n=== 루트파인딩 규칙 (필수 준수) ===\n"
+            f"1. 첫 스텝: hold_id는 반드시 {start_ids} 중 하나. action='시작 홀드 잡기' 또는 구체적 동작.\n"
+            f"2. 마지막 스텝: hold_id는 반드시 {top_ids} 중 하나. action='탑아웃' 또는 '탑 홀드 완등'.\n"
+            "3. 중간 스텝: 각 스텝의 y값이 점진적으로 감소(아래→위). 각 구간의 핵심 무브/기술을 action에 명시.\n"
             "4. action 설명 예시:\n"
             "   - 평범: '시작 홀드 잡기', '중간 홀드로 이동', '탑아웃'\n"
             "   - 구체적: '다이노로 멀리 떨어진 슬로퍼 제압', '크로스 무브로 상단 크림프', '토훅 걸고 밸런싱', '데드포인트', '매칭 후 크로스', '플래깅으로 균형', '힐훅 걸어 당기기'\n"
             "5. 스텝 개수: 홀드 개수와 난이도에 맞게 3~10개. 복잡한 문제는 더 많은 스텝 허용.\n"
-            "6. hold_id: 제공된 리스트 id 정확히 사용(0~N).\n"
-            "출력은 반드시 순수 JSON(추가 텍스트/마크다운 금지). 스키마를 준수하세요.\n"
+            "6. hold_id 검증: 제공된 홀드 리스트의 id만 사용 (0~N-1).\n"
+            "\n출력은 반드시 순수 JSON(추가 텍스트/마크다운 금지). 스키마를 준수하세요.\n"
             f"{schema}"
         )
         # 앙상블/리파인 설정 (기본값 축소: rate limit 방지)

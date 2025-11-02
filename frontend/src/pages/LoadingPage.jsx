@@ -35,11 +35,13 @@ const LoadingPage = ({
           <div className="bg-white/50 rounded-lg p-4 mb-4">
             <div className="space-y-2 text-xs text-left">
               {[
-                { range: [0, 10], label: '📸 이미지 처리', icon: '📸' },
-                { range: [10, 40], label: '🔍 YOLO 홀드 감지', icon: '🔍' },
-                { range: [40, 60], label: '🎨 색상 분류', icon: '🎨' },
+                { range: [0, 10], label: '📷 이미지 디코딩', icon: '📷' },
+                { range: [10, 30], label: '🧠 YOLO 모델 로딩', icon: '🧠', slow: true },
+                { range: [30, 40], label: '🔍 홀드 감지 실행', icon: '🔍' },
+                { range: [40, 42], label: '✅ 홀드 감지 완료', icon: '✅' },
+                { range: [42, 60], label: '🎨 색상 분류 & 클러스터링', icon: '🎨', slow: true },
                 { range: [60, 80], label: '📊 문제 분석', icon: '📊' },
-                { range: [80, 100], label: '🤖 GPT-4 분석', icon: '🤖' }
+                { range: [80, 100], label: '🤖 GPT-4 분석', icon: '🤖', slow: true }
               ].map((stage, idx) => {
                 const isActive = loadingProgress >= stage.range[0] && loadingProgress < stage.range[1]
                 const isDone = loadingProgress >= stage.range[1]
@@ -54,6 +56,7 @@ const LoadingPage = ({
                       isActive ? 'text-blue-600 font-bold' : isDone ? 'text-green-600 line-through' : 'text-slate-400'
                     }`}>
                       {stage.label}
+                      {stage.slow && isActive && <span className="ml-1 text-[10px] text-orange-500">(시간 소요)</span>}
                     </span>
                     <span className="text-[10px] text-slate-400">{stage.range[0]}~{stage.range[1]}%</span>
                   </div>
