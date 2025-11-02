@@ -172,22 +172,22 @@ async def _call_gpt4(image_base64: str, prompt: str, temperature: float = 0.2) -
         return { 'difficulty':'V?', 'type':'일반', 'confidence':0.5, 'reasoning': str(e), 'used_gpt4': True, 'raw_response': content }
 
 async def _refine_result(image_base64: str, context: Dict[str,Any], first_result: Dict) -> Dict:
-        schema = (
-            "JSON 스키마: {\n"
-            "  \"difficulty\": \"V0~V12\",\n"
-            "  \"confidence\": 0.0~1.0,\n"
-            "  \"primary_type\": one of [dynamic, static, crimp, sloper, pinch, balance, power, technical, coordination],\n"
-            "  \"secondary_types\": string[],\n"
-            "  \"reasoning\": string (모든 텍스트는 한국어),\n"
-            "  \"key_factors\": string[] (한국어),\n"
-            "  \"crux\": string (한국어),\n"
-            "  \"movements\": string[] (한국어),\n"
-            "  \"challenges\": string[] (한국어),\n"
-            "  \"tips\": string[] (한국어),\n"
-            "  \"comparison\": string,\n"
-            "  \"route\": [{\"step\": int, \"hold_id\": int, \"hold_color\": string, \"action\": string (한국어), \"difficulty\": string (한국어: 쉬움/중간/어려움)}]\n"
-            "}"
-        )
+    schema = (
+        "JSON 스키마: {\n"
+        "  \"difficulty\": \"V0~V12\",\n"
+        "  \"confidence\": 0.0~1.0,\n"
+        "  \"primary_type\": one of [dynamic, static, crimp, sloper, pinch, balance, power, technical, coordination],\n"
+        "  \"secondary_types\": string[],\n"
+        "  \"reasoning\": string (모든 텍스트는 한국어),\n"
+        "  \"key_factors\": string[] (한국어),\n"
+        "  \"crux\": string (한국어),\n"
+        "  \"movements\": string[] (한국어),\n"
+        "  \"challenges\": string[] (한국어),\n"
+        "  \"tips\": string[] (한국어),\n"
+        "  \"comparison\": string,\n"
+        "  \"route\": [{\"step\": int, \"hold_id\": int, \"hold_color\": string, \"action\": string (한국어), \"difficulty\": string (한국어: 쉬움/중간/어려움)}]\n"
+        "}"
+    )
     rubric = (
         "검토 규칙: 컨텍스트(홀드 수/간격/각도/규칙 힌트)와 1차 결과가 일치하는지 점검하고, 필요시 난이도/타입을 '약간'만 조정. "
         "근거 없는 큰 변경 금지. JSON만 출력. 모든 텍스트는 한국어로 작성."
