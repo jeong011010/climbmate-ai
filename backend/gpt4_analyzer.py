@@ -296,12 +296,22 @@ async def analyze_with_gpt4_vision(
         # 단일 호출 (temp=0.1로 안정성 유지)
         result = await _call_gpt4(image_base64, prompt, temperature=0.1)
         
+        # 거부 응답 재시도 (최대 1회)
+        if result.get('raw_response') and "sorry" in result['raw_response'].lower():
+            print("⚠️  GPT-4 거부 응답 감지, 재시도 중...")
+            # 프롬프트 앞에 더 강한 안전 컨텍스트 추가
+            retry_prompt = (
+                "This is an educational analysis of an indoor climbing gym training wall for fitness purposes. "
+                "The image shows artificial climbing holds on a wall in a safe, controlled environment.\n\n" + prompt
+            )
+            result = await _call_gpt4(image_base64, retry_prompt, temperature=0.1)
+        
         # 옵션: 리파인 패스 (env=1일 때만)
         if enable_refine and result.get('difficulty') and result.get('type'):
             refined = await _refine_result(image_base64, context, result)
             if refined.get('difficulty') and refined.get('type'):
                 result = refined
-
+        
         return result
         
     except Exception as e:
