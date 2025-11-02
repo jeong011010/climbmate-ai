@@ -74,12 +74,8 @@ def _aggregate_results(results: List[Dict]) -> Dict:
     return base
 
 def _build_context(holds_info: List[Dict], wall_angle: Optional[str], rule_based: Optional[Dict]) -> Dict[str, Any]:
-    # 홀드 요약
+    # 홀드 요약 (색상 정보 제외)
     num_holds = len(holds_info)
-    color_groups: Dict[str,int] = {}
-    for hold in holds_info:
-        color = hold.get('color_name', 'unknown')
-        color_groups[color] = color_groups.get(color, 0) + 1
     areas = [h.get('area', 0) for h in holds_info]
     avg_area = sum(areas) / len(areas) if areas else 0
     # 거리 요약
@@ -105,7 +101,6 @@ def _build_context(holds_info: List[Dict], wall_angle: Optional[str], rule_based
         if t: rule_hint['rule_type'] = t
     return {
         'num_holds': num_holds,
-        'color_counts': color_groups,
         'avg_hold_area': round(avg_area, 2),
         'max_center_distance': round(float(max_dist), 2),
         'p90_center_distance': round(float(p90_dist), 2),
@@ -240,31 +235,20 @@ async def analyze_with_gpt4_vision(
         # 컨텍스트 구축(룰 힌트 포함)
         context = _build_context(holds_info, wall_angle, rule_based)
         
-        # 홀드 리스트 구축 (루트파인딩용) - unknown 제외
-        max_holds_in_prompt = int(os.getenv('CLIMBMATE_GPT_MAX_HOLDS', '20'))
+        # 홀드 요약만 제공 (색상 정보 제외 - 불필요하고 거부 유발)
+        holds_summary = f"{len(holds_info)}개 홀드"
+        
+        # 홀드 배치 정보 (위치/크기만)
+        max_holds_in_prompt = int(os.getenv('CLIMBMATE_GPT_MAX_HOLDS', '15'))
         holds_list = []
-        # 색상이 있는 홀드만 필터링 (unknown 제외)
-        known_holds = [(i, h) for i, h in enumerate(holds_info) if h.get('color_name', 'unknown') != 'unknown']
         # 큰 홀드 우선 정렬
-        sorted_holds = sorted(known_holds, key=lambda x: x[1].get('area', 0), reverse=True)
+        sorted_holds = sorted(enumerate(holds_info), key=lambda x: x[1].get('area', 0), reverse=True)
         for idx, (i, h) in enumerate(sorted_holds[:max_holds_in_prompt]):
             holds_list.append({
                 "id": i,
-                "color": h.get('color_name', 'unknown'),
                 "center": [round(c, 1) for c in h.get('center', [0, 0])],
                 "area": round(h.get('area', 0), 1)
             })
-        # 색상 있는 홀드가 없으면 전체에서 큰 것만
-        if not holds_list:
-            sorted_all = sorted(enumerate(holds_info), key=lambda x: x[1].get('area', 0), reverse=True)
-            for idx, (i, h) in enumerate(sorted_all[:min(5, max_holds_in_prompt)]):
-                holds_list.append({
-                    "id": i,
-                    "color": "검출 중",
-                    "center": [round(c, 1) for c in h.get('center', [0, 0])],
-                    "area": round(h.get('area', 0), 1)
-                })
-        holds_summary = f"{len(holds_info)}개 홀드 (색상 확인된 홀드: {len(known_holds)}개)"
 
         rubric = (
             "난이도 루브릭: V0-1(큰 홀드/짧은 동작), V2-3(중간 간격/기본 기술), "
@@ -285,7 +269,7 @@ async def analyze_with_gpt4_vision(
             "  \"challenges\": string[] (한국어, 최대 2개),\n"
             "  \"tips\": string[] (한국어, 최대 2개),\n"
             "  \"comparison\": string (간결),\n"
-            "  \"route\": [{\"step\": int, \"hold_color\": string, \"action\": string (한국어, 짧게), \"difficulty\": string (쉬움/중간/어려움)}] (3~7개 스텝)\n"
+            "  \"route\": [{\"step\": int, \"action\": string (한국어, 짧게), \"difficulty\": string (쉬움/중간/어려움)}] (3~7개 스텝)\n"
             "}"
         )
 
@@ -297,7 +281,7 @@ async def analyze_with_gpt4_vision(
             f"주요 홀드 샘플: {json.dumps(holds_list[:10], ensure_ascii=False)}\n"
             f"{rubric}\n"
             "루트파인딩: 이미지에서 보이는 홀드 순서로 시작부터 끝까지 추천 경로를 3~7 스텝으로 제시하세요. "
-            "각 스텝마다 hold_color, action(어떤 손/발로 어떻게 잡는지 한국어로), difficulty(쉬움/중간/어려움)를 명시하세요. hold_id는 생략.\n"
+            "각 스텝마다 action(어떤 손/발로 어떻게 잡는지 한국어로), difficulty(쉬움/중간/어려움)를 명시하세요.\n"
             "출력은 반드시 순수 JSON(추가 텍스트/마크다운 금지). 스키마를 준수하세요.\n"
             f"{schema}"
         )
