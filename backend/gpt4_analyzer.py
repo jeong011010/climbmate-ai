@@ -437,6 +437,10 @@ def translate_and_enhance_gpt4_result(gpt4_result):
     tips_kr = translate_tips(gpt4_result.get('tips', []))
     reasoning_kr = translate_reasoning(gpt4_result.get('reasoning', ''))
 
+    # 루트 검증 및 재정렬 (y좌표 기준 큰→작은 순서)
+    route = gpt4_result.get('route', [])
+    validated_route = validate_and_fix_route(route, holds_info)
+    
     # 기본 결과 (한국어 필드 반영)
     result = {
         'difficulty': difficulty_map.get(gpt4_result.get('difficulty', 'V?'), 'V? (미분석)'),
@@ -450,7 +454,7 @@ def translate_and_enhance_gpt4_result(gpt4_result):
         'challenges': challenges_kr,
         'tips': tips_kr,
         'comparison': gpt4_result.get('comparison', ''),
-        'route': gpt4_result.get('route', [])
+        'route': validated_route
     }
     
     # 상세 분석 생성 (훨씬 더 자세하게)
@@ -458,6 +462,57 @@ def translate_and_enhance_gpt4_result(gpt4_result):
     result['detailed_analysis'] = detailed_analysis
     
     return result
+
+def validate_and_fix_route(route, holds_info):
+    """
+    루트 검증 및 수정: y좌표 기준 아래→위 순서로 재정렬
+    - 시작 홀드가 위에 있고 마지막 홀드가 아래에 있는 경우 수정
+    - 중간 스텝이 역순인 경우 재정렬
+    """
+    if not route or not holds_info:
+        return route
+    
+    # hold_id가 유효한 스텝만 필터링
+    valid_steps = []
+    for step in route:
+        hold_id = step.get('hold_id')
+        if hold_id is not None and 0 <= hold_id < len(holds_info):
+            valid_steps.append(step)
+    
+    if len(valid_steps) < 2:
+        return route
+    
+    # 각 스텝에 y좌표 추가
+    steps_with_y = []
+    for step in valid_steps:
+        hold_id = step.get('hold_id')
+        hold = holds_info[hold_id]
+        y_pos = hold.get('center', [0, 0])[1]
+        steps_with_y.append({
+            'step': step,
+            'y': y_pos,
+            'hold_id': hold_id
+        })
+    
+    # y좌표 기준 내림차순 정렬 (큰 y → 작은 y = 아래 → 위)
+    sorted_steps = sorted(steps_with_y, key=lambda x: x['y'], reverse=True)
+    
+    # step 번호 재할당
+    fixed_route = []
+    for idx, item in enumerate(sorted_steps, start=1):
+        step = item['step'].copy()
+        step['step'] = idx
+        
+        # action 수정: 첫 스텝은 "시작", 마지막 스텝은 "탑아웃" 포함
+        if idx == 1 and '시작' not in step.get('action', ''):
+            if '잡기' in step.get('action', '') or '홀드' in step.get('action', ''):
+                step['action'] = '시작 홀드 잡기'
+        elif idx == len(sorted_steps) and '탑' not in step.get('action', ''):
+            step['action'] = '탑아웃'
+        
+        fixed_route.append(step)
+    
+    return fixed_route
 
 def generate_detailed_analysis_v2(gpt4_result, translated_result):
     """GPT-4 결과를 바탕으로 매우 상세한 한글 분석 생성"""

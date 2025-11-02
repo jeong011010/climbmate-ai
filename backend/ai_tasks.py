@@ -82,10 +82,15 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                 'message': '이미지를 읽을 수 없습니다.'
             }
         
-        # 1단계: 이미지 디코딩 및 YOLO 모델 로딩 (0~30%)
+        # 1단계: 이미지 디코딩 및 YOLO 모델 로딩 (0~40%)
         self.update_state(
             state='PROGRESS',
             meta={'progress': 0, 'message': '📷 이미지 디코딩 중...', 'step': 'image_decoding'}
+        )
+        
+        self.update_state(
+            state='PROGRESS',
+            meta={'progress': 5, 'message': '📷 이미지 디코딩 완료', 'step': 'image_decoding_complete'}
         )
         
         self.update_state(
@@ -160,7 +165,7 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         # 3단계: 문제 분석 (60% ~ 80%)
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 60, 'message': '🧩 문제 분석 시작...', 'step': 'problem_analysis'}
+            meta={'progress': 65, 'message': '📊 문제 분석 시작...', 'step': 'problem_analysis'}
         )
         
         # 색상별로 그룹핑
