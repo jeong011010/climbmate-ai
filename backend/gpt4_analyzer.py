@@ -116,15 +116,16 @@ def _build_context(holds_info: List[Dict], wall_angle: Optional[str], rule_based
 async def _call_gpt4(image_base64: str, prompt: str, temperature: float = 0.2) -> Dict:
     response = await client.chat.completions.create(
         model="gpt-4o",
-        messages=[{
-            "role": "system",
-            "content": (
-                "You are an expert bouldering route setter and judge. "
-                "Respond in JSON only, strictly matching the provided schema. "
-                "All textual content must be written in Korean (한국어), with no English explanations. "
-                "Base difficulty on observable features and the rubric; avoid generic answers."
-            )
-        }, {
+            messages=[{
+                "role": "system",
+                "content": (
+                    "You are an expert bouldering route setter and judge analyzing indoor climbing gym walls for training purposes. "
+                    "This is a safe, controlled indoor environment used for fitness and training. "
+                    "Respond in JSON only, strictly matching the provided schema. "
+                    "All textual content must be written in Korean (한국어), with no English explanations. "
+                    "Base difficulty on observable features and the rubric; avoid generic answers."
+                )
+            }, {
             "role": "user",
             "content": [
                 {"type": "text", "text": prompt},
@@ -272,6 +273,7 @@ async def analyze_with_gpt4_vision(
         )
 
         prompt = (
+            "이것은 실내 클라이밍 짐의 훈련용 볼더링 벽입니다. 안전하고 통제된 환경에서 운동 목적으로 사용됩니다.\n"
             "클라이밍 문제를 정확히 분석하고 추천 루트를 제시하세요. 모호한 일반론을 피하고, 컨텍스트와 시각 증거를 근거로 판단하세요.\n"
             f"컨텍스트: {json.dumps(context, ensure_ascii=False)}\n"
             f"홀드 리스트: {json.dumps(holds_list, ensure_ascii=False)}\n"
