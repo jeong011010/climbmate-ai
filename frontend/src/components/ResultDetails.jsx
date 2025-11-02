@@ -197,7 +197,7 @@ const ResultDetails = ({
                 </span>
               </div>
 
-              {/* 종합 분석 */}
+              {/* 종합 분석 (전체 너비) */}
               <div className="bg-white/70 p-2.5 rounded-lg">
                 <div className="text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1">
                   <span>📊</span> 종합 분석
@@ -207,96 +207,108 @@ const ResultDetails = ({
                 </div>
               </div>
 
-              {/* 핵심 요인 */}
-              {(selectedProblem.gpt4_key_factors || selectedProblem.key_factors) && 
-               (selectedProblem.gpt4_key_factors?.length > 0 || selectedProblem.key_factors?.length > 0) && (
-                <div className="bg-white/70 p-2.5 rounded-lg">
-                  <div className="text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1">
-                    <span>🔑</span> 핵심 요인
+              {/* 2열 그리드: 핵심 요인 + 크럭스 */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {/* 핵심 요인 */}
+                {(selectedProblem.gpt4_key_factors || selectedProblem.key_factors) && 
+                 (selectedProblem.gpt4_key_factors?.length > 0 || selectedProblem.key_factors?.length > 0) && (
+                  <div className="bg-white/70 p-2.5 rounded-lg">
+                    <div className="text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1">
+                      <span>🔑</span> 핵심 요인
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {(selectedProblem.gpt4_key_factors || selectedProblem.key_factors || []).map((factor, idx) => (
+                        <span key={idx} className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs">
+                          {factor}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {(selectedProblem.gpt4_key_factors || selectedProblem.key_factors || []).map((factor, idx) => (
-                      <span key={idx} className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs">
-                        {factor}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
+                )}
 
-              {/* 크럭스 */}
-              {(selectedProblem.gpt4_crux || selectedProblem.crux) && (
-                <div className="bg-white/70 p-2.5 rounded-lg">
-                  <div className="text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1">
-                    <span>⚡</span> 크럭스 (핵심 구간)
+                {/* 크럭스 */}
+                {(selectedProblem.gpt4_crux || selectedProblem.crux) && (
+                  <div className="bg-white/70 p-2.5 rounded-lg">
+                    <div className="text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1">
+                      <span>⚡</span> 크럭스
+                    </div>
+                    <p className="text-xs text-slate-700 leading-relaxed">{selectedProblem.gpt4_crux || selectedProblem.crux}</p>
                   </div>
-                  <p className="text-xs text-slate-700 leading-relaxed">{selectedProblem.gpt4_crux || selectedProblem.crux}</p>
-                </div>
-              )}
+                )}
+              </div>
 
-              {/* 동작 시퀀스 */}
-              {(selectedProblem.gpt4_movements || selectedProblem.movements) && 
-               (selectedProblem.gpt4_movements?.length > 0 || selectedProblem.movements?.length > 0) && (
-                <div className="bg-white/70 p-2.5 rounded-lg">
-                  <div className="text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1">
-                    <span>🎬</span> 동작 순서
-                  </div>
-                  <div className="space-y-1">
-                    {(selectedProblem.gpt4_movements || selectedProblem.movements || []).map((movement, idx) => (
-                      <div key={idx} className="flex items-start gap-1.5 text-xs text-slate-700">
-                        <span className="text-blue-600 font-bold min-w-[16px]">{idx + 1}.</span>
-                        <span className="leading-relaxed">{movement}</span>
+              {/* 2열 그리드: 동작+도전과제 / 팁+비교 */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {/* 왼쪽: 동작+도전과제 */}
+                <div className="space-y-2">
+                  {/* 동작 시퀀스 */}
+                  {(selectedProblem.gpt4_movements || selectedProblem.movements) && 
+                   (selectedProblem.gpt4_movements?.length > 0 || selectedProblem.movements?.length > 0) && (
+                    <div className="bg-white/70 p-2.5 rounded-lg">
+                      <div className="text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1">
+                        <span>🎬</span> 동작
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* 도전과제 */}
-              {(selectedProblem.gpt4_challenges || selectedProblem.challenges) && 
-               (selectedProblem.gpt4_challenges?.length > 0 || selectedProblem.challenges?.length > 0) && (
-                <div className="bg-white/70 p-2.5 rounded-lg">
-                  <div className="text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1">
-                    <span>⚠️</span> 도전과제
-                  </div>
-                  <div className="space-y-0.5">
-                    {(selectedProblem.gpt4_challenges || selectedProblem.challenges || []).map((challenge, idx) => (
-                      <div key={idx} className="flex items-start gap-1.5 text-xs text-slate-700">
-                        <span className="text-orange-500">•</span>
-                        <span className="leading-relaxed">{challenge}</span>
+                      <div className="space-y-0.5">
+                        {(selectedProblem.gpt4_movements || selectedProblem.movements || []).map((movement, idx) => (
+                          <div key={idx} className="flex items-start gap-1.5 text-xs text-slate-700">
+                            <span className="text-blue-600 font-bold">{idx + 1}.</span>
+                            <span className="leading-relaxed">{movement}</span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+                    </div>
+                  )}
 
-              {/* 실전 팁 */}
-              {(selectedProblem.gpt4_tips || selectedProblem.tips) && 
-               (selectedProblem.gpt4_tips?.length > 0 || selectedProblem.tips?.length > 0) && (
-                <div className="bg-white/70 p-2.5 rounded-lg">
-                  <div className="text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1">
-                    <span>💡</span> 공략 팁
-                  </div>
-                  <div className="space-y-0.5">
-                    {(selectedProblem.gpt4_tips || selectedProblem.tips || []).map((tip, idx) => (
-                      <div key={idx} className="flex items-start gap-1.5 text-xs text-slate-700">
-                        <span className="text-green-500">•</span>
-                        <span className="leading-relaxed">{tip}</span>
+                  {/* 도전과제 */}
+                  {(selectedProblem.gpt4_challenges || selectedProblem.challenges) && 
+                   (selectedProblem.gpt4_challenges?.length > 0 || selectedProblem.challenges?.length > 0) && (
+                    <div className="bg-white/70 p-2.5 rounded-lg">
+                      <div className="text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1">
+                        <span>⚠️</span> 도전과제
                       </div>
-                    ))}
-                  </div>
+                      <div className="space-y-0.5">
+                        {(selectedProblem.gpt4_challenges || selectedProblem.challenges || []).map((challenge, idx) => (
+                          <div key={idx} className="flex items-start gap-1.5 text-xs text-slate-700">
+                            <span className="text-orange-500">•</span>
+                            <span className="leading-relaxed">{challenge}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
 
-              {/* 비교 분석 */}
-              {(selectedProblem.gpt4_comparison || selectedProblem.comparison) && (
-                <div className="bg-white/70 p-2.5 rounded-lg">
-                  <div className="text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1">
-                    <span>📈</span> 난이도 비교
-                  </div>
-                  <p className="text-xs text-slate-700 leading-relaxed">{selectedProblem.gpt4_comparison || selectedProblem.comparison}</p>
+                {/* 오른쪽: 팁+비교 */}
+                <div className="space-y-2">
+                  {/* 실전 팁 */}
+                  {(selectedProblem.gpt4_tips || selectedProblem.tips) && 
+                   (selectedProblem.gpt4_tips?.length > 0 || selectedProblem.tips?.length > 0) && (
+                    <div className="bg-white/70 p-2.5 rounded-lg">
+                      <div className="text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1">
+                        <span>💡</span> 팁
+                      </div>
+                      <div className="space-y-0.5">
+                        {(selectedProblem.gpt4_tips || selectedProblem.tips || []).map((tip, idx) => (
+                          <div key={idx} className="flex items-start gap-1.5 text-xs text-slate-700">
+                            <span className="text-green-500">•</span>
+                            <span className="leading-relaxed">{tip}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 비교 분석 */}
+                  {(selectedProblem.gpt4_comparison || selectedProblem.comparison) && (
+                    <div className="bg-white/70 p-2.5 rounded-lg">
+                      <div className="text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1">
+                        <span>📈</span> 비교
+                      </div>
+                      <p className="text-xs text-slate-700 leading-relaxed">{selectedProblem.gpt4_comparison || selectedProblem.comparison}</p>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
 
               {/* 추천 루트 */}
               {(selectedProblem.gpt4_route || selectedProblem.route) && 

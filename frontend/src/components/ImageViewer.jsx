@@ -108,6 +108,51 @@ const ImageViewer = ({
                     </g>
                   )
                 })}
+
+                {/* 추천 루트 스텝 번호 오버레이 */}
+                {(selectedProblem.gpt4_route || selectedProblem.route) && 
+                 (selectedProblem.gpt4_route?.length > 0 || selectedProblem.route?.length > 0) && (() => {
+                  const route = selectedProblem.gpt4_route || selectedProblem.route || []
+                  const holds = selectedProblem.holds || []
+                  
+                  return route.map((step, idx) => {
+                    // step.hold_id가 있으면 해당 홀드 찾기, 없으면 순서대로 매핑
+                    const holdIdx = step.hold_id !== undefined ? step.hold_id : idx
+                    const hold = holds[holdIdx]
+                    
+                    if (!hold || !hold.center) return null
+                    
+                    const [cx, cy] = hold.center
+                    const stepNum = step.step || (idx + 1)
+                    
+                    return (
+                      <g key={idx}>
+                        {/* 배경 원 */}
+                        <circle
+                          cx={cx}
+                          cy={cy}
+                          r="25"
+                          fill="white"
+                          opacity="0.95"
+                          stroke="#3b82f6"
+                          strokeWidth="3"
+                        />
+                        {/* 스텝 번호 */}
+                        <text
+                          x={cx}
+                          y={cy}
+                          textAnchor="middle"
+                          dominantBaseline="central"
+                          fontSize="28"
+                          fontWeight="bold"
+                          fill="#1e40af"
+                        >
+                          {stepNum}
+                        </text>
+                      </g>
+                    )
+                  })
+                })()}
               </svg>
             )
           })()}
