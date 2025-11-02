@@ -116,10 +116,18 @@ const ImageViewer = ({
                   const holds = selectedProblem.holds || []
                   
                   return route.map((step, idx) => {
-                    // step.hold_id가 있으면 해당 홀드 찾기, 없으면 순서대로 매핑
-                    const holdIdx = step.hold_id !== undefined ? step.hold_id : idx
-                    const hold = holds[holdIdx]
+                    // hold_id 검증: 유효한 범위인지 확인
+                    const holdIdx = step.hold_id !== undefined && step.hold_id >= 0 && step.hold_id < holds.length 
+                      ? step.hold_id 
+                      : null
                     
+                    // 유효한 hold_id가 없으면 스킵(GPT 잘못된 id 반환 시)
+                    if (holdIdx === null) {
+                      console.warn(`Route step ${idx+1}: invalid hold_id ${step.hold_id}, skipping`)
+                      return null
+                    }
+                    
+                    const hold = holds[holdIdx]
                     if (!hold || !hold.center) return null
                     
                     const [cx, cy] = hold.center
@@ -127,23 +135,23 @@ const ImageViewer = ({
                     
                     return (
                       <g key={idx}>
-                        {/* 배경 원 */}
+                        {/* 배경 원 (작게) */}
                         <circle
                           cx={cx}
                           cy={cy}
-                          r="25"
+                          r="18"
                           fill="white"
-                          opacity="0.95"
+                          opacity="0.92"
                           stroke="#3b82f6"
-                          strokeWidth="3"
+                          strokeWidth="2.5"
                         />
-                        {/* 스텝 번호 */}
+                        {/* 스텝 번호 (작게) */}
                         <text
                           x={cx}
                           y={cy}
                           textAnchor="middle"
                           dominantBaseline="central"
-                          fontSize="28"
+                          fontSize="20"
                           fontWeight="bold"
                           fill="#1e40af"
                         >
