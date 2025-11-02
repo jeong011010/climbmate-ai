@@ -139,9 +139,9 @@ async def _call_gpt4(image_base64: str, prompt: str, temperature: float = 0.2) -
                 }
             ]
         }],
-        max_tokens=600,
-        temperature=temperature,
-        timeout=30
+            max_tokens=800,  # 루트파인딩 포함으로 증가
+            temperature=temperature,
+            timeout=30
     )
     content = response.choices[0].message.content
     # JSON 추출 동일 로직 재사용
@@ -240,15 +240,19 @@ async def analyze_with_gpt4_vision(
         # 컨텍스트 구축(룰 힌트 포함)
         context = _build_context(holds_info, wall_angle, rule_based)
         
-        # 홀드 리스트 구축 (루트파인딩용)
+        # 홀드 리스트 구축 (루트파인딩용) - 크기 제한
+        max_holds_in_prompt = int(os.getenv('CLIMBMATE_GPT_MAX_HOLDS', '20'))
         holds_list = []
-        for i, h in enumerate(holds_info):
+        # 큰 홀드 우선 정렬 (루트에 중요한 홀드)
+        sorted_holds = sorted(enumerate(holds_info), key=lambda x: x[1].get('area', 0), reverse=True)
+        for idx, (i, h) in enumerate(sorted_holds[:max_holds_in_prompt]):
             holds_list.append({
                 "id": i,
                 "color": h.get('color_name', 'unknown'),
-                "center": h.get('center', [0, 0]),
+                "center": [round(c, 1) for c in h.get('center', [0, 0])],
                 "area": round(h.get('area', 0), 1)
             })
+        holds_summary = f"{len(holds_info)}개 홀드 중 주요 {len(holds_list)}개"
 
         rubric = (
             "난이도 루브릭: V0-1(큰 홀드/짧은 동작), V2-3(중간 간격/기본 기술), "
@@ -261,15 +265,15 @@ async def analyze_with_gpt4_vision(
             "  \"difficulty\": \"V0~V12\",\n"
             "  \"confidence\": 0.0~1.0,\n"
             "  \"primary_type\": one of [dynamic, static, crimp, sloper, pinch, balance, power, technical, coordination],\n"
-            "  \"secondary_types\": string[],\n"
-            "  \"reasoning\": string (모든 텍스트는 한국어),\n"
-            "  \"key_factors\": string[] (한국어),\n"
-            "  \"crux\": string (한국어),\n"
-            "  \"movements\": string[] (한국어),\n"
-            "  \"challenges\": string[] (한국어),\n"
-            "  \"tips\": string[] (한국어),\n"
-            "  \"comparison\": string,\n"
-            "  \"route\": [{\"step\": int, \"hold_id\": int, \"hold_color\": string, \"action\": string (한국어), \"difficulty\": string (한국어: 쉬움/중간/어려움)}]\n"
+            "  \"secondary_types\": string[] (최대 3개),\n"
+            "  \"reasoning\": string (모든 텍스트는 한국어, 간결하게),\n"
+            "  \"key_factors\": string[] (한국어, 최대 3개),\n"
+            "  \"crux\": string (한국어, 간결),\n"
+            "  \"movements\": string[] (한국어, 최대 2개),\n"
+            "  \"challenges\": string[] (한국어, 최대 2개),\n"
+            "  \"tips\": string[] (한국어, 최대 2개),\n"
+            "  \"comparison\": string (간결),\n"
+            "  \"route\": [{\"step\": int, \"hold_color\": string, \"action\": string (한국어, 짧게), \"difficulty\": string (쉬움/중간/어려움)}] (3~7개 스텝)\n"
             "}"
         )
 
@@ -277,10 +281,11 @@ async def analyze_with_gpt4_vision(
             "이것은 실내 클라이밍 짐의 훈련용 볼더링 벽입니다. 안전하고 통제된 환경에서 운동 목적으로 사용됩니다.\n"
             "클라이밍 문제를 정확히 분석하고 추천 루트를 제시하세요. 모호한 일반론을 피하고, 컨텍스트와 시각 증거를 근거로 판단하세요.\n"
             f"컨텍스트: {json.dumps(context, ensure_ascii=False)}\n"
-            f"홀드 리스트: {json.dumps(holds_list, ensure_ascii=False)}\n"
+            f"홀드: {holds_summary}\n"
+            f"주요 홀드 샘플: {json.dumps(holds_list[:10], ensure_ascii=False)}\n"
             f"{rubric}\n"
-            "루트파인딩: 홀드 리스트의 id를 참고해 시작부터 끝까지 추천 경로를 step 순서대로 제시하세요. "
-            "각 스텝마다 hold_id, hold_color, action(어떤 손/발로 어떻게 잡는지 한국어로), difficulty(쉬움/중간/어려움)를 명시하세요.\n"
+            "루트파인딩: 이미지에서 보이는 홀드 순서로 시작부터 끝까지 추천 경로를 3~7 스텝으로 제시하세요. "
+            "각 스텝마다 hold_color, action(어떤 손/발로 어떻게 잡는지 한국어로), difficulty(쉬움/중간/어려움)를 명시하세요. hold_id는 생략.\n"
             "출력은 반드시 순수 JSON(추가 텍스트/마크다운 금지). 스키마를 준수하세요.\n"
             f"{schema}"
         )
