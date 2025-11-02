@@ -283,28 +283,20 @@ async def analyze_with_gpt4_vision(
             "출력은 반드시 순수 JSON(추가 텍스트/마크다운 금지). 스키마를 준수하세요.\n"
             f"{schema}"
         )
-        # 앙상블/리파인 설정
-        ens_n = int(os.getenv('CLIMBMATE_GPT_ENS_N', '2'))
-        enable_refine = os.getenv('CLIMBMATE_GPT_REFINE', '1') == '1'
-        temps = [0.2, 0.0]
-
-        # 1) 앙상블 1차 호출들
-        results = []
-        for i in range(max(1, ens_n)):
-            t = temps[i % len(temps)]
-            r = await _call_gpt4(image_base64, prompt, temperature=t)
-            results.append(r)
-        base = _aggregate_results(results) if len(results) > 1 else results[0]
-
-        # 2) 리파인 패스
-        final = base
-        if enable_refine:
-            refined = await _refine_result(image_base64, context, base)
-            # 간단 머지: 리파인이 스키마 준수 시 우선
+        # 앙상블/리파인 설정 (기본값 축소: rate limit 방지)
+        ens_n = int(os.getenv('CLIMBMATE_GPT_ENS_N', '1'))  # 기본 1회로 축소
+        enable_refine = os.getenv('CLIMBMATE_GPT_REFINE', '0') == '1'  # 기본 OFF
+        
+        # 단일 호출 (temp=0.1로 안정성 유지)
+        result = await _call_gpt4(image_base64, prompt, temperature=0.1)
+        
+        # 옵션: 리파인 패스 (env=1일 때만)
+        if enable_refine and result.get('difficulty') and result.get('type'):
+            refined = await _refine_result(image_base64, context, result)
             if refined.get('difficulty') and refined.get('type'):
-                final = refined
+                result = refined
 
-        return final
+        return result
         
     except Exception as e:
         print(f"❌ GPT-4 Vision 분석 실패: {e}")
