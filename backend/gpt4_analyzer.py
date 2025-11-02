@@ -398,7 +398,7 @@ async def analyze_with_gpt4_vision(
             'used_gpt4': False
         }
 
-def translate_and_enhance_gpt4_result(gpt4_result):
+def translate_and_enhance_gpt4_result(gpt4_result, holds_info=None):
     """GPT-4 결과를 한글로 번역하고 상세 분석 추가"""
     
     # 기본 번역 매핑
@@ -443,7 +443,11 @@ def translate_and_enhance_gpt4_result(gpt4_result):
 
     # 루트 검증 및 재정렬 (y좌표 기준 큰→작은 순서)
     route = gpt4_result.get('route', [])
-    validated_route = validate_and_fix_route(route, holds_info)
+    if holds_info:
+        validated_route = validate_and_fix_route(route, holds_info)
+    else:
+        print("⚠️ 경고: holds_info가 없어 루트 검증을 건너뜁니다.")
+        validated_route = route
     
     # 기본 결과 (한국어 필드 반영)
     result = {
@@ -464,6 +468,11 @@ def translate_and_enhance_gpt4_result(gpt4_result):
     # 상세 분석 생성 (훨씬 더 자세하게)
     detailed_analysis = generate_detailed_analysis_v2(gpt4_result, result)
     result['detailed_analysis'] = detailed_analysis
+    
+    # 원본 필드 유지 (used_gpt4, raw_response 등)
+    result['used_gpt4'] = gpt4_result.get('used_gpt4', True)
+    if 'raw_response' in gpt4_result:
+        result['raw_response'] = gpt4_result['raw_response']
     
     return result
 

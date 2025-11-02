@@ -7,7 +7,7 @@ import asyncio
 from celery import current_task
 from celery_app import celery_app
 from holdcheck import preprocess, clustering
-from backend.gpt4_analyzer import analyze_with_gpt4_vision
+from backend.gpt4_analyzer import analyze_with_gpt4_vision, translate_and_enhance_gpt4_result
 
 # 🎯 YOLO 모델 선택 (환경 변수로 설정 가능)
 # 'roboflow' (기본) 또는 'alternative' (새 모델 테스트)
@@ -298,17 +298,20 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                     print(f"⚠️ 문제 {i} GPT-4 분석 실패: {result}")
                     problem['gpt4_available'] = False
                 else:
+                    # 루트 검증 및 한글 번역 적용
+                    translated = translate_and_enhance_gpt4_result(result, problem['holds'])
+                    
                     # GPT-4 결과를 문제에 병합
-                    problem.update(result)
+                    problem.update(translated)
                     # 프론트엔드 전달용 필드 추가
-                    problem['gpt4_secondary_types'] = result.get('secondary_types', [])
-                    problem['gpt4_key_factors'] = result.get('key_factors', [])
-                    problem['gpt4_crux'] = result.get('crux', '')
-                    problem['gpt4_movements'] = result.get('movements', [])
-                    problem['gpt4_challenges'] = result.get('challenges', [])
-                    problem['gpt4_tips'] = result.get('tips', [])
-                    problem['gpt4_comparison'] = result.get('comparison', '')
-                    problem['gpt4_route'] = result.get('route', [])
+                    problem['gpt4_secondary_types'] = translated.get('secondary_types', [])
+                    problem['gpt4_key_factors'] = translated.get('key_factors', [])
+                    problem['gpt4_crux'] = translated.get('crux', '')
+                    problem['gpt4_movements'] = translated.get('movements', [])
+                    problem['gpt4_challenges'] = translated.get('challenges', [])
+                    problem['gpt4_tips'] = translated.get('tips', [])
+                    problem['gpt4_comparison'] = translated.get('comparison', '')
+                    problem['gpt4_route'] = translated.get('route', [])
         
         # 비동기 함수 실행
         import asyncio

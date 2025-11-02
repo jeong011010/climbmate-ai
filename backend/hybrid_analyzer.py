@@ -75,7 +75,7 @@ async def hybrid_analyze(
             else:
                 # 정상 결과
                 result['methods_tried'].append('gpt4')
-                translated = translate_and_enhance_gpt4_result(gpt4_result)
+                translated = translate_and_enhance_gpt4_result(gpt4_result, holds_data)
                 result['difficulty'] = {
                     'grade': translated.get('difficulty', 'V?'),
                     'confidence': translated.get('confidence', 0.6)
