@@ -325,11 +325,6 @@ const ResultDetails = ({
                         </span>
                         <div className="flex-1">
                           <div className="flex items-center gap-1.5 mb-0.5">
-                            {step.limb && (
-                              <span className="px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded text-[10px] font-semibold">
-                                {step.limb}
-                              </span>
-                            )}
                             <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${
                               step.difficulty === '쉬움' ? 'bg-green-100 text-green-700' :
                               step.difficulty === '중간' ? 'bg-yellow-100 text-yellow-700' :
@@ -338,7 +333,7 @@ const ResultDetails = ({
                               {step.difficulty}
                             </span>
                           </div>
-                          <p className="text-slate-700 leading-relaxed">{step.action}</p>
+                          <p className="text-slate-700 leading-relaxed font-medium">{step.action}</p>
                         </div>
                       </div>
                     ))}

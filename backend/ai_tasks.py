@@ -82,15 +82,20 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                 'message': '이미지를 읽을 수 없습니다.'
             }
         
-        # 홀드 감지 진행률 업데이트
+        # 1단계: 이미지 디코딩 및 YOLO 모델 로딩 (0~30%)
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 20, 'message': '🔍 이미지 전처리 중...', 'step': 'image_preprocessing'}
+            meta={'progress': 0, 'message': '📷 이미지 디코딩 중...', 'step': 'image_decoding'}
         )
         
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 30, 'message': '🔍 홀드 감지 진행 중...', 'step': 'yolo_detection'}
+            meta={'progress': 10, 'message': '🧠 YOLO 모델 로딩 중...', 'step': 'yolo_loading'}
+        )
+        
+        self.update_state(
+            state='PROGRESS',
+            meta={'progress': 30, 'message': '🔍 홀드 감지 실행 중...', 'step': 'yolo_detection'}
         )
         
         # YOLO 홀드 감지
@@ -105,7 +110,7 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         # 홀드 감지 완료 (40%까지)
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 40, 'message': f'✅ {len(hold_data) if hold_data else 0}개 홀드 감지 완료', 'step': 'yolo_complete'}
+            meta={'progress': 40, 'message': f'✅ {len(hold_data) if hold_data else 0}개 홀드 감지 완료', 'step': 'detection_complete'}
         )
         
         if not hold_data:
@@ -127,13 +132,13 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         holds = hold_data
         total_holds = len(holds)
         
-        # 2단계: 색상 분석 (42% ~ 45%)
+        # 2단계: 색상 분류 (42% ~ 60%)
         self.update_state(
             state='PROGRESS',
             meta={
                 'progress': 42,
-                'message': f'🎨 색상 분석 중... (홀드 {total_holds}개)',
-                'step': 'color_analysis',
+                'message': f'🎨 색상 분류 시작... (홀드 {total_holds}개)',
+                'step': 'color_classification',
                 'holds_count': total_holds
             }
         )
@@ -146,16 +151,16 @@ def analyze_image_async(self, image_base64, wall_angle=None):
             config_path="holdcheck/color_ranges.json"
         )
         
-        # 색상 분석 완료 (45%까지)
+        # 색상 클러스터링 완료 (60%까지)
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 45, 'message': f'✅ 색상 분석 완료', 'step': 'color_complete'}
+            meta={'progress': 60, 'message': f'✅ 색상 클러스터링 완료', 'step': 'color_clustering_complete'}
         )
         
-        # 3단계: 문제 생성 (색상별 그룹핑) (50% ~ 60%)
+        # 3단계: 문제 분석 (60% ~ 80%)
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 50, 'message': '🧩 문제 그룹 생성 중...', 'step': 'problem_generation'}
+            meta={'progress': 60, 'message': '🧩 문제 분석 시작...', 'step': 'problem_analysis'}
         )
         
         # 색상별로 그룹핑
@@ -179,15 +184,15 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         
         for color_name, group_holds in problems_by_color.items():
             if len(group_holds) >= 1:  # 모든 홀드 그룹 표시
-                # 진행률 업데이트 (50% ~ 60% 사이)
+                # 진행률 업데이트 (60% ~ 80% 사이)
                 processed_colors += 1
-                progress = 50 + int((processed_colors / total_colors) * 10)
+                progress = 60 + int((processed_colors / total_colors) * 20)
                 self.update_state(
                     state='PROGRESS',
                     meta={
                         'progress': progress, 
-                        'message': f'🧩 {color_name} 문제 처리 중... ({processed_colors}/{total_colors})',
-                        'step': 'problem_enrichment',
+                        'message': f'🧩 {color_name} 문제 분석 중... ({processed_colors}/{total_colors})',
+                        'step': 'problem_analysis',
                         'problems_count': len(problems)
                     }
                 )
@@ -241,11 +246,11 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                         'analysis': analysis
                     })
         
-        # 4단계: GPT-4 분석 (🚀 비동기 병렬 처리)
+        # 4단계: GPT-4 분석 (80% ~ 99%)
         total_problems = len(problems)
         self.update_state(
             state='PROGRESS',
-            meta={'progress': 95, 'message': f'🤖 {total_problems}개 문제 분석 중...', 'step': 'gpt4_analysis'}
+            meta={'progress': 80, 'message': f'🤖 GPT-4 분석 시작... ({total_problems}개 문제)', 'step': 'gpt4_analysis'}
         )
         
         # 🚀 모든 문제를 동시에 GPT-4에 요청 (병렬 처리)
@@ -264,6 +269,17 @@ def analyze_image_async(self, image_base64, wall_angle=None):
             
             # 결과를 각 문제에 적용
             for i, (problem, result) in enumerate(zip(problems, results)):
+                # 진행률 업데이트 (80% ~ 99% 사이)
+                progress = 80 + int(((i + 1) / total_problems) * 19)
+                self.update_state(
+                    state='PROGRESS',
+                    meta={
+                        'progress': progress,
+                        'message': f'🤖 GPT-4 분석 중... ({i + 1}/{total_problems})',
+                        'step': 'gpt4_analysis'
+                    }
+                )
+                
                 if isinstance(result, Exception):
                     print(f"⚠️ 문제 {i} GPT-4 분석 실패: {result}")
                     problem['gpt4_available'] = False
