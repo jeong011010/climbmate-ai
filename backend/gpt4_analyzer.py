@@ -521,6 +521,10 @@ def validate_and_fix_route(route, holds_info):
     print(f"🔍 현재 루트 y좌표: {[item['y'] for item in sorted_steps]}")
     
     route_hold_ids = [item['hold_id'] for item in sorted_steps]
+    
+    # 🚨 가장 위 홀드가 루트에 있는지 확인
+    last_step_hold_id = sorted_steps[-1]['hold_id'] if sorted_steps else None
+    
     if top_hold_id not in route_hold_ids:
         # 가장 위 홀드가 루트에 없으면 강제로 추가
         print(f"⚠️ 경고: 가장 위 홀드 (id={top_hold_id}, y={all_holds_y[top_hold_id][1]})가 루트에 없음. 강제로 추가합니다.")
@@ -536,8 +540,39 @@ def validate_and_fix_route(route, holds_info):
         })
         # 재정렬
         sorted_steps = sorted(sorted_steps, key=lambda x: x['y'], reverse=True)
+    elif last_step_hold_id != top_hold_id:
+        # 가장 위 홀드가 루트에는 있지만 마지막 스텝이 아닌 경우, 마지막으로 이동
+        print(f"⚠️ 경고: 가장 위 홀드 (id={top_hold_id})가 루트 중간에 있음. 마지막 스텝으로 변경합니다.")
+        # 가장 위 홀드를 제외한 나머지 스텝만 유지
+        sorted_steps = [s for s in sorted_steps if s['hold_id'] != top_hold_id]
+        # 가장 위 홀드를 마지막에 추가
+        top_hold = holds_info[top_hold_id]
+        sorted_steps.append({
+            'step': {
+                'hold_id': top_hold_id,
+                'action': '탑아웃',
+                'difficulty': '중간'
+            },
+            'y': top_hold.get('center', [0, 0])[1],
+            'hold_id': top_hold_id
+        })
+        # 재정렬 (큰 y → 작은 y)
+        sorted_steps = sorted(sorted_steps, key=lambda x: x['y'], reverse=True)
     else:
-        print(f"✅ 가장 위 홀드가 루트에 포함되어 있습니다.")
+        print(f"✅ 가장 위 홀드가 마지막 스텝으로 올바르게 설정되어 있습니다.")
+    
+    # 중복 홀드 제거 (같은 홀드를 여러번 사용하는 경우)
+    unique_steps = []
+    seen_hold_ids = set()
+    for item in sorted_steps:
+        hold_id = item['hold_id']
+        if hold_id not in seen_hold_ids:
+            unique_steps.append(item)
+            seen_hold_ids.add(hold_id)
+        else:
+            print(f"⚠️ 중복 홀드 제거: hold_id={hold_id}, y={item['y']}")
+    
+    sorted_steps = unique_steps
     
     # step 번호 재할당
     fixed_route = []
@@ -550,14 +585,15 @@ def validate_and_fix_route(route, holds_info):
             if '시작' not in step.get('action', ''):
                 step['action'] = '시작 홀드 잡기'
         elif idx == len(sorted_steps):
-            if '탑' not in step.get('action', ''):
-                step['action'] = '탑아웃'
+            # 마지막 스텝은 무조건 "탑아웃"
+            step['action'] = '탑아웃'
             # 마지막 스텝이 가장 위 홀드인지 최종 확인
             if item['hold_id'] != top_hold_id:
                 print(f"⚠️ 경고: 마지막 스텝이 가장 위 홀드가 아님. hold_id={item['hold_id']}, top_hold_id={top_hold_id}")
         
         fixed_route.append(step)
     
+    print(f"✅ 최종 루트: {len(fixed_route)}개 스텝, 홀드 IDs={[s['hold_id'] for s in fixed_route]}")
     return fixed_route
 
 def generate_detailed_analysis_v2(gpt4_result, translated_result):

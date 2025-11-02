@@ -36,8 +36,7 @@ const LoadingPage = ({
             <div className="space-y-2 text-xs text-left">
               {[
                 { range: [0, 10], label: '📷 이미지 디코딩', icon: '📷' },
-                { range: [10, 30], label: '🧠 YOLO 모델 로딩', icon: '🧠', slow: true },
-                { range: [30, 40], label: '🔍 홀드 감지 실행', icon: '🔍' },
+                { range: [10, 40], label: '🧠 YOLO 모델 로딩 & 홀드 감지', icon: '🧠', slow: true },
                 { range: [40, 42], label: '✅ 홀드 감지 완료', icon: '✅' },
                 { range: [42, 60], label: '🎨 색상 분류 & 클러스터링', icon: '🎨', slow: true },
                 { range: [60, 80], label: '📊 문제 분석', icon: '📊' },
