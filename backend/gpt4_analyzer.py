@@ -329,13 +329,17 @@ async def analyze_with_gpt4_vision(
             f"주요 홀드 샘플 (id/x/y/area): {json.dumps(holds_list[:10], ensure_ascii=False)}\n"
             f"{rubric}\n"
             f"{example}\n"
-            "\n=== 루트파인딩 규칙 (필수 준수) ===\n"
-            f"1. 첫 스텝 (손으로 잡기): hold_id는 반드시 {start_ids} 중 하나.\n"
+            "\n=== ⚠️ 루트파인딩 규칙 (반드시 준수) ===\n"
+            f"1. 🚨 첫 스텝 (시작): hold_id는 ONLY {start_ids} 중 하나를 사용해야 합니다.\n"
             f"   - {start_ids}는 바닥 근처 발홀드를 제외한 하단 손 홀드입니다.\n"
-            f"   - 바닥 가까이 있는 큰 홀드(y>{int(floor_threshold)}, area>3000)는 발로 밟는 홀드이므로 첫 스텝으로 사용 금지.\n"
+            f"   - 바닥 가까이 있는 큰 홀드(y>{int(floor_threshold)}, area>3000)는 발로 밟는 홀드이므로 첫 스텝으로 절대 사용 금지.\n"
             f"   - action='시작 홀드 잡기' 또는 구체적 동작.\n"
-            f"2. 마지막 스텝 (탑아웃): hold_id는 반드시 {top_ids} 중 하나. action='탑아웃' 또는 '탑 홀드 완등'.\n"
-            "3. 중간 스텝: 각 스텝의 y값이 점진적으로 감소(아래→위). 각 구간의 핵심 무브/기술을 action에 명시.\n"
+            f"\n2. 🚨 마지막 스텝 (탑아웃): hold_id는 ONLY {top_ids} 중 하나를 사용해야 합니다.\n"
+            f"   - {top_ids}는 가장 위(작은 y좌표)에 있는 홀드들입니다.\n"
+            f"   - 마지막 스텝은 반드시 가장 위에 있는 홀드여야 합니다.\n"
+            f"   - action='탑아웃' 또는 '탑 홀드 완등' 필수 포함.\n"
+            f"   - ⛔ {top_ids} 외의 홀드를 마지막 스텝으로 사용하면 안 됩니다.\n"
+            "\n3. 중간 스텝: 각 스텝의 y값이 점진적으로 감소(아래→위). 각 구간의 핵심 무브/기술을 action에 명시.\n"
             f"4. 발홀드 인식: 바닥 근처(y>{int(floor_threshold)})의 큰 홀드는 발로 디디는 홀드. 루트 스텝에 명시하지 않음.\n"
             "5. action 설명 예시:\n"
             "   - 평범: '시작 홀드 잡기', '중간 홀드로 이동', '탑아웃'\n"
@@ -466,8 +470,8 @@ def translate_and_enhance_gpt4_result(gpt4_result):
 def validate_and_fix_route(route, holds_info):
     """
     루트 검증 및 수정: y좌표 기준 아래→위 순서로 재정렬
-    - 시작 홀드가 위에 있고 마지막 홀드가 아래에 있는 경우 수정
-    - 중간 스텝이 역순인 경우 재정렬
+    - GPT-4가 잘못된 순서로 반환해도 강제로 수정
+    - 가장 위 홀드가 반드시 마지막 스텝이 되도록 보장
     """
     if not route or not holds_info:
         return route
@@ -497,6 +501,28 @@ def validate_and_fix_route(route, holds_info):
     # y좌표 기준 내림차순 정렬 (큰 y → 작은 y = 아래 → 위)
     sorted_steps = sorted(steps_with_y, key=lambda x: x['y'], reverse=True)
     
+    # 🚨 추가 검증: 마지막 스텝이 가장 위 홀드인지 확인
+    # 만약 루트에 가장 위 홀드가 없다면, 가장 위에 있는 홀드를 마지막에 추가
+    all_holds_y = [(idx, holds_info[idx].get('center', [0, 0])[1]) for idx in range(len(holds_info))]
+    top_hold_id = min(all_holds_y, key=lambda x: x[1])[0]  # 가장 작은 y = 가장 위
+    
+    route_hold_ids = [item['hold_id'] for item in sorted_steps]
+    if top_hold_id not in route_hold_ids:
+        # 가장 위 홀드가 루트에 없으면 강제로 추가
+        print(f"⚠️ 경고: 가장 위 홀드 (id={top_hold_id})가 루트에 없음. 강제로 추가합니다.")
+        top_hold = holds_info[top_hold_id]
+        sorted_steps.append({
+            'step': {
+                'hold_id': top_hold_id,
+                'action': '탑아웃',
+                'difficulty': '중간'
+            },
+            'y': top_hold.get('center', [0, 0])[1],
+            'hold_id': top_hold_id
+        })
+        # 재정렬
+        sorted_steps = sorted(sorted_steps, key=lambda x: x['y'], reverse=True)
+    
     # step 번호 재할당
     fixed_route = []
     for idx, item in enumerate(sorted_steps, start=1):
@@ -504,11 +530,15 @@ def validate_and_fix_route(route, holds_info):
         step['step'] = idx
         
         # action 수정: 첫 스텝은 "시작", 마지막 스텝은 "탑아웃" 포함
-        if idx == 1 and '시작' not in step.get('action', ''):
-            if '잡기' in step.get('action', '') or '홀드' in step.get('action', ''):
+        if idx == 1:
+            if '시작' not in step.get('action', ''):
                 step['action'] = '시작 홀드 잡기'
-        elif idx == len(sorted_steps) and '탑' not in step.get('action', ''):
-            step['action'] = '탑아웃'
+        elif idx == len(sorted_steps):
+            if '탑' not in step.get('action', ''):
+                step['action'] = '탑아웃'
+            # 마지막 스텝이 가장 위 홀드인지 최종 확인
+            if item['hold_id'] != top_hold_id:
+                print(f"⚠️ 경고: 마지막 스텝이 가장 위 홀드가 아님. hold_id={item['hold_id']}, top_hold_id={top_hold_id}")
         
         fixed_route.append(step)
     
