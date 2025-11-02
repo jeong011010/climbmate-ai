@@ -275,12 +275,20 @@ async def analyze_with_gpt4_vision(
             "}"
         )
 
-        # Few-shot 예시
+        # 홀드를 y좌표 내림차순으로 정렬해 "시작→끝" 순서 명확화
+        sorted_by_position = sorted(enumerate(holds_info), key=lambda x: x[1].get('center', [0, 0])[1], reverse=True)
+        start_holds = sorted_by_position[:3]  # 하단 3개 (시작)
+        top_holds = sorted_by_position[-3:]   # 상단 3개 (탑)
+        
+        start_ids = [h[0] for h in start_holds]
+        top_ids = [h[0] for h in top_holds]
+        
+        # Few-shot 예시 (실제 좌표 기반)
         example = (
-            "예시: 홀드 리스트가 [{\"id\":0, \"y\":1500, \"area\":5000}, {\"id\":1, \"y\":800, \"area\":3000}, {\"id\":2, \"y\":200, \"area\":4000}]일 때, "
-            "route는 [{\"step\":1, \"hold_id\":0, \"action\":\"시작 홀드 잡기\", \"difficulty\":\"쉬움\"}, "
-            "{\"step\":2, \"hold_id\":1, \"action\":\"중간 홀드로 이동\", \"difficulty\":\"중간\"}, "
-            "{\"step\":3, \"hold_id\":2, \"action\":\"탑 홀드 완등\", \"difficulty\":\"쉬움\"}] (y 큰→작은 순서)"
+            f"중요: 이미지 좌표계에서 y값이 클수록 아래쪽입니다. "
+            f"현재 홀드 중 하단(시작 후보)은 id {start_ids} (큰 y), 상단(탑 후보)은 id {top_ids} (작은 y)입니다. "
+            f"루트는 반드시 큰 y → 작은 y 순서로 진행되어야 합니다. "
+            "예: y=1500(id:0) → y=800(id:1) → y=200(id:2) 순서."
         )
         
         prompt = (
@@ -290,13 +298,13 @@ async def analyze_with_gpt4_vision(
             f"홀드: {holds_summary}\n"
             f"주요 홀드 샘플 (id/x/y/area): {json.dumps(holds_list[:10], ensure_ascii=False)}\n"
             f"{rubric}\n"
-            "루트파인딩: 클라이밍은 일반적으로 아래→위로 올라갑니다. 이미지 좌표계에서 큰 y값=아래(시작), 작은 y값=위(끝)입니다. "
             f"{example}\n"
-            "이미지를 보고 시작 홀드부터 탑 홀드까지 자연스러운 경로를 3~7 스텝으로 제시하세요. "
-            "hold_id는 반드시 제공된 홀드 리스트의 id를 정확히 사용하세요(0~N 범위). "
-            "트래버스나 대각선 경로도 고려하되, 보통은 y값이 큰→작은 순서입니다.\n"
-            "action 설명 시 구체적 기술을 명시하세요: 다이노(dyno), 데드포인트, 슬로퍼 잡기, 크림프, 토훅(toe hook), 힐훅, 밸런싱, 코디네이션, 크로스 무브, 매칭(matching), 플래깅, 드롭니, 탑아웃 등. "
-            "평범한 동작은 간단히('왼손 잡기'), 특수 구간은 구체적으로('다이노로 상단 슬로퍼 제압', '토훅 걸고 탑아웃').\n"
+            "루트파인딩 규칙:\n"
+            "1. route의 첫 스텝은 반드시 하단 시작 후보 중 하나(큰 y값)여야 합니다.\n"
+            "2. 마지막 스텝은 반드시 상단 탑 후보 중 하나(작은 y값)여야 합니다.\n"
+            "3. 중간 스텝들은 y값이 점진적으로 감소(아래→위)해야 합니다(트래버스 제외).\n"
+            "4. action은 구체적으로: 평범한 동작('왼손 잡기'), 특수 기술('다이노로 슬로퍼 제압', '토훅 걸고 밸런싱', '크로스 무브', '데드포인트', '매칭', '플래깅', '탑아웃') 등.\n"
+            "5. hold_id는 제공된 리스트의 id를 정확히 사용(0~N).\n"
             "출력은 반드시 순수 JSON(추가 텍스트/마크다운 금지). 스키마를 준수하세요.\n"
             f"{schema}"
         )
