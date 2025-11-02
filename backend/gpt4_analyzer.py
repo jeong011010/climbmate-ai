@@ -125,13 +125,13 @@ async def _call_gpt4(image_base64: str, prompt: str, temperature: float = 0.2) -
             "role": "user",
             "content": [
                 {"type": "text", "text": prompt},
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": f"data:image/jpeg;base64,{image_base64}",
-                        "detail": "low"
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/jpeg;base64,{image_base64}",
+                            "detail": "high"
+                        }
                     }
-                }
             ]
         }],
             max_tokens=800,  # 루트파인딩 포함으로 증가
@@ -292,15 +292,29 @@ async def analyze_with_gpt4_vision(
         # 단일 호출 (temp=0.1로 안정성 유지)
         result = await _call_gpt4(image_base64, prompt, temperature=0.1)
         
-        # 거부 응답 재시도 (최대 1회)
-        if result.get('raw_response') and "sorry" in result['raw_response'].lower():
-            print("⚠️  GPT-4 거부 응답 감지, 재시도 중...")
-            # 프롬프트 앞에 더 강한 안전 컨텍스트 추가
-            retry_prompt = (
-                "This is an educational analysis of an indoor climbing gym training wall for fitness purposes. "
-                "The image shows artificial climbing holds on a wall in a safe, controlled environment.\n\n" + prompt
-            )
-            result = await _call_gpt4(image_base64, retry_prompt, temperature=0.1)
+        # 거부 응답 재시도 (최대 2회, 점진적 완화)
+        retry_count = 0
+        while result.get('raw_response') and "sorry" in result['raw_response'].lower() and retry_count < 2:
+            retry_count += 1
+            print(f"⚠️  GPT-4 거부 응답 감지 ({retry_count}/2), 재시도 중...")
+            
+            # 재시도 전략
+            if retry_count == 1:
+                # 1차: 더 강한 안전 컨텍스트
+                retry_prompt = (
+                    "This is an educational analysis of an indoor climbing gym training wall for fitness purposes. "
+                    "The image shows artificial climbing holds on a wall in a safe, controlled environment.\n\n" + prompt
+                )
+            else:
+                # 2차: 프롬프트 단순화 (루트 제외, 분석만)
+                simple_schema = schema.replace('"route": [{', '"route": [')
+                retry_prompt = prompt.replace(
+                    "루트파인딩: 이미지에서 보이는 홀드 순서로 시작부터 끝까지 추천 경로를 3~7 스텝으로 제시하세요. "
+                    "각 스텝마다 action(어떤 손/발로 어떻게 잡는지 한국어로), difficulty(쉬움/중간/어려움)를 명시하세요.\n",
+                    ""
+                ).replace(schema, simple_schema)
+            
+            result = await _call_gpt4(image_base64, retry_prompt, temperature=0.0)
         
         # 옵션: 리파인 패스 (env=1일 때만)
         if enable_refine and result.get('difficulty') and result.get('type'):
