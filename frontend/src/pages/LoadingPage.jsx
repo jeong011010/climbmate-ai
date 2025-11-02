@@ -31,6 +31,37 @@ const LoadingPage = ({
           </div>
           <p className="text-lg gradient-text font-bold mb-3 animate-pulse">{currentAnalysisStep}</p>
           
+          {/* 상세 진행 단계 타임라인 */}
+          <div className="bg-white/50 rounded-lg p-4 mb-4">
+            <div className="space-y-2 text-xs text-left">
+              {[
+                { range: [0, 10], label: '📸 이미지 처리', icon: '📸' },
+                { range: [10, 40], label: '🔍 YOLO 홀드 감지', icon: '🔍' },
+                { range: [40, 60], label: '🎨 색상 분류', icon: '🎨' },
+                { range: [60, 80], label: '📊 문제 분석', icon: '📊' },
+                { range: [80, 100], label: '🤖 GPT-4 분석', icon: '🤖' }
+              ].map((stage, idx) => {
+                const isActive = loadingProgress >= stage.range[0] && loadingProgress < stage.range[1]
+                const isDone = loadingProgress >= stage.range[1]
+                return (
+                  <div key={idx} className="flex items-center gap-2">
+                    <span className={`text-base transition-all ${
+                      isActive ? 'scale-125 animate-pulse' : isDone ? 'opacity-50' : 'opacity-30'
+                    }`}>
+                      {isActive ? '▶' : isDone ? '✓' : '○'}
+                    </span>
+                    <span className={`flex-1 font-medium transition-all ${
+                      isActive ? 'text-blue-600 font-bold' : isDone ? 'text-green-600 line-through' : 'text-slate-400'
+                    }`}>
+                      {stage.label}
+                    </span>
+                    <span className="text-[10px] text-slate-400">{stage.range[0]}~{stage.range[1]}%</span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+          
           {/* 홀드/문제 개수 표시 */}
           {(detectedHolds > 0 || detectedProblems > 0) && (
             <div className="flex justify-center gap-6 text-sm text-slate-500 mb-3">
