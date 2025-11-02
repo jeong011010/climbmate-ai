@@ -235,18 +235,20 @@ async def analyze_with_gpt4_vision(
         # 컨텍스트 구축(룰 힌트 포함)
         context = _build_context(holds_info, wall_angle, rule_based)
         
-        # 홀드 요약만 제공 (색상 정보 제외 - 불필요하고 거부 유발)
+        # 홀드 요약만 제공 (색상 정보 제외)
         holds_summary = f"{len(holds_info)}개 홀드"
         
-        # 홀드 배치 정보 (위치/크기만)
+        # 홀드 배치 정보: 위치(x,y) 제공
         max_holds_in_prompt = int(os.getenv('CLIMBMATE_GPT_MAX_HOLDS', '15'))
         holds_list = []
-        # 큰 홀드 우선 정렬
+        # 크기 우선 정렬 (중요 홀드 먼저)
         sorted_holds = sorted(enumerate(holds_info), key=lambda x: x[1].get('area', 0), reverse=True)
         for idx, (i, h) in enumerate(sorted_holds[:max_holds_in_prompt]):
+            center = h.get('center', [0, 0])
             holds_list.append({
                 "id": i,
-                "center": [round(c, 1) for c in h.get('center', [0, 0])],
+                "x": round(center[0], 1),
+                "y": round(center[1], 1),  # 큰 y = 아래쪽(이미지 좌표계)
                 "area": round(h.get('area', 0), 1)
             })
 
@@ -269,7 +271,7 @@ async def analyze_with_gpt4_vision(
             "  \"challenges\": string[] (한국어, 최대 2개),\n"
             "  \"tips\": string[] (한국어, 최대 2개),\n"
             "  \"comparison\": string (간결),\n"
-            "  \"route\": [{\"step\": int, \"action\": string (한국어, 짧게), \"difficulty\": string (쉬움/중간/어려움)}] (3~7개 스텝)\n"
+            "  \"route\": [{\"step\": int, \"hold_id\": int, \"action\": string (한국어, 짧게), \"difficulty\": string (쉬움/중간/어려움)}] (3~7개 스텝, 아래→위 순서)\n"
             "}"
         )
 
@@ -280,8 +282,10 @@ async def analyze_with_gpt4_vision(
             f"홀드: {holds_summary}\n"
             f"주요 홀드 샘플: {json.dumps(holds_list[:10], ensure_ascii=False)}\n"
             f"{rubric}\n"
-            "루트파인딩: 이미지에서 보이는 홀드 순서로 시작부터 끝까지 추천 경로를 3~7 스텝으로 제시하세요. "
-            "각 스텝마다 action(어떤 손/발로 어떻게 잡는지 한국어로), difficulty(쉬움/중간/어려움)를 명시하세요.\n"
+            "루트파인딩: 클라이밍은 일반적으로 아래→위로 올라갑니다(이미지에서 큰 y값=아래, 작은 y값=위). "
+            "이미지를 보고 시작 홀드(보통 하단)부터 끝 홀드(보통 상단)까지 자연스러운 경로를 3~7 스텝으로 제시하세요. "
+            "트래버스(좌→우, 우→좌)나 대각선 경로도 고려하세요. "
+            "각 스텝마다 hold_id(홀드 리스트의 id), action(손/발 어떻게), difficulty(쉬움/중간/어려움)를 명시하세요.\n"
             "출력은 반드시 순수 JSON(추가 텍스트/마크다운 금지). 스키마를 준수하세요.\n"
             f"{schema}"
         )
