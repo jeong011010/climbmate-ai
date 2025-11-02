@@ -116,6 +116,7 @@ def _build_context(holds_info: List[Dict], wall_angle: Optional[str], rule_based
 async def _call_gpt4(image_base64: str, prompt: str, temperature: float = 0.2) -> Dict:
     response = await client.chat.completions.create(
         model="gpt-4o",
+        store=True,  # 로그 30일 저장 (대시보드에서 확인 가능)
             messages=[{
                 "role": "system",
                 "content": (
