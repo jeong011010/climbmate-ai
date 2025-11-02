@@ -506,10 +506,15 @@ def validate_and_fix_route(route, holds_info):
     all_holds_y = [(idx, holds_info[idx].get('center', [0, 0])[1]) for idx in range(len(holds_info))]
     top_hold_id = min(all_holds_y, key=lambda x: x[1])[0]  # 가장 작은 y = 가장 위
     
+    print(f"🔍 루트 검증: 전체 홀드 수={len(holds_info)}, 루트 스텝 수={len(sorted_steps)}")
+    print(f"🔍 가장 위 홀드: id={top_hold_id}, y={all_holds_y[top_hold_id][1]}")
+    print(f"🔍 현재 루트 홀드 IDs: {[item['hold_id'] for item in sorted_steps]}")
+    print(f"🔍 현재 루트 y좌표: {[item['y'] for item in sorted_steps]}")
+    
     route_hold_ids = [item['hold_id'] for item in sorted_steps]
     if top_hold_id not in route_hold_ids:
         # 가장 위 홀드가 루트에 없으면 강제로 추가
-        print(f"⚠️ 경고: 가장 위 홀드 (id={top_hold_id})가 루트에 없음. 강제로 추가합니다.")
+        print(f"⚠️ 경고: 가장 위 홀드 (id={top_hold_id}, y={all_holds_y[top_hold_id][1]})가 루트에 없음. 강제로 추가합니다.")
         top_hold = holds_info[top_hold_id]
         sorted_steps.append({
             'step': {
@@ -522,6 +527,8 @@ def validate_and_fix_route(route, holds_info):
         })
         # 재정렬
         sorted_steps = sorted(sorted_steps, key=lambda x: x['y'], reverse=True)
+    else:
+        print(f"✅ 가장 위 홀드가 루트에 포함되어 있습니다.")
     
     # step 번호 재할당
     fixed_route = []

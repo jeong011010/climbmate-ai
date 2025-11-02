@@ -77,11 +77,6 @@ def analyze_image_async(self, image_base64, wall_angle=None):
         )
         time.sleep(0.5)
         
-        self.update_state(
-            state='PROGRESS',
-            meta={'progress': 30, 'message': '🔍 홀드 감지 실행 중...', 'step': 'yolo_detection'}
-        )
-        
         # Base64 이미지 디코딩
         image_bytes = base64.b64decode(image_base64)
         nparr = np.frombuffer(image_bytes, np.uint8)
@@ -102,12 +97,23 @@ def analyze_image_async(self, image_base64, wall_angle=None):
                 'message': '이미지를 읽을 수 없습니다.'
             }
         
+        # YOLO 모델 로딩 시작 (실제 로딩은 preprocess 내부에서 발생)
+        self.update_state(
+            state='PROGRESS',
+            meta={'progress': 15, 'message': '🧠 YOLO 모델 초기화 중...', 'step': 'yolo_loading'}
+        )
+        
         # YOLO 홀드 감지
         from holdcheck.preprocess import preprocess
         
         # 선택된 모델 사용
         model_path = MODEL_PATH_DOCKER if os.path.exists(MODEL_PATH_DOCKER) else MODEL_PATH_LOCAL
         print(f"🎯 사용 중인 모델: {model_path}")
+        
+        self.update_state(
+            state='PROGRESS',
+            meta={'progress': 30, 'message': '🔍 홀드 감지 실행 중...', 'step': 'yolo_detection'}
+        )
         
         hold_data, masks = preprocess(image, model_path=model_path)
         
