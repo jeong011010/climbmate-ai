@@ -1,0 +1,232 @@
+{
+  "version": "2.0",
+  "last_updated": "2025-10-30",
+  "feedback_count": 101,
+  "source": "test_cases/color_classification_test_cases.json",
+  "colors": {
+    "white": {
+      "name": "흰색",
+      "priority": 13,
+      "hsv_ranges": [
+        {
+          "h": [
+            0,
+            180
+          ],
+          "s": [
+            0,
+            40
+          ],
+          "v": [
+            180,
+            255
+          ]
+        }
+      ],
+      "rgb_conditions": []
+    },
+    "purple": {
+      "name": "보라색",
+      "priority": 3,
+      "hsv_ranges": [
+        {
+          "h": [
+            110,
+            160
+          ],
+          "s": [
+            40,
+            255
+          ],
+          "v": [
+            45,
+            255
+          ]
+        }
+      ],
+      "rgb_conditions": []
+    },
+    "pink": {
+      "name": "분홍색",
+      "priority": 4,
+      "hsv_ranges": [
+        {
+          "h": [
+            160,
+            177
+          ],
+          "s": [
+            30,
+            255
+          ],
+          "v": [
+            80,
+            255
+          ]
+        }
+      ],
+      "rgb_conditions": []
+    },
+    "orange": {
+      "name": "주황색",
+      "priority": 5,
+      "hsv_ranges": [
+        {
+          "h": [
+            8,
+            18
+          ],
+          "s": [
+            90,
+            255
+          ],
+          "v": [
+            120,
+            255
+          ]
+        }
+      ],
+      "rgb_conditions": []
+    },
+    "yellow": {
+      "name": "노란색",
+      "priority": 6,
+      "hsv_ranges": [
+        {
+          "h": [
+            13,
+            24
+          ],
+          "s": [
+            136,
+            229
+          ],
+          "v": [
+            136,
+            240
+          ]
+        }
+      ],
+      "rgb_conditions": []
+    },
+    "red": {
+      "name": "빨간색",
+      "priority": 5,
+      "hsv_ranges": [
+        {
+          "h": [
+            0,
+            10
+          ],
+          "s": [
+            100,
+            255
+          ],
+          "v": [
+            100,
+            255
+          ]
+        },
+        {
+          "h": [
+            177,
+            180
+          ],
+          "s": [
+            90,
+            255
+          ],
+          "v": [
+            100,
+            255
+          ]
+        }
+      ],
+      "rgb_conditions": []
+    },
+    "black": {
+      "name": "검정색",
+      "priority": 1,
+      "hsv_ranges": [
+        {
+          "h": [
+            14,
+            117
+          ],
+          "s": [
+            17,
+            74
+          ],
+          "v": [
+            52,
+            215
+          ]
+        }
+      ],
+      "rgb_conditions": []
+    },
+    "green": {
+      "name": "초록색",
+      "priority": 7,
+      "hsv_ranges": [
+        {
+          "h": [
+            59,
+            93
+          ],
+          "s": [
+            22,
+            255
+          ],
+          "v": [
+            62,
+            255
+          ]
+        }
+      ],
+      "rgb_conditions": []
+    },
+    "blue": {
+      "name": "파란색",
+      "priority": 9,
+      "hsv_ranges": [
+        {
+          "h": [
+            100,
+            125
+          ],
+          "s": [
+            3,
+            160
+          ],
+          "v": [
+            138,
+            238
+          ]
+        }
+      ],
+      "rgb_conditions": []
+    },
+    "mint": {
+      "name": "민트색",
+      "priority": 8,
+      "hsv_ranges": [
+        {
+          "h": [
+            70,
+            94
+          ],
+          "s": [
+            10,
+            93
+          ],
+          "v": [
+            89,
+            212
+          ]
+        }
+      ],
+      "rgb_conditions": []
+    }
+  }
+}
