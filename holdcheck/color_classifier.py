@@ -615,9 +615,19 @@ def classify_color_by_hsv(h, s, v, rgb, colors_config):
     # 🔥 orange 앵커: H=10-15 고채도는 orange 강제 (orange→yellow 오분류 방지)
     elif 10 <= h <= 15 and s >= 130 and v >= 100:
         anchor_color = "orange"
+    # 🔥 green 앵커: H=75-82 중채도(85-95) 어두운 것은 green (V 110-145, 매우 정밀)
+    elif 75 <= h <= 82 and 85 <= s <= 95 and 110 <= v <= 145:
+        anchor_color = "green"
+    # 🔥 mint 앵커: H=80-84 초고채도(S≥230) 밝은 것은 mint (V≥180, 매우 정밀)
+    elif 80 <= h <= 84 and s >= 230 and v >= 180:
+        anchor_color = "mint"
     # 밝은 라임 앵커: H 30~36, 고채도·고명도는 라임 고정(ML이 덮지 않도록)
     elif 30 <= h < 36 and s >= 180 and v >= 170:
         anchor_color = "lime"
+    
+    # 앵커 확정 시 즉시 반환 (ML 우회)
+    if anchor_color is not None:
+        return anchor_color, 0.95, f"Anchor: {anchor_color} (H={h}, S={s}, V={v})"
 
     # 0.5️⃣ ML 1차 시도 (후보 제한, 앵커 우선)
     load_ml_color_model()
