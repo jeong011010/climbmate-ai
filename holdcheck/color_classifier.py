@@ -609,6 +609,12 @@ def classify_color_by_hsv(h, s, v, rgb, colors_config):
         anchor_color = "white"
     elif h >= 176 and s >= 150 and v >= 90:
         anchor_color = "red"
+    # 🔥 red/pink 경계 앵커: H=173-175 고채도는 red 강제 (pink→red 오분류 방지)
+    elif 173 <= h <= 175 and s >= 150 and v >= 120:
+        anchor_color = "red"
+    # 🔥 orange 앵커: H=10-15 고채도는 orange 강제 (orange→yellow 오분류 방지)
+    elif 10 <= h <= 15 and s >= 130 and v >= 100:
+        anchor_color = "orange"
     # 밝은 라임 앵커: H 30~36, 고채도·고명도는 라임 고정(ML이 덮지 않도록)
     elif 30 <= h < 36 and s >= 180 and v >= 170:
         anchor_color = "lime"
@@ -737,7 +743,7 @@ def classify_color_by_hsv(h, s, v, rgb, colors_config):
                 allowed_classes = set()
 
             # ML이 허용 집합 내에서 임계치 이상이면 override
-            if ml_color and (not allowed_classes or ml_color in allowed_classes) and ml_conf >= ml_threshold:
+            if ml_color and allowed_classes and ml_color in allowed_classes and ml_conf >= ml_threshold:
                 if ml_color != base_color or ml_conf >= base_conf:
                     return ml_color, ml_conf, f"Hybrid-ML override[{boundary_type}]: {ml_conf:.2f} (base {base_color}/{base_conf:.2f})"
 
