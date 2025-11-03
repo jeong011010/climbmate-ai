@@ -605,6 +605,8 @@ def classify_color_by_hsv(h, s, v, rgb, colors_config):
     anchor_color = None
     if v < 70 and s < 140:
         anchor_color = "black"
+    elif v < 20:  # 극단 어두움은 채도 무시하고 black (V=2 케이스)
+        anchor_color = "black"
     elif v >= 230 and s <= 12:
         anchor_color = "white"
     elif h >= 176 and s >= 150 and v >= 90:
@@ -612,8 +614,8 @@ def classify_color_by_hsv(h, s, v, rgb, colors_config):
     # 🔥 red/pink 경계 앵커: H=173-175 고채도는 red 강제 (pink→red 오분류 방지)
     elif 173 <= h <= 175 and s >= 150 and v >= 120:
         anchor_color = "red"
-    # 🔥 orange 앵커: H=10-15 고채도는 orange 강제 (orange→yellow 오분류 방지)
-    elif 10 <= h <= 15 and s >= 130 and v >= 100:
+    # 🔥 orange 앵커: H=10-20 고채도는 orange 강제 (orange→yellow 오분류 방지)
+    elif 10 <= h <= 20 and s >= 130 and v >= 100:
         anchor_color = "orange"
     # 🔥 green 앵커: H=75-82 중채도(85-95) 어두운 것은 green (V 110-145, 매우 정밀)
     elif 75 <= h <= 82 and 85 <= s <= 95 and 110 <= v <= 145:
